@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation'
 import {
     AppBar,
     Avatar,
-    Box,
+    Box, Button,
     createTheme, CssBaseline,
     Drawer,
     IconButton,
@@ -33,6 +33,7 @@ import {
     HomeOutlined, LinkOutlined, ManageAccountsOutlined, SvgIconComponent
 } from "@mui/icons-material";
 import {AppRouterCacheProvider} from "@mui/material-nextjs/v13-appRouter";
+import {useSessionStorage} from "usehooks-ts";
 
 // 指定一些主题颜色
 const gdtTheme = createTheme({
@@ -89,6 +90,13 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
     // 显式指定跳转路径
     const router = useRouter()
 
+    // sessionStorage, 浏览器原生特性, 能储存一些全局变量
+    // 这里的三个值会在登录期间被赋值
+    // usehooks-ts 提供的特性, 能在 Next 中安全地使用 sessionStorage (否则编译会报错, 虽然不影响正常使用)
+    const [id, setId] = useSessionStorage("id", -1)
+    const [isSiteAdmin, setIsSiteAdmin] = useSessionStorage("isSiteAdmin", false)
+    const [jwt, setJWT] = useSessionStorage("jwt", "")
+
     return (
         <html lang="zh">
         <head><title>projectGDT</title></head>
@@ -104,9 +112,15 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
                 <Toolbar>
                     <Avatar src="/logo.svg" sx={{ width: 40, height: 40 }} variant={"square"}/>
                     <Typography variant={"h6"} sx={{paddingX: 1, flexGrow: 1}}>projectGDT</Typography>
-                    <IconButton size="large" aria-controls="menu-appbar" aria-haspopup={true} color="inherit">
-                        <AccountCircleOutlined />
-                    </IconButton>
+                    {
+                        id == -1 ?
+                            // if not logged in
+                            <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => router.push("/login")}>{dict.login.title}</Button> :
+                            // if logged in
+                            <IconButton size="large" aria-controls="menu-appbar" aria-haspopup={true} color="inherit">
+                                <AccountCircleOutlined />
+                            </IconButton>
+                    }
                 </Toolbar>
             </AppBar></Box>
 
