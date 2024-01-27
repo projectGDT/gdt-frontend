@@ -15,7 +15,7 @@ import {useSessionStorage} from "usehooks-ts";
 import {dict} from "@/i18n/zh-cn"
 
 // @/templates 定义了一些常量和模板
-import {backendAddress, POST} from "@/templates";
+import {backendAddress, POST} from "@/utils";
 import Script from "next/script";
 
 // 定义一种错误, 和网络错误区分开, 后面会有用
