@@ -19,15 +19,8 @@ import {dict} from "@/i18n/zh-cn"
 import {backendAddress, GET, POST} from "@/utils";
 import Script from "next/script";
 
-import InputBox from "@/app/register/inputbox";
-import { validateQQ, validateUsername } from "@/app/register/validate";
-
-// 定义一种错误, 和网络错误区分开, 后面会有用
-export class IncorrectCredentialsError extends Error {
-    constructor(props?: string | undefined) {
-        super(props || undefined);
-    }
-}
+import InputBox from "@/app/lib/inputbox";
+import { validatePassword, validateQid, validateUsername } from "@/app/register/validate";
 
 // 注册页面
 export default function Page() {
@@ -41,6 +34,8 @@ export default function Page() {
     const [id, setId] = useSessionStorage("id", -1)
     const [isSiteAdmin, setIsSiteAdmin] = useSessionStorage("isSiteAdmin", false)
     const [jwt, setJWT] = useSessionStorage("jwt", "")
+
+    const [password, setPassword] = useState('');  // 用于和确认密码进行比较
 
     return (
         <Box sx={{display: "flex", flexDirection: "column", alignItems: "center"}}>
@@ -66,23 +61,25 @@ export default function Page() {
                 <Stack spacing={2} sx={{alignItems: "center"}}>
                     <Typography variant={"h5"}>{dict.register.title}</Typography>
                     <InputBox
-                        name={"qq"}
-                        label={dict.register.qq}
-                        validator={validateQQ}
-                        helperTextList={dict.register.qqRequirement}
+                        name={"qid"}
+                        label={dict.register.qid}
+                        validator={validateQid}
                     />
                     <InputBox
                         name={"username"}
                         label={dict.register.username}
-                        validator={validateUsername}
-                        helperTextList={dict.register.usernameRequirement}
+                        // validator={validateUsername}
                     />
-                    <TextField name={"password"}
-                        label={dict.register.password} type={"password"} variant={"outlined"} sx={{width: "35vh"}}/>
-                    <TextField name={"confirmPassword"}
-                        label={dict.register.confirmPassword} type={"password"} variant={"outlined"} sx={{width: "35vh"}}/>
-                    <TextField name={"inviteCode"}
-                        label={dict.register.inviteCode} variant={"outlined"} sx={{width: "35vh"}}/>
+                    <InputBox
+                        name={"password"}
+                        label={dict.register.password}
+                        isPassword={true}
+                        // validator={validatePassword}
+                    />
+                    <InputBox
+                        name={"inviteCode"}
+                        label={dict.register.inviteCode}
+                    />
                     <div className="cf-turnstile" data-sitekey="0x4AAAAAAAQCzJ-tEMh00a-r" data-theme="light"></div>
                     {/* 这个元素会向 FormData 中注入一个名为 cf-turnstile-response 的属性 */}
 
@@ -103,7 +100,7 @@ export default function Page() {
                                     // 后端返回了内容, 但状态码不是 2xx / 3xx, 显示 "IncorrectCredentials" Alert
                                     setIncorrectCredentialsOpen(true)
                                     // 及时中止响应, 抛出的错误被最后的 catch 捕获
-                                    throw new IncorrectCredentialsError()
+                                    // throw new IncorrectCredentialsError()
                                 }
                             })
                             .then(({id, isSiteAdmin, jwt}) => {
@@ -119,7 +116,7 @@ export default function Page() {
                                 //     那么这个错误是有关凭据的, 上面已经显示了相关 Alert
                                 //     这里的 "NetworkError" Alert 就不再显示了
                                 //     否则, 错误就是由网络故障引起的
-                                if (!(error instanceof IncorrectCredentialsError)) setNetworkErrorOpen(true)
+                                // if (!(error instanceof IncorrectCredentialsError)) setNetworkErrorOpen(true)
                             })
                     }}>{dict.register.submit}</Button>
                 </Stack>

@@ -20,20 +20,22 @@ export const dict = {
     register: {
         title: "注册",
 
-        qq: "QQ号",
-        qqRequirement: ["", "请输入有效QQ号", "此QQ号已经被注册"],
+        qid: "QQ号",
+        qidError: {
+            invalidQid: "请输入有效QQ号",
+            alreadyExists: "此QQ号已经被注册",
+        },
         username: "用户名",
-        usernameRequirement: ["", "用户名必须以字母开头，长度为3~16字符", "该用户名已被注册"],
+        usernameError: ["用户名必须以字母开头，长度为3~16字符", "该用户名已被注册"],
         password: "密码",
-        passwordRequirement: "密码至少为8位，包含字母和数字",
-        confirmPassword: "确认密码",
-        confirmPasswordRequirement: "两次输入密码不一致",
+        passwordError: ["密码至少为8位，包含字母和数字"],
+        // confirmPassword: "确认密码",
+        // confirmPasswordRequirement: ["两次输入密码不一致"],
         inviteCode: "邀请码（可选）",
         submit: "注册",
 
         fail: {
             title: "注册失败",
-
             networkError: "请检查网络连接是否正常。",
         }
     },

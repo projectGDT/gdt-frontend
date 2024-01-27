@@ -1,12 +1,31 @@
+import { backendAddress, GET, POST } from "@/utils"
+import { dict } from "@/i18n/zh-cn";
+
 // 检查QQ号是否合法/是否已注册
-export const validateQQ = (qq: string): number => {
-    // 检查是否是合法QQ号
-    const regex = /^[0-9]{4,12}$/;
-    if (!regex.test(qq)) {
-        return 1;
-    }
-    // TODO: 检查QQ号是否被注册过
-    return 0;
+export const validateQid = (qid: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        // 检查是否是合法QQ号
+        const regex = /^[0-9]{4,12}$/;
+        if (!regex.test(qid)) {
+            throw new Error(dict.register.qidError.invalidQid);
+        }
+        // 检查QQ号是否被注册过
+        fetch(`${backendAddress}/register/check-qid/${qid}`, GET(false))
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error(dict.register.qidError.invalidQid);
+            })
+            .then((json: any) => {
+                console.log(json);
+                if (json["exists"]) {
+                    throw Error(dict.register.qidError.alreadyExists);
+                }
+                resolve();
+            })
+            .catch(e => reject(e)); // 所有错误交给InputBox处理
+    });
 }
 
 // 检查用户名是否合法/是否已注册
