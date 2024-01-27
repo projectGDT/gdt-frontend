@@ -16,7 +16,7 @@ import {useSessionStorage} from "usehooks-ts";
 import {dict} from "@/i18n/zh-cn"
 
 // @/templates 定义了一些常量和模板
-import {backendAddress, GET, POST} from "@/templates";
+import {backendAddress, GET, POST} from "@/utils";
 import Script from "next/script";
 
 import InputBox from "@/app/register/inputbox";
