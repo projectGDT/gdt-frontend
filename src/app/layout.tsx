@@ -92,6 +92,7 @@ function Account(props: {id: Number, router: AppRouterInstance}) {
         // if not logged in
         return (
             <>
+                {/* TODO */}
                 <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => props.router.push("/login")}>{dict.login.title}</Button>
                 <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => props.router.push("/register")}>{dict.register.title}</Button>
             </>

@@ -26,9 +26,12 @@ export const dict = {
             alreadyExists: "此QQ号已经被注册",
         },
         username: "用户名",
-        usernameError: ["用户名必须以字母开头，长度为3~16字符", "该用户名已被注册"],
+        usernameError: {
+            invalidUsername: "用户名必须以字母开头，长度为3~16字符",
+            alreadyExists: "该用户名已被注册",
+        },
         password: "密码",
-        passwordError: ["密码至少为8位，包含字母和数字"],
+        passwordError: "密码为8~20位，包含字母和数字",
         // confirmPassword: "确认密码",
         // confirmPasswordRequirement: ["两次输入密码不一致"],
         inviteCode: "邀请码（可选）",
@@ -37,6 +40,7 @@ export const dict = {
         fail: {
             title: "注册失败",
             networkError: "请检查网络连接是否正常。",
+            invalidInfoError: "请检查注册信息是否符合要求。",
         }
     },
     list: {
