@@ -91,14 +91,13 @@ function Account(props: {id: Number, router: AppRouterInstance}) {
     if (props.id === -1) {
         // if not logged in
         return (
-            <>
-                {/* TODO */}
-                <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => props.router.push("/login")}>{dict.login.title}</Button>
-                <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => props.router.push("/register")}>{dict.register.title}</Button>
-            </>
+            <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => props.router.push("/login")}>
+                {dict.login.title + ' / ' + dict.register.title}
+            </Button>
         )
     }
     // if logged in
+    // TODO
     return (
         <IconButton size="large" aria-controls="menu-appbar" aria-haspopup={true} color="inherit">
             <AccountCircleOutlined />

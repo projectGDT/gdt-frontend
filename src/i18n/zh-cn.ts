@@ -18,6 +18,8 @@ export const dict = {
         success: "登录成功"
     },
     register: {
+        linkFromLoginPage: "注册",
+
         title: "注册",
 
         qid: "QQ号",
@@ -27,7 +29,7 @@ export const dict = {
         },
         username: "用户名",
         usernameError: {
-            invalidUsername: "用户名必须以字母开头，长度为3~16字符",
+            invalidUsername: "必须以字母开头，3~16字符",
             alreadyExists: "该用户名已被注册",
         },
         password: "密码",

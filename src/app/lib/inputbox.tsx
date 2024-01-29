@@ -8,6 +8,7 @@ const defaultValidator = (): Promise<void> => {
 interface InputBoxProps {
     name: string;
     label: string;
+    sx?: object;
     setValidity?: (status: boolean) => void; // 用于向父组件传递输入的正确性
     isPassword?: boolean;
     validator?: (input: string) => Promise<void>;
@@ -17,7 +18,8 @@ interface InputBoxProps {
 // resolve表示无错误，返回error message将设置为提示内容helperText
 const InputBox: React.FC<InputBoxProps> = (props: InputBoxProps) => {
     const {
-        name, label, setValidity = (b => {}), isPassword = false,
+        name, label, sx = {width: "35vh"},
+        setValidity = (b => {}), isPassword = false,
         validator = defaultValidator
     } = props;
 
@@ -58,7 +60,7 @@ const InputBox: React.FC<InputBoxProps> = (props: InputBoxProps) => {
             helperText={helperText}
             onBlur={() => handleBlur(content)}
             onChange={(e) => setContent(e.target.value)}
-            sx={{width: "35vh"}}
+            sx={sx}
         />
     );
 }
