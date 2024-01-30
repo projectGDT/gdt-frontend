@@ -16,7 +16,8 @@ import {dict} from "@/i18n/zh-cn"
 
 // @/utils 定义了一些常量和模板
 import {backendAddress, GET, POST} from "@/utils";
-import Script from "next/script";
+import TurnstileInput from "turnstile-next/dist/esm/Input";
+import {refreshTurnstile} from "turnstile-next/utils";
 
 import InputBox from "@/components/inputbox";
 import { validatePassword, validateQid, validateUsername } from "@/app/register/validate";
@@ -41,11 +42,11 @@ export default function Page() {
     const [usernameValidity, setUsernameValidity] = useState(false);
     const [passwordValidity, setPasswordValidity] = useState(false);
 
+    // 刷新Cloudflare验证码防止加载不出来
+    useEffect(() => {refreshTurnstile();});
+
     return (
         <Box sx={{display: "flex", flexDirection: "column", alignItems: "start"}}>
-            {/* 引入 Cloudflare Turnstile */}
-            <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer/>
-
             <Box sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -90,8 +91,8 @@ export default function Page() {
                         name={"inviteCode"}
                         label={dict.register.inviteCode}
                     />
-                    <div className="cf-turnstile" data-sitekey="0x4AAAAAAAQCzJ-tEMh00a-r" data-theme="light"></div>
-                    {/* 这个元素会向 FormData 中注入一个名为 cf-turnstile-response 的属性 */}
+                    {/* cf验证码 */}
+                    <TurnstileInput siteKey="0x4AAAAAAAQCzJ-tEMh00a-r" theme="light"></TurnstileInput>
 
                     <Button
                         variant={"contained"} size={"large"}
