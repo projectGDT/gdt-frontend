@@ -18,7 +18,7 @@ import {dict} from "@/i18n/zh-cn"
 import {backendAddress, GET, POST} from "@/utils";
 import Script from "next/script";
 
-import InputBox from "@/app/lib/inputbox";
+import InputBox from "@/components/inputbox";
 import { validatePassword, validateQid, validateUsername } from "@/app/register/validate";
 
 // 定义一种错误, 和网络错误区分开, 后面会有用
