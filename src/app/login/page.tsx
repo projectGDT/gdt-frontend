@@ -47,7 +47,7 @@ export default function Page() {
 
     return (
         <Box sx={{display: "flex", flexDirection: "column", alignItems: "start"}}>
-            <Box sx={{
+            <Box ml={20} sx={{
                 display: "flex",
                 flexDirection: "column",
                 height: "25vh" // 用于指定相对尺寸, vh 是一个单位, 等于窗口高度或宽度除以 100
