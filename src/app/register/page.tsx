@@ -16,11 +16,11 @@ import {dict} from "@/i18n/zh-cn"
 
 // @/utils 定义了一些常量和模板
 import {backendAddress, GET, POST} from "@/utils";
-import TurnstileInput from "turnstile-next/dist/esm/Input";
-import {refreshTurnstile} from "turnstile-next/utils";
-
 import InputBox from "@/components/inputbox";
+
 import { validatePassword, validateQid, validateUsername } from "@/app/register/validate";
+
+import { Turnstile } from "@marsidev/react-turnstile";
 
 // 定义一种错误, 和网络错误区分开, 后面会有用
 class InvalidInfoError extends Error {
@@ -42,9 +42,6 @@ export default function Page() {
     const [usernameValidity, setUsernameValidity] = useState(false);
     const [passwordValidity, setPasswordValidity] = useState(false);
 
-    // 刷新Cloudflare验证码防止加载不出来
-    useEffect(() => {refreshTurnstile();});
-
     return (
         <Box sx={{display: "flex", flexDirection: "column", alignItems: "start"}}>
             <Box ml={20} sx={{
@@ -52,6 +49,7 @@ export default function Page() {
                 flexDirection: "column",
                 height: "20vh" // 用于指定相对尺寸, vh 是一个单位, 等于窗口高度或宽度除以 100
             }}>
+                {/* // TODO: 换成snackbar */}
                 <Collapse in={networkErrorOpen}>
                     <Alert severity="error">{dict.register.fail.networkError}</Alert>
                 </Collapse>
@@ -92,7 +90,7 @@ export default function Page() {
                         label={dict.register.inviteCode}
                     />
                     {/* cf验证码 */}
-                    <TurnstileInput siteKey="0x4AAAAAAAQCzJ-tEMh00a-r" theme="light"></TurnstileInput>
+                    <Turnstile siteKey="0x4AAAAAAAQCzJ-tEMh00a-r" options={{theme: 'light'}} />
 
                     <Button
                         variant={"contained"} size={"large"}

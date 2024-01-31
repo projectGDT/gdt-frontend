@@ -14,8 +14,7 @@ import Link from "next/link";
 import {useSessionStorage} from "usehooks-ts";
 
 // cf验证码的轮子
-import TurnstileInput from "turnstile-next/dist/esm/Input";
-import { refreshTurnstile } from "turnstile-next/utils";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 import {dict} from "@/i18n/zh-cn"
 
@@ -41,9 +40,6 @@ export default function Page() {
     const [id, setId] = useSessionStorage("id", -1)
     const [isSiteAdmin, setIsSiteAdmin] = useSessionStorage("isSiteAdmin", false)
     const [jwt, setJWT] = useSessionStorage("jwt", "")
-
-    // 刷新Cloudflare验证码防止加载不出来
-    useEffect(() => {refreshTurnstile();});
 
     return (
         <Box sx={{display: "flex", flexDirection: "column", alignItems: "start"}}>
@@ -79,7 +75,7 @@ export default function Page() {
                         sx={{width: "35vh"}}
                     />
                     {/* cf验证码 */}
-                    <TurnstileInput siteKey="0x4AAAAAAAQCzJ-tEMh00a-r" theme="light"></TurnstileInput>
+                    <Turnstile siteKey="0x4AAAAAAAQCzJ-tEMh00a-r" options={{theme: 'light'}} />
 
                     <div>
                         <Button sx={{mr: 2}} variant={"contained"} size={"large"} onClick={() => {

@@ -122,8 +122,6 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
         <html lang="zh">
         <head><title>projectGDT</title></head>
         <body>
-        {/* 加载Cloudflare验证脚本，登陆注册页面就不再加载了 */}
-        <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer/>
         {/* 这种 Provider 是很常见的, 可以把一些参数 / 属性往下层层传递 */}
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
         <ThemeProvider theme={gdtTheme}><Box sx={{ display: 'flex' }}>
