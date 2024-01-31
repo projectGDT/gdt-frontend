@@ -3,7 +3,7 @@
 import {
     Alert,
     Box,
-    Button, Collapse,
+    Button, Collapse, Snackbar,
     Stack,
     TextField,
     Typography
@@ -43,19 +43,28 @@ export default function Page() {
             {/* 引入 Cloudflare Turnstile */}
             <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer/>
 
+            <Snackbar
+                open={incorrectCredentialsOpen}
+                autoHideDuration={5000}
+                onClose={() => {setIncorrectCredentialsOpen(false)}}
+                key={"ic"}
+            >
+                <Alert severity={"error"} variant={"filled"}>{dict.login.fail.incorrectCredentials}</Alert>
+            </Snackbar>
+            <Snackbar
+                open={networkErrorOpen}
+                autoHideDuration={5000}
+                onClose={() => {setNetworkErrorOpen(false)}}
+                key={"ne"}
+            >
+                <Alert severity={"error"} variant={"filled"}>{dict.login.fail.networkError}</Alert>
+            </Snackbar>
+
             <Box sx={{
                 display: "flex",
                 flexDirection: "column",
-                height: "25vh" // 用于指定相对尺寸, vh 是一个单位, 等于窗口高度或宽度除以 100
-            }}>
-                {/* 预存两个 Alert, 包含在 Collapse 中, 默认情况下是折叠的 */}
-                <Collapse in={incorrectCredentialsOpen /* 指定控制 Alert 是否展示的变量 */}>
-                    <Alert severity="error">{dict.login.fail.incorrectCredentials}</Alert>
-                </Collapse>
-                <Collapse in={networkErrorOpen}>
-                    <Alert severity="error">{dict.login.fail.networkError}</Alert>
-                </Collapse>
-            </Box>
+                height: "25vh"
+            }}></Box>
 
             <Box component={"form"} ref={formRef}>
                 {/* 单向纵向排布元素常用 Stack */}
@@ -69,7 +78,7 @@ export default function Page() {
                     {/* 这个元素会向 FormData 中注入一个名为 cf-turnstile-response 的属性 */}
 
                     <Button variant={"contained"} onClick={() => {
-                        // 重置两个 Alert 的状态
+                        // 重置两个 SnackBar 的状态
                         setNetworkErrorOpen(false)
                         setIncorrectCredentialsOpen(false)
 
