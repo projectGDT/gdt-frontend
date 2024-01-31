@@ -26,6 +26,8 @@ import Script from "next/script";
 import { Image } from "@mui/icons-material";
 import { space } from "postcss/lib/list";
 
+import mc, { NewPingResult, OldPingResult } from 'minecraft-protocol';
+
 // 定义一种错误, 和网络错误区分开, 后面会有用
 class IncorrectCredentialsError extends Error {
     constructor(props?: string | undefined) {
@@ -37,22 +39,16 @@ const TESTITEMS = [
     {
         server: {
             id: 1,
-            name: "TimelessMC", 
-            logolink: "http://dummyimage.com/128x128",
-            remote: {
-                address: "mc.example.com",
-                port: 19132,
-                protocol: "BEDROCK",
-            },
-            uniqueIdProvider: [
-                -1,
-                -3,
-            ]
+            name: "TimelessMC",
+            logoLink: "http://dummyimage.com/128x128",
+            javaRemote: {
+                address: "mc4.rhymc.com",
+                port: 10155
+            }
         },
-        isOperator: true,
-    },
+        isOperator: true
+    }
 ]
-
 const TESTFINDS = {
     servers: [
         {
@@ -61,8 +57,8 @@ const TESTFINDS = {
             logoLink: "http://dummyimage.com/128x128",
             coverLink: "http://dummyimage.com/1280x720",
             javaRemote: {
-                address: "string",
-                port: 0
+                address: "mc4.rhymc.com",
+                port: 10155
             },
             bedrockRemote: {
               address: "string",
@@ -76,8 +72,8 @@ const TESTFINDS = {
             logoLink: "http://dummyimage.com/128x128",
             coverLink: "http://dummyimage.com/1280x720",
             javaRemote: {
-                address: "string",
-                port: 0
+                address: "mc4.rhymc.com",
+                port: 10155
             },
             bedrockRemote: {
               address: "string",
@@ -91,8 +87,8 @@ const TESTFINDS = {
             logoLink: "http://dummyimage.com/128x128",
             coverLink: "http://dummyimage.com/1280x720",
             javaRemote: {
-                address: "string",
-                port: 0
+                address: "mc4.rhymc.com",
+                port: 10155
             },
             bedrockRemote: {
               address: "string",
@@ -102,6 +98,13 @@ const TESTFINDS = {
         }
     ],
     hasNextPage: false
+}
+
+class ServerPingInfo {
+    isJavaEdition: boolean = true;
+    online: number = 0;
+    max: number = 0;
+    latency: number = 0;
 }
 
 function ServerName(props: {logolink: string, name: string}) {
@@ -115,7 +118,6 @@ function ServerName(props: {logolink: string, name: string}) {
     )
 }
 
-
 // 这一块的内容会套在 /src/app/layout.jsx 定义的东西里面
 export default function Page() {
     const router = useRouter()
@@ -128,7 +130,37 @@ export default function Page() {
     const [id, setId] = useSessionStorage("id", -1)
     const [isSiteAdmin, setIsSiteAdmin] = useSessionStorage("isSiteAdmin", false)
     const [jwt, setJWT] = useSessionStorage("jwt", "")
+/*
+    let pingInfo: ServerPingInfo[];
+    let cnt: number = 0;
 
+    useEffect(() => {
+        // 先GET加入服务器和 发现服务器列表，然后对加入服务器中的每一个执行一次ping
+        TESTITEMS.forEach(element => {
+            if (element.server.javaRemote !== null) {
+                const pingOption: mc.PingOptions = {
+                    host: element.server.javaRemote.address,
+                    port: element.server.javaRemote.port
+                }
+                mc.ping(pingOption, (err, pingResults) => {
+                    if (err) console.error('ERROR: ${err.message}');
+                    let result = pingResults as NewPingResult;
+                    pingInfo[cnt].isJavaEdition = true;
+                    pingInfo[cnt].online = result.players.online;
+                    pingInfo[cnt].max = result.players.max;
+                    pingInfo[cnt].latency = result.latency;
+                    cnt += 1;
+                });
+            }
+            else {
+                pingInfo[cnt].isJavaEdition = false;
+                cnt += 1;
+            }
+        });
+    }, [])
+
+    let rendercnt: number = -1;
+*/
     return (
         // 一个 Box 放下两栏：“我加入的”和“推荐”
         <Box sx={{display: "flex", flexDirection: "column"}}>
@@ -136,20 +168,28 @@ export default function Page() {
                 <Box sx={{fontSize: 30}}>{dict.list.subtitle[0]}</Box>
                 <Box paddingY={1}>
                     <Grid container spacing={2}>
-                        {TESTITEMS.map(({server, isOperator}) =>
-                            <Grid item xs={3}>
+                        {TESTITEMS.map(({server, isOperator}) =>{
+                            //rendercnt += 1;
+
+                            return (<Grid item xs={3}>
                                 <Paper elevation={3}>
-                                    <ServerName logolink={server.logolink} name={server.name}/>
+                                    <ServerName logolink={server.logoLink} name={server.name}/>
                                     <Divider variant="middle"/>
-                                    <Box sx={{display: "flex", flexDirection: "row", height: "12vh", paddingX: 1, paddingY: 1}}>
-                                        这里是人数和延迟
+                                    <Box sx={{display: "flex", flexDirection: "row", height: "12vh", paddingX: 1.5, paddingY: 1, fontSize: 20, justifyContent: "space-between"}}>
+                                        <div>人数</div>
+                                        <div>延迟</div>
+                                        {/*pingInfo[rendercnt].isJavaEdition && 
+                                            <div>
+                                                <div>{pingInfo[rendercnt].online} / {pingInfo[rendercnt].max}</div>
+                                                <div>{pingInfo[rendercnt].latency}</div>
+                                        </div>*/}
                                     </Box>
                                     <Box sx={{display: "flex", paddingX: 1, paddingY: 1, flexDirection: "row-reverse"}}>
                                         这里放按钮
                                     </Box>
                                 </Paper>
-                            </Grid>
-                        )}
+                            </Grid>)
+                        })}
                     </Grid>
                 </Box>
                 <Divider variant="middle" sx={{paddingY: 1}}/>
