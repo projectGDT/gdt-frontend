@@ -38,7 +38,7 @@ const TESTITEMS = [
         server: {
             id: 1,
             name: "TimelessMC", 
-            logolink: "http://dummyimage.com/336x280",
+            logolink: "http://dummyimage.com/128x128",
             remote: {
                 address: "mc.example.com",
                 port: 19132,
@@ -51,75 +51,70 @@ const TESTITEMS = [
         },
         isOperator: true,
     },
-    {
-        server: {
-            id: 2,
-            name: "TimelessMC", 
-            logolink: "http://dummyimage.com/336x280",
-            remote: {
-                address: "mc.example.com",
-                port: 19132,
-                protocol: "BEDROCK",
-            },
-            uniqueIdProvider: [
-                -1,
-                -3,
-            ]
-        },
-        isOperator: true,
-    },
-    {
-        server: {
-            id: 3,
-            name: "TimelessMC", 
-            logolink: "http://dummyimage.com/336x280",
-            remote: {
-                address: "mc.example.com",
-                port: 19132,
-                protocol: "BEDROCK",
-            },
-            uniqueIdProvider: [
-                -1,
-                -3,
-            ]
-        },
-        isOperator: true,
-    },
-    {
-        server: {
-            id: 4,
-            name: "TimelessMC", 
-            logolink: "http://dummyimage.com/336x280",
-            remote: {
-                address: "mc.example.com",
-                port: 19132,
-                protocol: "BEDROCK",
-            },
-            uniqueIdProvider: [
-                -1,
-                -3,
-            ]
-        },
-        isOperator: true,
-    },
-    {
-        server: {
-            id: 5,
-            name: "TimelessMC", 
-            logolink: "http://dummyimage.com/336x280",
-            remote: {
-                address: "mc.example.com",
-                port: 19132,
-                protocol: "BEDROCK",
-            },
-            uniqueIdProvider: [
-                -1,
-                -3,
-            ]
-        },
-        isOperator: true,
-    }
 ]
+
+const TESTFINDS = {
+    servers: [
+        {
+            id: 0,
+            name: "string",
+            logoLink: "http://dummyimage.com/128x128",
+            coverLink: "http://dummyimage.com/1280x720",
+            javaRemote: {
+                address: "string",
+                port: 0
+            },
+            bedrockRemote: {
+              address: "string",
+              port: 0
+            },
+            applyingPolicy: "CLOSED"
+        },
+        {
+            id: 1,
+            name: "string",
+            logoLink: "http://dummyimage.com/128x128",
+            coverLink: "http://dummyimage.com/1280x720",
+            javaRemote: {
+                address: "string",
+                port: 0
+            },
+            bedrockRemote: {
+              address: "string",
+              port: 0
+            },
+            applyingPolicy: "CLOSED"
+        },
+        {
+            id: 1,
+            name: "string",
+            logoLink: "http://dummyimage.com/128x128",
+            coverLink: "http://dummyimage.com/1280x720",
+            javaRemote: {
+                address: "string",
+                port: 0
+            },
+            bedrockRemote: {
+              address: "string",
+              port: 0
+            },
+            applyingPolicy: "CLOSED"
+        }
+    ],
+    hasNextPage: false
+}
+
+function ServerName(props: {logolink: string, name: string}) {
+    return (
+        <Box sx={{paddingX: 1.5, paddingY: 1}}>
+            <Box sx={{display: "flex", height: "auto"}}>
+                <img src={props.logolink} style={{width: 64, height: 64}}/>
+                <Box sx={{display: "flex", alignItems: "center", paddingX: 1, fontSize: 23}}>{props.name}</Box>
+            </Box>
+        </Box>
+    )
+}
+
 
 // 这一块的内容会套在 /src/app/layout.jsx 定义的东西里面
 export default function Page() {
@@ -144,12 +139,7 @@ export default function Page() {
                         {TESTITEMS.map(({server, isOperator}) =>
                             <Grid item xs={3}>
                                 <Paper elevation={3}>
-                                    <Box sx={{display: "flex", flexDirection: "row", height: "10vh", paddingX: 1.5, paddingY: 1}}>
-                                        <Box sx={{display: "flex", height: "8vh"}}>
-                                            <img src={server.logolink}/>
-                                            <Box sx={{display: "flex", alignItems: "center", paddingX: 1, fontSize: 23}}>{server.name}</Box>
-                                        </Box>
-                                    </Box>
+                                    <ServerName logolink={server.logolink} name={server.name}/>
                                     <Divider variant="middle"/>
                                     <Box sx={{display: "flex", flexDirection: "row", height: "12vh", paddingX: 1, paddingY: 1}}>
                                         这里是人数和延迟
@@ -165,19 +155,14 @@ export default function Page() {
                 <Divider variant="middle" sx={{paddingY: 1}}/>
                 <Box sx={{fontSize: 30, paddingY: 1}}>{dict.list.subtitle[1]}</Box>
                 <Box paddingY={1}>
-                    <Grid container spacing={1}>
-                        {TESTITEMS.map(({server, isOperator}) =>
-                            <Grid item xs={6}>
+                    <Grid container spacing={2}>
+                        {TESTFINDS.servers.map(({name, logoLink, coverLink}) =>
+                            <Grid item xs={4}>
                                 <Paper elevation={3}>
-                                    <Box sx={{display: "flex", flexDirection: "row", height: "10vh", paddingX: 1.5, paddingY: 1}}>
-                                        <Box sx={{display: "flex", height: "8vh"}}>
-                                            <img src={server.logolink}/>
-                                            <Box sx={{display: "flex", alignItems: "center", paddingX: 1, fontSize: 23}}>{server.name}</Box>
-                                        </Box>
-                                    </Box>
+                                    <ServerName logolink={logoLink} name={name}/>
                                     <Divider variant="middle"/>
-                                    <Box sx={{display: "flex", flexDirection: "row", height: "15vh", paddingX: 1, paddingY: 1}}>
-                                        这里是cover
+                                    <Box sx={{display: "flex", flexDirection: "row", paddingX: 1, paddingY: 1}}>
+                                        <img src={coverLink} style={{width: "100%"}}/>
                                     </Box>
                                 </Paper>
                             </Grid>
