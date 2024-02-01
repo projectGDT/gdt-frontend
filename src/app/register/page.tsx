@@ -3,7 +3,8 @@
 import {
     Alert,
     Box,
-    Button, Collapse,
+    Button,
+    Snackbar,
     Stack,
     TextField,
     Typography
@@ -34,8 +35,21 @@ export default function Page() {
     const router = useRouter();
     const formRef = useRef();
 
+    // 两个警告snackbar的显示状态
     const [networkErrorOpen, setNetworkErrorOpen] = useState(false);
     const [invalidInfoErrorOpen, setInvalidInfoErrorOpen] = useState(false);
+    const handleNetworkErrorClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setNetworkErrorOpen(false);
+    }
+    const handleInvalidInfoErrorClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setInvalidInfoErrorOpen(false);
+    }
 
     // QQ号用户名密码的合法性，同时为true注册按钮才可用
     const [qidValidity, setQidValidity] = useState(false);
@@ -48,15 +62,14 @@ export default function Page() {
                 display: "flex",
                 flexDirection: "column",
                 height: "20vh" // 用于指定相对尺寸, vh 是一个单位, 等于窗口高度或宽度除以 100
-            }}>
-                {/* // TODO: 换成snackbar */}
-                <Collapse in={networkErrorOpen}>
-                    <Alert severity="error">{dict.register.fail.networkError}</Alert>
-                </Collapse>
-                <Collapse in={invalidInfoErrorOpen}>
-                    <Alert severity="error">{dict.register.fail.invalidInfoError}</Alert>
-                </Collapse>
-            </Box>
+            }}></Box>
+
+            <Snackbar open={networkErrorOpen} autoHideDuration={3000} onClose={handleNetworkErrorClose}>
+                <Alert severity="error" variant="filled">{dict.register.fail.networkError}</Alert>
+            </Snackbar>
+            <Snackbar open={invalidInfoErrorOpen} autoHideDuration={3000} onClose={handleInvalidInfoErrorClose}>
+                <Alert severity="error" variant="filled">{dict.register.fail.invalidInfoError}</Alert>
+            </Snackbar>
 
             <Box ml={20} component={"form"} ref={formRef}>
                 {/* 单向纵向排布元素常用 Stack */}
