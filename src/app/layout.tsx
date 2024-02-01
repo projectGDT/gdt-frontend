@@ -11,7 +11,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-import React from "react"
+import React, { useState } from "react"
 import { useRouter } from 'next/navigation'
 import {
     AppBar,
@@ -23,6 +23,8 @@ import {
     List, ListItem,
     ListItemButton, ListItemIcon,
     ListItemText,
+    Menu,
+    MenuItem,
     ThemeProvider, Toolbar,
     Typography
 } from '@mui/material'
@@ -30,7 +32,8 @@ import {
     AccountCircleOutlined, DashboardCustomizeOutlined,
     DnsOutlined,
     HandymanOutlined,
-    HomeOutlined, LinkOutlined, ManageAccountsOutlined, SvgIconComponent
+    HomeOutlined, LinkOutlined, ManageAccountsOutlined, SvgIconComponent,
+    Logout
 } from "@mui/icons-material";
 import {AppRouterCacheProvider} from "@mui/material-nextjs/v13-appRouter";
 import {useSessionStorage} from "usehooks-ts";
@@ -89,20 +92,59 @@ const NAVIGATORS = [
 
 // AppBar 右上角账户组件，未登录显示登录/注册，登录显示头像
 function Account(props: {id: Number, router: AppRouterInstance}) {
-    if (props.id === -1) {
+    const {id, router} = props;
+    if (id === -1) {
         // if not logged in
         return (
-            <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => props.router.push("/login")}>
+            <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => router.push("/login")}>
                 {dict.login.title + ' / ' + dict.register.title}
             </Button>
         )
     }
     // if logged in
-    // TODO
+    // 账户头像处菜单
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    }
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    // 注销
+    const handleLogoutClick = () => {
+        // 清空sessionStorage中账号数据，返回首页
+        window.sessionStorage.clear();
+        setAnchorEl(null);
+        router.push("/");
+        window.location.reload();
+    };
+
     return (
-        <IconButton size="large" aria-controls="menu-appbar" aria-haspopup={true} color="inherit">
-            <AccountCircleOutlined />
-        </IconButton>
+        <div>
+            <IconButton
+                size="large"
+                aria-controls="menu-appbar"
+                aria-haspopup={true}
+                color="inherit"
+                onClick={handleClick}
+            ><AccountCircleOutlined /></IconButton>
+            <Menu
+                anchorEl={anchorEl}
+                id="account-menu"
+                open={open}
+                onClose={handleClose}
+                onClick={handleClose}
+            >
+                <MenuItem onClick={handleLogoutClick}>
+                    <ListItemIcon>
+                        <Logout fontSize="small" />
+                    </ListItemIcon>
+                    {dict.logout.title}
+                </MenuItem>
+            </Menu>
+        </div>
     )
 }
 
