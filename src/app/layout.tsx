@@ -11,7 +11,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-import React from "react"
+import React, {useEffect, useState} from "react"
 import { useRouter } from 'next/navigation'
 import {
     AppBar,
@@ -86,25 +86,6 @@ const NAVIGATORS = [
     }
 ]
 
-// AppBar 右上角账户组件，未登录显示登录/注册，登录显示头像
-function Account(props: {id: Number, router: AppRouterInstance}) {
-    if (props.id === -1) {
-        // if not logged in
-        return (
-            <>
-                <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => props.router.push("/login")}>{dict.login.title}</Button>
-                <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => props.router.push("/register")}>{dict.register.title}</Button>
-            </>
-        )
-    }
-    // if logged in
-    return (
-        <IconButton size="large" aria-controls="menu-appbar" aria-haspopup={true} color="inherit">
-            <AccountCircleOutlined />
-        </IconButton>
-    )
-}
-
 // RootLayout, 所有 UI 的根本框架 (布局), 具体的用户界面在 children 参数中传递, 嵌套在根本框架中
 export default function RootLayout({children}: { children: React.ReactNode }) {
     // 显式指定跳转路径
@@ -116,6 +97,17 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
     const [id, setId] = useSessionStorage("id", -1)
     const [isSiteAdmin, setIsSiteAdmin] = useSessionStorage("isSiteAdmin", false)
     const [jwt, setJWT] = useSessionStorage("jwt", "")
+    
+    const [accountWidget, setAccountWidget] = useState(<></>)
+    
+    useEffect(() => {
+        setAccountWidget(id === -1 ? <>
+            <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => router.push("/login")}>{dict.login.title}</Button>
+            <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => router.push("/register")}>{dict.register.title}</Button>
+        </> : <IconButton size="large" aria-controls="menu-appbar" aria-haspopup={true} color="inherit">
+            <AccountCircleOutlined />
+        </IconButton>)
+    }, [id])
 
     return (
         <html lang="zh">
@@ -132,7 +124,7 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
                 <Toolbar>
                     <Avatar src="/logo.svg" sx={{ width: 40, height: 40 }} variant={"square"}/>
                     <Typography variant={"h6"} sx={{paddingX: 1, flexGrow: 1}}>projectGDT</Typography>
-                    <Account id={id} router={router} />
+                    {accountWidget}
                 </Toolbar>
             </AppBar></Box>
 
