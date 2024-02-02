@@ -1,3 +1,5 @@
+import {Link} from "@mui/material";
+
 export const dict = {
     portal: {
         title: "门户页面",
@@ -48,6 +50,33 @@ export const dict = {
     },
     settings: {
         title: "个人设置",
+
+        profile: {
+            bind: {
+                javaMicrosoft: {
+                    title: "Java 版微软（正版）Profile 绑定",
+
+                    submit: "开始绑定",
+
+                    step1: {
+                        title: "Step 1 - 设备码认证",
+                        content: (link: string) => <>请打开链接 <Link href={link}>{link}</Link> 并完成后续操作。</>
+                    },
+
+                    complete: {
+                        title: "...没有 Step 2！已经完成啦！",
+                        content: (uuid: string, playerName: string) => <>
+                            你的 UUID 是 <b>{uuid}</b> <br/>
+                            你的玩家名是 <b>{playerName}</b>
+                        </>
+                    },
+
+                    fail: {
+                        internalError: "服务器出现了内部错误。请检查你的微软账号是否拥有 Minecraft。"
+                    }
+                }
+            }
+        }
     },
     tools: {
         title: "实用工具",

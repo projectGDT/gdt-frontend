@@ -16,6 +16,7 @@
     "@mui/icons-material": "^5.15.4",
     "@mui/material": "^5.15.4",
     "@mui/material-nextjs": "^5.15.3",
+    "event-source-polyfill": "^1.0.31",
     "next": "14.0.4",
     "react": "^18",
     "react-dom": "^18.2.0",
@@ -23,6 +24,7 @@
     "usehooks-ts": "^2.9.5"
   },
   "devDependencies": {
+    "@types/event-source-polyfill": "^1.0.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
