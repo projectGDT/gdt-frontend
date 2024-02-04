@@ -156,6 +156,14 @@ export default function Page() {
     const [id, setId] = useSessionStorage("id", -1)
     const [isSiteAdmin, setIsSiteAdmin] = useSessionStorage("isSiteAdmin", false)
     const [jwt, setJWT] = useSessionStorage("jwt", "")
+
+    const [joinedServers, setJoinedServers] = useSessionStorage("joinedServers", [-1]);
+    
+    // 这边加一个 useEffects 获得已加入的服务器列表，然后存进 joinedServers
+    useEffect(() => {
+        setJoinedServers(TESTITEMS.map(({server}) => {return server.id}))
+    }, []);
+
 /*
     let pingInfo: ServerPingInfo[];
     let cnt: number = 0;

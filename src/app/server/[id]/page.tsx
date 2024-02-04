@@ -25,7 +25,7 @@ class IncorrectCredentialsError extends Error {
 }
 
 // 这一块的内容会套在 /src/app/layout.jsx 定义的东西里面
-export default function Page({ params }:{ params: { id: number } }) {
+export default function Page({ params }:{ params: { id: string } }) {
     const router = useRouter()
     const formRef = useRef()
 
@@ -37,7 +37,11 @@ export default function Page({ params }:{ params: { id: number } }) {
     const [isSiteAdmin, setIsSiteAdmin] = useSessionStorage("isSiteAdmin", false)
     const [jwt, setJWT] = useSessionStorage("jwt", "")
 
+    const [joinedServers, setJoinedServers] = useSessionStorage("joinedServers", [-1]);
+
     return (
-        <p>{params.id}</p>
+        <>
+            {joinedServers.includes(parseInt(params.id)) ? <p>加入了</p> : <p>没加入</p>}
+        </>
     )
 }
