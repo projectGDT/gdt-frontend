@@ -40,6 +40,7 @@ export const dict = {
     list: {
         title: "服务器列表",
         subtitle: ["我加入的", "发现"],
+        cardButtons: ["设置", "管理"],
     },
     manage: {
         title: "服务器管理"

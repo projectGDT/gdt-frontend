@@ -7,6 +7,7 @@ import {
     Container,
     Divider,
     Grid,
+    Link,
     List,
     ListItem,
     Paper,
@@ -21,12 +22,12 @@ import {useSessionStorage} from "usehooks-ts";
 import {dict} from "@/i18n/zh-cn"
 
 // @/templates 定义了一些常量和模板
-import {backendAddress, POST} from "@/templates";
 import Script from "next/script";
 import { Image } from "@mui/icons-material";
 import { space } from "postcss/lib/list";
 
 import mc, { NewPingResult, OldPingResult } from 'minecraft-protocol';
+import { Router, useSearchParams } from "react-router-dom";
 
 // 定义一种错误, 和网络错误区分开, 后面会有用
 class IncorrectCredentialsError extends Error {
@@ -47,12 +48,24 @@ const TESTITEMS = [
             }
         },
         isOperator: true
+    },
+    {
+        server: {
+            id: 2,
+            name: "TimelessMC",
+            logoLink: "http://dummyimage.com/128x128",
+            javaRemote: {
+                address: "mc4.rhymc.com",
+                port: 10155
+            }
+        },
+        isOperator: false
     }
 ]
 const TESTFINDS = {
     servers: [
         {
-            id: 0,
+            id: 3,
             name: "string",
             logoLink: "http://dummyimage.com/128x128",
             coverLink: "http://dummyimage.com/1280x720",
@@ -67,7 +80,7 @@ const TESTFINDS = {
             applyingPolicy: "CLOSED"
         },
         {
-            id: 1,
+            id: 4,
             name: "string",
             logoLink: "http://dummyimage.com/128x128",
             coverLink: "http://dummyimage.com/1280x720",
@@ -82,7 +95,7 @@ const TESTFINDS = {
             applyingPolicy: "CLOSED"
         },
         {
-            id: 1,
+            id: 5,
             name: "string",
             logoLink: "http://dummyimage.com/128x128",
             coverLink: "http://dummyimage.com/1280x720",
@@ -107,14 +120,27 @@ class ServerPingInfo {
     latency: number = 0;
 }
 
-function ServerName(props: {logolink: string, name: string}) {
+// 每个卡片上的服务器图标和名称
+function ServerName(props: {logolink: string, name: string, id: number}) {
     return (
         <Box sx={{paddingX: 1.5, paddingY: 1}}>
             <Box sx={{display: "flex", height: "auto"}}>
                 <img src={props.logolink} style={{width: 64, height: 64}}/>
-                <Box sx={{display: "flex", alignItems: "center", paddingX: 1, fontSize: 23}}>{props.name}</Box>
+                {/*<Box sx={{display: "flex", alignItems: "center", paddingX: 1, fontSize: 23}}>{props.name}</Box>*/}
+                <Link href={`/server/${props.id}`} color="inherit" underline="none" sx={{display: "flex", alignItems: "center", paddingX: 1, fontSize: 23}}>{props.name}</Link>
             </Box>
         </Box>
+    )
+}
+
+// 每个卡片下面的按钮
+function CardButtons(props: {id: number, isOp: boolean}) {
+    const router = useRouter()
+    return (
+        <Stack direction="row-reverse" paddingX={1.5} paddingY={1}>
+            <Button variant="text" size="small">{dict.list.cardButtons[0]}</Button>
+            {props.isOp && <Button variant="text" size="small" onClick={() => router.replace(`/server/${props.id}/manage`)}>{dict.list.cardButtons[1]}</Button>}
+        </Stack>
     )
 }
 
@@ -171,22 +197,20 @@ export default function Page() {
                         {TESTITEMS.map(({server, isOperator}) =>{
                             //rendercnt += 1;
 
-                            return (<Grid item xs={3}>
+                            return (<Grid item xs={3} key={server.id}>
                                 <Paper elevation={3}>
-                                    <ServerName logolink={server.logoLink} name={server.name}/>
+                                    <ServerName logolink={server.logoLink} name={server.name} id={server.id}/>
                                     <Divider variant="middle"/>
-                                    <Box sx={{display: "flex", flexDirection: "row", height: "12vh", paddingX: 1.5, paddingY: 1, fontSize: 20, justifyContent: "space-between"}}>
-                                        <div>人数</div>
-                                        <div>延迟</div>
+                                    <Box sx={{display: "flex", flexDirection: "row", height: "8vh", paddingX: 2, paddingY: 1, fontSize: 20, justifyContent: "space-between"}}>
+                                        <div>0/20</div>
+                                        <div>50ms</div>
                                         {/*pingInfo[rendercnt].isJavaEdition && 
                                             <div>
                                                 <div>{pingInfo[rendercnt].online} / {pingInfo[rendercnt].max}</div>
                                                 <div>{pingInfo[rendercnt].latency}</div>
                                         </div>*/}
                                     </Box>
-                                    <Box sx={{display: "flex", paddingX: 1, paddingY: 1, flexDirection: "row-reverse"}}>
-                                        这里放按钮
-                                    </Box>
+                                    <CardButtons id={server.id} isOp={isOperator}/>
                                 </Paper>
                             </Grid>)
                         })}
@@ -196,10 +220,10 @@ export default function Page() {
                 <Box sx={{fontSize: 30, paddingY: 1}}>{dict.list.subtitle[1]}</Box>
                 <Box paddingY={1}>
                     <Grid container spacing={2}>
-                        {TESTFINDS.servers.map(({name, logoLink, coverLink}) =>
-                            <Grid item xs={4}>
+                        {TESTFINDS.servers.map(({id, name, logoLink, coverLink}) =>
+                            <Grid item xs={4} key={id}>
                                 <Paper elevation={3}>
-                                    <ServerName logolink={logoLink} name={name}/>
+                                    <ServerName logolink={logoLink} name={name} id={id}/>
                                     <Divider variant="middle"/>
                                     <Box sx={{display: "flex", flexDirection: "row", paddingX: 1, paddingY: 1}}>
                                         <img src={coverLink} style={{width: "100%"}}/>
