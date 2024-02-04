@@ -5,7 +5,7 @@ import { dict } from "@/i18n/zh-cn";
 export const validateQid = (qid: string): Promise<void> => {
     return new Promise((resolve, reject) => {
         // 前端检查是否是合法QQ号
-        const regex = /^[0-9]{4,12}$/;
+        const regex = /^[1-9][0-9]{4,9}$/;
         if (!regex.test(qid)) {
             throw new Error(dict.register.qidError.invalidQid);
         }

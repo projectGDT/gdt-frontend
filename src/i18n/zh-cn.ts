@@ -46,6 +46,8 @@ export const dict = {
             title: "注册失败",
             networkError: "请检查网络连接是否正常。",
             invalidInfoError: "请检查注册信息是否符合要求。",
+            invalidCaptcha: "验证码无效，请刷新后重试",
+            wrongInvitationCode: "邀请码无效"
         }
     },
     list: {

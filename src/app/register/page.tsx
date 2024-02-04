@@ -6,7 +6,6 @@ import {
     Button,
     Snackbar,
     Stack,
-    TextField,
     Typography
 } from "@mui/material";
 
@@ -23,32 +22,19 @@ import { validatePassword, validateQid, validateUsername } from "@/app/register/
 
 import { Turnstile } from "@marsidev/react-turnstile";
 
-// 定义一种错误, 和网络错误区分开, 后面会有用
-class InvalidInfoError extends Error {
-    constructor(props?: string | undefined) {
-        super(props || undefined);
-    }
-}
-
 // 注册页面
 export default function Page() {
     const router = useRouter();
     const formRef = useRef();
 
-    // 两个警告snackbar的显示状态
-    const [networkErrorOpen, setNetworkErrorOpen] = useState(false);
-    const [invalidInfoErrorOpen, setInvalidInfoErrorOpen] = useState(false);
-    const handleNetworkErrorClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    // 警告snackbar
+    const [errMsg, setErrMsg] = useState('');
+    const [errOpen, setErrOpen] = useState(false);
+    const handleErrClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === 'clickaway') {
             return;
         }
-        setNetworkErrorOpen(false);
-    }
-    const handleInvalidInfoErrorClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setInvalidInfoErrorOpen(false);
+        setErrOpen(false);
     }
 
     // QQ号用户名密码的合法性，同时为true注册按钮才可用
@@ -64,11 +50,8 @@ export default function Page() {
                 height: "20vh" // 用于指定相对尺寸, vh 是一个单位, 等于窗口高度或宽度除以 100
             }}></Box>
 
-            <Snackbar open={networkErrorOpen} autoHideDuration={3000} onClose={handleNetworkErrorClose}>
-                <Alert severity="error" variant="filled">{dict.register.fail.networkError}</Alert>
-            </Snackbar>
-            <Snackbar open={invalidInfoErrorOpen} autoHideDuration={3000} onClose={handleInvalidInfoErrorClose}>
-                <Alert severity="error" variant="filled">{dict.register.fail.invalidInfoError}</Alert>
+            <Snackbar open={errOpen} autoHideDuration={3000} onClose={handleErrClose}>
+                <Alert severity="error" variant="filled">{errMsg}</Alert>
             </Snackbar>
 
             <Box ml={20} component={"form"} ref={formRef}>
@@ -110,29 +93,33 @@ export default function Page() {
                         disabled={!(qidValidity && usernameValidity && passwordValidity)}
                         onClick={() => {
                             // 重置Alert状态
-                            setNetworkErrorOpen(false);
-                            setInvalidInfoErrorOpen(false);
+                            setErrOpen(false);
 
                             fetch(`${backendAddress}/register/submit`, POST(Object.fromEntries(new FormData(formRef.current).entries()),false))
                                 .then(response => {
-                                    if (response.ok) {
+                                    if (response.ok || response.status === 400) {
                                         return response.json();
                                     }
-                                    // 后端检查发现注册信息不合法
-                                    throw new InvalidInfoError();
+                                    throw new Error(dict.register.fail.networkError);
                                 })
-                                .then((json: any) => {
-                                    // 重定向，并将passkey和emailAddr传递到finish页面
-                                    sessionStorage.setItem('emailAddr', json['emailAddr']);
-                                    sessionStorage.setItem('passkey', json['passkey']);
-                                    router.push("/register/finish");
-                                })
-                                .catch(error => {
-                                    if (error instanceof InvalidInfoError) {
-                                        setInvalidInfoErrorOpen(true);
-                                    } else {
-                                        setNetworkErrorOpen(true);
+                                .then(json => {
+                                    switch (json["reason"]) {
+                                        case "info-invalid":
+                                            throw new Error(dict.register.fail.invalidInfoError);
+                                        case "bad-captcha-response":
+                                            throw new Error(dict.register.fail.invalidCaptcha);
+                                        case "qid-exists":
+                                            throw new Error(dict.register.qidError.alreadyExists);
+                                        case "username-exists":
+                                            throw new Error(dict.register.usernameError.alreadyExists);
+                                        case "wrong-invitation-code":
+                                            throw new Error(dict.register.fail.wrongInvitationCode);
                                     }
+                                    // TODO: 注册确认阶段
+                                })
+                                .catch(e => {
+                                    setErrMsg(e.message);
+                                    setErrOpen(true);
                                 });
                         }}
                     >{dict.register.submit}</Button>
