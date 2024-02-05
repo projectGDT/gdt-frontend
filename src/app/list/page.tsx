@@ -39,7 +39,7 @@ class IncorrectCredentialsError extends Error {
 const TESTITEMS = [
     {
         server: {
-            id: 1,
+            id: 0,
             name: "TimelessMC",
             logoLink: "http://dummyimage.com/128x128",
             javaRemote: {
@@ -51,7 +51,7 @@ const TESTITEMS = [
     },
     {
         server: {
-            id: 2,
+            id: 1,
             name: "TimelessMC",
             logoLink: "http://dummyimage.com/128x128",
             javaRemote: {
@@ -64,6 +64,21 @@ const TESTITEMS = [
 ]
 const TESTFINDS = {
     servers: [
+        {
+            id: 2,
+            name: "string",
+            logoLink: "http://dummyimage.com/128x128",
+            coverLink: "http://dummyimage.com/1280x720",
+            javaRemote: {
+                address: "mc4.rhymc.com",
+                port: 10155
+            },
+            bedrockRemote: {
+              address: "string",
+              port: 0
+            },
+            applyingPolicy: "CLOSED"
+        },
         {
             id: 3,
             name: "string",
@@ -81,21 +96,6 @@ const TESTFINDS = {
         },
         {
             id: 4,
-            name: "string",
-            logoLink: "http://dummyimage.com/128x128",
-            coverLink: "http://dummyimage.com/1280x720",
-            javaRemote: {
-                address: "mc4.rhymc.com",
-                port: 10155
-            },
-            bedrockRemote: {
-              address: "string",
-              port: 0
-            },
-            applyingPolicy: "CLOSED"
-        },
-        {
-            id: 5,
             name: "string",
             logoLink: "http://dummyimage.com/128x128",
             coverLink: "http://dummyimage.com/1280x720",
