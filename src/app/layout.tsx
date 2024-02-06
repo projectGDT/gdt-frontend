@@ -45,7 +45,9 @@ const gdtTheme = createTheme({
         },
         secondary: {
             main: '#da0357',
+            light: '#ee9611',
         },
+
     },
 })
 
