@@ -1,23 +1,11 @@
 "use client"
 
-import {Alert, AlertTitle, Box, Button, Collapse, LinearProgress, Paper, Snackbar, Stack, TextField, Typography} from "@mui/material";
-import {dict} from "@/i18n/zh-cn";
-import React, {useRef, useState} from "react";
-import {backendAddress, backendAddressWs, POST} from "@/utils";
 import {useSessionStorage} from "usehooks-ts";
-import Script from "next/script";
-import { EventSourcePolyfill } from "event-source-polyfill";
-import {io, Socket} from "socket.io-client";
-
-class EmptyCache {
-    async getCached () {}
-    async setCached (value: any) {}
-    async setCachedPartial (value: any) {}
-}
-
-function emptyCacheFactory(object: any) {
-    return new EmptyCache()
-}
+import React, {useState} from "react";
+import {Alert, Box, Button, Collapse, LinearProgress, Paper, Snackbar, Stack, Typography} from "@mui/material";
+import {dict} from "@/i18n/zh-cn";
+import {io} from "socket.io-client";
+import {backendAddressWs} from "@/utils";
 
 export default function Page() {
     const [jwt, _setJwt] = useSessionStorage("jwt", "")
