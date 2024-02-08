@@ -22,3 +22,5 @@ export const POST = (dataObject: any, withJWT: boolean = true): RequestInit => {
 }
 
 export const backendAddress = "http://localhost:14590"
+
+export const backendAddressWs = "ws://localhost:14590"

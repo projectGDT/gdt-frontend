@@ -3,10 +3,11 @@
 import {Alert, AlertTitle, Box, Button, Collapse, LinearProgress, Paper, Snackbar, Stack, TextField, Typography} from "@mui/material";
 import {dict} from "@/i18n/zh-cn";
 import React, {useRef, useState} from "react";
-import {backendAddress, POST} from "@/utils";
+import {backendAddress, backendAddressWs, POST} from "@/utils";
 import {useSessionStorage} from "usehooks-ts";
 import Script from "next/script";
 import { EventSourcePolyfill } from "event-source-polyfill";
+import {io, Socket} from "socket.io-client";
 
 class EmptyCache {
     async getCached () {}
@@ -21,8 +22,8 @@ function emptyCacheFactory(object: any) {
 export default function Page() {
     const [jwt, _setJwt] = useSessionStorage("jwt", "")
 
-    const [networkError, setNetworkError] = useState(false)
-    const [internalError, setInternalError] = useState(false)
+    const [errorOpen, setErrorOpen] = useState(false)
+    const [errorMsg, setErrMsg] = useState("")
 
     const [submitDisabled, setSubmitDisabled] = useState(false)
 
@@ -30,20 +31,18 @@ export default function Page() {
 
     const [showStep1, setShowStep1] = useState(false)
     const [userCode, setUserCode] = useState("")
-    const [redirectUri, setRedirectUri] = useState("")
+    const [verificationUri, setVerificationUri] = useState("")
 
     const [showComplete, setShowComplete] = useState(false)
-    const [uuid, setUuid] = useState("")
+    const [uuid, setUUID] = useState("")
     const [playerName, setPlayerName] = useState("")
 
     return <Box sx={{display: "flex", flexDirection: "column", alignItems: "stretch"}}>
-        <Script src={"/eventsource.min.js"}/>
-
-        <Snackbar open={internalError}
+        <Snackbar open={errorOpen}
                   autoHideDuration={5000}
-                  onClose={() => {setInternalError(false)}}
+                  onClose={() => {setErrorOpen(false)}}
                   key={"ie"}>
-            <Alert severity={"error"} variant={"filled"}>{dict.settings.profile.bind.javaMicrosoft.fail.internalError}</Alert>
+            <Alert severity={"error"} variant={"filled"}>{errorMsg}</Alert>
         </Snackbar>
 
         <Box sx={{
@@ -58,31 +57,44 @@ export default function Page() {
                 setSubmitDisabled(true) // disable itself
                 setLoading(true)
 
-                const session = new EventSourcePolyfill(
-                    `${backendAddress}/post-login/profile/bind/java-microsoft`,
+                const socket = io(
+                    `${backendAddressWs}/post-login/profile/bind/java-microsoft`,
                     {
-                        headers: {
-                            "Authorization": `Bearer ${jwt}`
+                        auth: {
+                            token: jwt
                         }
                     }
                 )
 
-                session.addEventListener("message", event => {
-                    const body = JSON.parse(event.data)
-                    if ("userCode" in body && "redirectUri" in body) {
-                        setUserCode(body["userCode"])
-                        setRedirectUri(body["redirectUri"])
-                        setShowStep1(true)
-                    }
-                    if ("success" in body) {
-                        setLoading(false)
-                        if (body["success"]) {
-                            setUuid(body["uuid"])
-                            setPlayerName(body["playerName"])
-                        } else {
-                            setInternalError(true)
-                        }
-                    }
+                socket.once("user-code", ({userCode: payloadUserCode, verificationUri: payloadVerificationUri}) => {
+                    setUserCode(payloadUserCode)
+                    setVerificationUri(payloadVerificationUri)
+                    setShowStep1(true)
+                })
+
+                socket.once("success", ({uuid: payloadUUID, playerName: payloadPlayerName}) => {
+                    setLoading(false)
+                    setUUID(payloadUUID)
+                    setPlayerName(payloadPlayerName)
+                    setShowComplete(true)
+                })
+
+                socket.once("internal-error", () => {
+                    setLoading(false)
+                    setErrorOpen(true)
+                    setErrMsg(dict.settings.profile.bind.javaMicrosoft.fail.internalError)
+                })
+
+                socket.once("timeout", () => {
+                    setLoading(false)
+                    setErrorOpen(true)
+                    setErrMsg(dict.settings.profile.bind.javaMicrosoft.fail.timeout)
+                })
+
+                socket.once("already-exists", () => {
+                    setLoading(false)
+                    setErrorOpen(true)
+                    setErrMsg(dict.settings.profile.bind.javaMicrosoft.fail.alreadyExists)
                 })
             }}>{dict.settings.profile.bind.javaMicrosoft.submit}</Button>
 
@@ -94,7 +106,7 @@ export default function Page() {
                 <Paper elevation={2} sx={{marginX: "20%", padding: 1.5}}>
                     <Typography variant={"h6"}>{dict.settings.profile.bind.javaMicrosoft.step1.title}</Typography>
                     <Typography>
-                        {dict.settings.profile.bind.javaMicrosoft.step1.content(`${redirectUri}?otc=${userCode}`)}
+                        {dict.settings.profile.bind.javaMicrosoft.step1.content(`${verificationUri}?otc=${userCode}`)}
                     </Typography>
                 </Paper>
             </Collapse>
@@ -108,9 +120,5 @@ export default function Page() {
                 </Paper>
             </Collapse>
         </Stack>
-
-        <Box>
-
-        </Box>
     </Box>
 }

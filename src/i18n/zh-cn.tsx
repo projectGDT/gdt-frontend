@@ -60,7 +60,10 @@ export const dict = {
 
                     step1: {
                         title: "Step 1 - 设备码认证",
-                        content: (link: string) => <>请打开链接 <Link href={link}>{link}</Link> 并完成后续操作。</>
+                        content: (link: string) => <>
+                            请打开链接 <Link href={link} target={"_blank"}>{link}</Link> 并完成后续操作。 <br/>
+                            此操作会打开一个新标签页。请在完成操作后回到原先的标签页。
+                        </>
                     },
 
                     complete: {
@@ -72,7 +75,9 @@ export const dict = {
                     },
 
                     fail: {
-                        internalError: "服务器出现了内部错误。请检查你的微软账号是否拥有 Minecraft。"
+                        internalError: "服务器出现了内部错误。请检查你的微软账号是否拥有 Minecraft。",
+                        timeout: "操作超时。",
+                        alreadyExists: "该 Profile 已经被其他人（也可能是你自己！）绑定。"
                     }
                 }
             }
