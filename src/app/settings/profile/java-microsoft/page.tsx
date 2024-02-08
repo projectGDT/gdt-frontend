@@ -5,7 +5,7 @@ import React, {useState} from "react";
 import {Alert, Box, Button, Collapse, LinearProgress, Paper, Snackbar, Stack, Typography} from "@mui/material";
 import {dict} from "@/i18n/zh-cn";
 import {io} from "socket.io-client";
-import {backendAddressWs} from "@/utils";
+import {backendAddress} from "@/utils";
 
 export default function Page() {
     const [jwt, _setJwt] = useSessionStorage("jwt", "")
@@ -41,12 +41,12 @@ export default function Page() {
 
         <Stack spacing={2} sx={{alignItems: "center", width: "100%"}}>
             <Typography variant={"h5"}>{dict.settings.profile.bind.javaMicrosoft.title}</Typography>
-            <Button variant={"contained"} disabled={submitDisabled} onClick={async () => {
+            <Button variant={"contained"} disabled={submitDisabled} onClick={() => {
                 setSubmitDisabled(true) // disable itself
                 setLoading(true)
 
                 const socket = io(
-                    `${backendAddressWs}/post-login/profile/bind/java-microsoft`,
+                    `${backendAddress}/post-login/profile/bind/java-microsoft`,
                     {
                         auth: {
                             token: jwt

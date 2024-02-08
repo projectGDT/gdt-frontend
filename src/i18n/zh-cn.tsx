@@ -79,6 +79,24 @@ export const dict = {
                         timeout: "操作超时。",
                         alreadyExists: "该 Profile 已经被其他人（也可能是你自己！）绑定。"
                     }
+                },
+                xbox: {
+                    title: "基岩版（Xbox）Profile 绑定",
+
+                    submit: "开始绑定",
+
+                    complete: {
+                        title: "绑定完成",
+                        content: (xuid: string, playerName: string) => <>
+                            你的 XUID 是 <b>{xuid}</b> <br/>
+                            你的玩家名是 <b>{playerName}</b>
+                        </>
+                    },
+
+                    fail: {
+                        internalError: "服务器出现了内部错误。请检查你的微软账号年龄是否超过 18 岁，以及你的家庭组设置。",
+                        alreadyExists: "该 Profile 已经被其他人（也可能是你自己！）绑定。"
+                    }
                 }
             }
         }
