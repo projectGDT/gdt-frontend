@@ -1,9 +1,10 @@
-export const GET = (withJWT: boolean): RequestInit => {
-    const jwt = sessionStorage.getItem("jwt")
+export const GET = (withJWT: boolean = true): RequestInit => {
+    const jwtRaw = sessionStorage.getItem("jwt")
     return {
         headers: withJWT ? {
-            "Authorization": `Bearer ${jwt != null ? jwt : ""}`
-        } : {}
+            "Authorization": `Bearer ${jwtRaw != null ? JSON.parse(jwtRaw) : ""}`
+        } : {},
+        cache: "no-store"
     }
 }
 
