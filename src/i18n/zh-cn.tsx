@@ -52,9 +52,37 @@ export const dict = {
         title: "个人设置",
 
         profile: {
+            title: "Profile 管理",
+            secondary: "Minecraft 账户的绑定与解绑",
+
+            doBind: "绑定",
+            javaMicrosoft: {
+                title: "Java 版正版 Profile",
+                fallback: "你还没有绑定 Java 版正版 Profile！"
+            },
+            javaLittleSkin: {
+                title: "Java 版 LittleSkin Profile",
+                fallback: "你还没有绑定 Java 版 LittleSkin Profile！"
+            },
+            xbox: {
+                title: "基岩版 Profile",
+                fallback: "你还没有绑定基岩版 Profile！"
+            },
+            offline: {
+                title: "离线 Profile",
+                fallback: "要增删和管理离线 Profile，请进入对应的服务器页面。",
+                secondary: (serverId: number) => `服务器 ID #${serverId}`
+            },
+
+            onDelete: {
+                content: "确认解绑此 Profile？",
+                confirm: "确认",
+                cancel: "取消"
+            },
+
             bind: {
                 javaMicrosoft: {
-                    title: "Java 版微软（正版）Profile 绑定",
+                    title: "Java 版正版（微软）Profile 绑定",
 
                     submit: "开始绑定",
 
@@ -65,15 +93,14 @@ export const dict = {
                             此操作会打开一个新标签页。请在完成操作后回到原先的标签页。
                         </>
                     },
-
                     complete: {
                         title: "...没有 Step 2！已经完成啦！",
                         content: (uuid: string, playerName: string) => <>
                             你的 UUID 是 <b>{uuid}</b> <br/>
-                            你的玩家名是 <b>{playerName}</b>
+                            你的玩家名是 <b>{playerName}</b><br/>
+                            <Link href={"."}>返回 Profile 管理页面</Link>
                         </>
                     },
-
                     fail: {
                         internalError: "服务器出现了内部错误。请检查你的微软账号是否拥有 Minecraft。",
                         timeout: "操作超时。",
@@ -89,10 +116,10 @@ export const dict = {
                         title: "绑定完成",
                         content: (xuid: string, playerName: string) => <>
                             你的 XUID 是 <b>{xuid}</b> <br/>
-                            你的玩家名是 <b>{playerName}</b>
+                            你的玩家名是 <b>{playerName}</b><br/>
+                            <Link href={"."}>返回 Profile 管理页面</Link>
                         </>
                     },
-
                     fail: {
                         internalError: "服务器出现了内部错误。请检查你的微软账号年龄是否超过 18 岁，以及你的家庭组设置。",
                         alreadyExists: "该 Profile 已经被其他人（也可能是你自己！）绑定。"
