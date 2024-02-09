@@ -12,7 +12,6 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 import React, {useEffect, useState} from "react"
-import { useRouter } from 'next/navigation'
 import {
     AppBar,
     Avatar,
@@ -30,11 +29,10 @@ import {
     AccountCircleOutlined, DashboardCustomizeOutlined,
     DnsOutlined,
     HandymanOutlined,
-    HomeOutlined, LinkOutlined, ManageAccountsOutlined, SvgIconComponent
+    HomeOutlined, LinkOutlined, ManageAccountsOutlined
 } from "@mui/icons-material";
 import {AppRouterCacheProvider} from "@mui/material-nextjs/v13-appRouter";
 import {useSessionStorage} from "usehooks-ts";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 // 指定一些主题颜色
 const gdtTheme = createTheme({
@@ -53,7 +51,7 @@ const gdtTheme = createTheme({
 const drawerWidth = 240
 
 // 侧边栏导航按钮的基本信息, 通过 map 方法转换成按钮
-const NAVIGATORS = [
+const navigation = [
     {
         href: "/",
         icon: HomeOutlined,
@@ -88,33 +86,26 @@ const NAVIGATORS = [
 
 // RootLayout, 所有 UI 的根本框架 (布局), 具体的用户界面在 children 参数中传递, 嵌套在根本框架中
 export default function RootLayout({children}: { children: React.ReactNode }) {
-    // 显式指定跳转路径
-    const router = useRouter()
-
     // sessionStorage, 浏览器原生特性, 能储存一些全局变量
     // 这里的三个值会在登录期间被赋值
     // usehooks-ts 提供的特性, 能在 Next 中安全地使用 sessionStorage (否则编译会报错, 虽然不影响正常使用)
-    const [id, setId] = useSessionStorage("id", -1)
-    const [isSiteAdmin, setIsSiteAdmin] = useSessionStorage("isSiteAdmin", false)
-    const [jwt, setJWT] = useSessionStorage("jwt", "")
-    
+    const [id, _setId] = useSessionStorage("id", -1)
     const [accountWidget, setAccountWidget] = useState(<></>)
     
     useEffect(() => {
         setAccountWidget(id === -1 ? <>
-            <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => router.push("/login")}>{dict.login.title}</Button>
-            <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => router.push("/register")}>{dict.register.title}</Button>
+            <Button href={"/login"} size={"large"} variant={"text"} color={"inherit"}>{dict.login.title}</Button>
+            <Button href={"/register"} size={"large"} variant={"text"} color={"inherit"}>{dict.register.title}</Button>
         </> : <IconButton size="large" aria-controls="menu-appbar" aria-haspopup={true} color="inherit">
             <AccountCircleOutlined />
         </IconButton>)
     }, [id])
 
-    return (
-        <html lang="zh">
-        <head><title>projectGDT</title></head>
-        <body>
-        {/* 这种 Provider 是很常见的, 可以把一些参数 / 属性往下层层传递 */}
-        <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+    return <html lang="zh">
+    <head><title>projectGDT</title></head>
+    <body>
+    {/* 这种 Provider 是很常见的, 可以把一些参数 / 属性往下层层传递 */}
+    <AppRouterCacheProvider options={{ enableCssLayer: true }}>
         <ThemeProvider theme={gdtTheme}><Box sx={{ display: 'flex' }}>
             {/* 用于屏蔽 Next.js 自带的样式表, 如果没有这一行, 上下左右会有默认的无法消除的 8px 页边距, 只在这一个地方写即可 */}
             <CssBaseline />
@@ -138,9 +129,9 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
                 <Box sx={{ overflow: 'auto' }}>
                     <List>
                         {/* "React 哲学", 用 map 把数组中的元素转换为 ListItem! */}
-                        {NAVIGATORS.map(({href, icon: Icon, display}) =>
+                        {navigation.map(({href, icon: Icon, display}) =>
                             <ListItem key={href} disablePadding>
-                                <ListItemButton onClick={() => router.push(href)}>
+                                <ListItemButton href={href}>
                                     <ListItemIcon><Icon/></ListItemIcon>
                                     <ListItemText primary={display}/>
                                 </ListItemButton>
@@ -156,6 +147,5 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
             </Box>
         </Box>
         </ThemeProvider></AppRouterCacheProvider></body>
-        </html>
-    )
+    </html>
 }
