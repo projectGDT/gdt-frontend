@@ -1,13 +1,12 @@
 "use client"
 
-import {List, ListItemButton, ListItemText} from "@mui/material";
+import {Box, List, ListItemButton, ListItemText, Paper, Skeleton, Typography} from "@mui/material";
 import React from "react";
 import {dict} from "@/i18n/zh-cn";
-import {useRouter} from "next/navigation";
 
 const settingNavigation = [
     {
-        href: "/settings/profile",
+        href: "settings/profile",
         display: {
             primary: dict.settings.profile.title,
             secondary: dict.settings.profile.secondary
@@ -16,14 +15,15 @@ const settingNavigation = [
 ]
 
 export default function Page() {
-    const router = useRouter()
-
-    return <List>
-        {settingNavigation.map(entry => (
-            <ListItemButton key={entry.href} onClick={() => router.push(entry.href)}><ListItemText
-                primary={entry.display.primary}
-                secondary={entry.display.secondary}
-            /></ListItemButton>
-        ))}
-    </List>
+    return <Box sx={{display: "flex", flexDirection: "column", gap: 2, textAlign: "center"}}>
+        <Typography variant={"h5"}>{dict.settings.title}</Typography>
+        <Paper><List>
+            {settingNavigation.map(entry => (
+                <ListItemButton key={entry.href} href={entry.href}>
+                    <ListItemText primary={entry.display.primary}
+                                  secondary={entry.display.secondary}/>
+                </ListItemButton>
+            ))}
+        </List></Paper>
+    </Box>
 }
