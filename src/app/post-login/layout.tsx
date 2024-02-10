@@ -10,6 +10,8 @@ import {
     LinkOutlined, ManageAccountsOutlined
 } from "@mui/icons-material";
 import {dict} from "@/i18n/zh-cn";
+import {useSessionStorage} from "usehooks-ts";
+import {useRouter} from "next/navigation";
 
 // 侧边栏导航按钮的基本信息, 通过 map 方法转换成按钮
 const navigation = [
@@ -46,50 +48,56 @@ const navigation = [
 ]
 
 export default function PostLoginLayout({children}: { children: React.ReactNode }) {
+    const router = useRouter()
+
+    const [jwt, _setJWT] = useSessionStorage("jwt", "")
     const [content, setContent] = useState(<></>)
 
     useEffect(() => {
-
-    }, []);
-
-    return <Box sx={{display: "flex", flexGrow: 1}}>
-        {/* Drawer 形成了左侧侧边栏 */}
-        <Drawer variant="permanent" PaperProps={{
-            sx: {
-                display: "flex",
+        if (jwt) setContent(
+        <Box sx={{display: "flex", flexGrow: 1}}>
+            {/* Drawer 形成了左侧侧边栏 */}
+            <Drawer variant="permanent" PaperProps={{
+                sx: {
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "stretch",
+                    width: "15%",
+                    flexGrow: 0
+                }
+            }} sx={{
+                width: "15%"
+            }}>
+                {/* 这里塞一个 Toolbar 是为了占位, 否则下面 List 的最上面的部分会被 AppBar 遮住 */}
+                <Toolbar/>
+                <Box sx={{display: "flex", flexGrow: 1}}>
+                    <List sx={{flexGrow: 1}}>
+                        {/* "React 哲学", 用 map 把数组中的元素转换为 ListItem! */}
+                        {navigation.map(({href, icon: Icon, display}) =>
+                            <ListItem key={href} disablePadding>
+                                <ListItemButton href={href}>
+                                    <ListItemIcon><Icon/></ListItemIcon>
+                                    <ListItemText primary={display}/>
+                                </ListItemButton>
+                            </ListItem>
+                        )}
+                    </List>
+                    <Divider/>
+                </Box>
+            </Drawer>
+            <Box sx={{
+                display: "inline-flex",
                 flexDirection: "column",
+                flexGrow: 1,
                 alignItems: "stretch",
-                width: "15%",
-                flexGrow: 0
-            }
-        }} sx={{
-            width: "15%"
-        }}>
-            {/* 这里塞一个 Toolbar 是为了占位, 否则下面 List 的最上面的部分会被 AppBar 遮住 */}
-            <Toolbar/>
-            <Box sx={{display: "flex", flexGrow: 1}}>
-                <List sx={{flexGrow: 1}}>
-                    {/* "React 哲学", 用 map 把数组中的元素转换为 ListItem! */}
-                    {navigation.map(({href, icon: Icon, display}) =>
-                        <ListItem key={href} disablePadding>
-                            <ListItemButton href={href}>
-                                <ListItemIcon><Icon/></ListItemIcon>
-                                <ListItemText primary={display}/>
-                            </ListItemButton>
-                        </ListItem>
-                    )}
-                </List>
-                <Divider/>
+                padding: 2
+            }}>
+                {children}
             </Box>
-        </Drawer>
-        <Box sx={{
-            display: "inline-flex",
-            flexDirection: "column",
-            flexGrow: 1,
-            alignItems: "stretch",
-            padding: 2
-        }}>
-            {children}
         </Box>
-    </Box>
+        )
+        else router.push("/login")
+    }, [children, jwt]);
+
+    return content
 }

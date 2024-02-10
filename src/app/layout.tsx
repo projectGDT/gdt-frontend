@@ -55,19 +55,18 @@ const drawerWidth = 240
 // RootLayout, 所有 UI 的根本框架 (布局), 具体的用户界面在 children 参数中传递, 嵌套在根本框架中
 export default function RootLayout({children}: { children: React.ReactNode }) {
     // sessionStorage, 浏览器原生特性, 能储存一些全局变量
-    // 这里的三个值会在登录期间被赋值
     // usehooks-ts 提供的特性, 能在 Next 中安全地使用 sessionStorage (否则编译会报错, 虽然不影响正常使用)
-    const [id, _setId] = useSessionStorage("id", -1)
+    const [jwt, _setJWT] = useSessionStorage("jwt", "")
     const [accountWidget, setAccountWidget] = useState(<></>)
     
     useEffect(() => {
-        setAccountWidget(id === -1 ? <>
+        setAccountWidget(jwt ? <IconButton size="large" aria-controls="menu-appbar" aria-haspopup={true} color="inherit">
+            <AccountCircleOutlined/>
+        </IconButton>: <>
             <Button href={"/login"} size={"large"} variant={"text"} color={"inherit"}>{dict.login.title}</Button>
             <Button href={"/register"} size={"large"} variant={"text"} color={"inherit"}>{dict.register.title}</Button>
-        </> : <IconButton size="large" aria-controls="menu-appbar" aria-haspopup={true} color="inherit">
-            <AccountCircleOutlined />
-        </IconButton>)
-    }, [id])
+        </>)
+    }, [jwt])
 
     return <html lang="zh">
     <head><title>projectGDT</title></head>

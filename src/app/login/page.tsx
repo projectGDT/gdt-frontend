@@ -4,7 +4,6 @@ import {
     Alert,
     Box,
     Button, Snackbar,
-    Stack,
     TextField,
     Typography
 } from "@mui/material";
@@ -15,7 +14,6 @@ import {useSessionStorage} from "usehooks-ts";
 import {dict} from "@/i18n/zh-cn"
 
 import {backendAddress, POST} from "@/utils";
-import Script from "next/script";
 import {Turnstile} from "@marsidev/react-turnstile";
 
 
@@ -25,6 +23,8 @@ export default function Page() {
 
     const [incorrectCredentialsOpen, setIncorrectCredentialsOpen] = useState(false)
     const [networkErrorOpen, setNetworkErrorOpen] = useState(false)
+
+    const [disabled, setDisabled] = useState(false)
 
     // const [id, setId] = useSessionStorage("id", -1)
     // const [isSiteAdmin, setIsSiteAdmin] = useSessionStorage("isSiteAdmin", false)
@@ -63,10 +63,10 @@ export default function Page() {
                     <TextField name={"password"} label={dict.login.password} type={"password"} sx={{width: 300}}/>
                     <Turnstile siteKey={"0x4AAAAAAAQCzJ-tEMh00a-r"}/>
 
-                    <Button variant={"contained"} onClick={() => {
-                        // 重置两个 SnackBar 的状态
-                        setNetworkErrorOpen(false)
-                        setIncorrectCredentialsOpen(false)
+                    <Button variant={"contained"} disabled={disabled} onClick={() => {
+                        setDisabled(true)
+
+                        console.log(Object.fromEntries(new FormData(formRef.current).entries()))
 
                         // API 地址, 使用字符串模板拼接 backendAddress 和 path 而成
                         fetch(`${backendAddress}/login`, POST(
@@ -88,6 +88,7 @@ export default function Page() {
                                 default:
                                     setNetworkErrorOpen(true)
                             }
+                            setDisabled(false)
                         })
                     }}>{dict.login.submit}</Button>
                 </Box>
