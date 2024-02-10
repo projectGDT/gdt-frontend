@@ -1,7 +1,6 @@
 "use client"
 
 import {
-    Alert,
     Box,
     Button, Collapse,
     Stack,
@@ -9,14 +8,14 @@ import {
     Typography
 } from "@mui/material";
 
-import React, {ReactElement, useEffect, useId, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import {useRouter} from "next/navigation";
 import {useSessionStorage} from "usehooks-ts";
 
 import {dict} from "@/i18n/zh-cn"
 
 // @/templates 定义了一些常量和模板
-import {backendAddress, GET, POST} from "@/utils";
+import {backendAddress, POST} from "@/utils";
 import Script from "next/script";
 
 import InputBox from "@/app/register/inputbox";
@@ -38,9 +37,9 @@ export default function Page() {
     const [incorrectCredentialsOpen, setIncorrectCredentialsOpen] = useState(false)
     const [networkErrorOpen, setNetworkErrorOpen] = useState(false)
 
-    const [id, setId] = useSessionStorage("id", -1)
-    const [isSiteAdmin, setIsSiteAdmin] = useSessionStorage("isSiteAdmin", false)
-    const [jwt, setJWT] = useSessionStorage("jwt", "")
+    const [_id, setId] = useSessionStorage("id", -1)
+    const [_isSiteAdmin, setIsSiteAdmin] = useSessionStorage("isSiteAdmin", false)
+    const [_jwt, setJWT] = useSessionStorage("jwt", "")
 
     return (
         <Box sx={{display: "flex", flexDirection: "column", alignItems: "center"}}>
