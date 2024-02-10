@@ -16,6 +16,7 @@ import {dict} from "@/i18n/zh-cn"
 
 import {backendAddress, POST} from "@/utils";
 import Script from "next/script";
+import {Turnstile} from "@marsidev/react-turnstile";
 
 
 export default function Page() {
@@ -35,7 +36,6 @@ export default function Page() {
         display: "flex",
         flexDirection: "column",
         alignItems: "stretch",
-        paddingX: "40%",
         flexGrow: 1
     }}>
         <Box sx={{
@@ -44,8 +44,6 @@ export default function Page() {
             flexGrow: 1
         }}>
             <Box sx={{flexGrow: 1}}>
-                <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer/>
-
                 <Snackbar open={incorrectCredentialsOpen}
                           autoHideDuration={5000}
                           onClose={() => {setIncorrectCredentialsOpen(false)}}
@@ -59,11 +57,12 @@ export default function Page() {
                     <Alert severity={"error"} variant={"filled"}>{dict.login.fail.networkError}</Alert>
                 </Snackbar>
                 <Box component={"form"} ref={formRef}
-                     sx={{display: "flex", flexDirection: "column", gap: 2, textAlign: "center"}}>
+                     sx={{display: "flex", flexDirection: "column", alignItems: "center", gap: 2, textAlign: "center"}}>
                     <Typography variant={"h5"}>{dict.login.title}</Typography>
-                    <TextField name={"username"} label={dict.login.username}/>
-                    <TextField name={"password"} label={dict.login.password} type={"password"}/>
-                    <div className="cf-turnstile" data-sitekey="0x4AAAAAAAQCzJ-tEMh00a-r" data-theme="light"></div>
+                    <TextField name={"username"} label={dict.login.username} sx={{width: 300}}/>
+                    <TextField name={"password"} label={dict.login.password} type={"password"} sx={{width: 300}}/>
+                    <Turnstile siteKey={"0x4AAAAAAAQCzJ-tEMh00a-r"}/>
+
                     <Button variant={"contained"} onClick={() => {
                         // 重置两个 SnackBar 的状态
                         setNetworkErrorOpen(false)
