@@ -28,6 +28,8 @@ import { space } from "postcss/lib/list";
 
 import mc, { NewPingResult, OldPingResult } from 'minecraft-protocol';
 import { Router, useSearchParams } from "react-router-dom";
+import { GET, POST, backendAddress } from "@/utils";
+import { ServerInfo } from "@/types";
 
 // 定义一种错误, 和网络错误区分开, 后面会有用
 class IncorrectCredentialsError extends Error {
@@ -158,11 +160,103 @@ export default function Page() {
     const [jwt, setJWT] = useSessionStorage("jwt", "")
 
     const [joinedServers, setJoinedServers] = useSessionStorage("joinedServers", [-1]);
+    const [refreshing, setRefreshing] = useState(true);
+    const [joinedServersInfo, setJoinedServersInfo] = useState<ServerInfo[]>([]);
+
+    // 推荐功能
+    const [recommendedList, setRecommendList] = useState<number[]>([]);
+    const [recommendCount, setRecommendCount] = useState(0);
     
-    // 这边加一个 useEffects 获得已加入的服务器列表，然后存进 joinedServers
+    // 这边加一个 useEffect 获得已加入的服务器列表，然后存进 joinedServers
     useEffect(() => {
-        setJoinedServers(TESTITEMS.map(({server}) => {return server.id}))
+        // setJoinedServers(joinedServersInfo.map(({server}) => {return server.id}))
+        fetchServerList();
     }, []);
+
+    // 获取发现服务器推荐列表，保存下来
+    useEffect(() => {
+        fetchRecommendList();
+    }, []);
+
+    // 获取推荐列表中，服务器的信息
+    useEffect(() => {
+        if (recommendedList.length !== 0)
+            fetchRecommendInfo();
+    }, [recommendedList])
+
+    const fetchRecommendInfo = () => {
+        setRefreshing(true); // 获取信息时候把刷新状态设为 true
+
+        const fetchIndex: number[] = [];
+        for (let i = 0; i + recommendCount * 10 < recommendedList.length && i < 10; i++) {
+            fetchIndex.push(recommendedList[i + recommendCount * 10]);
+        }
+
+        fetch(`${backendAddress}/post-login/me/discover/query`, POST(fetchIndex, true))
+            .then(response => {
+                if (response.ok)
+                    return response.json();
+                else 
+                    throw new Error(`HTTP ERROR, CODE: ${response.status}`); // 暂时先这样处理错误
+            })
+            .then(data => {
+                console.log(data);
+                // setRecommendList(data);
+                // TODO：设置显示用的recommendinfo
+            })
+            .catch(error => {
+                console.error(error); // 暂时先这样处理错误
+            })
+            .finally(() => {
+                setRefreshing(false); // 最后把刷新状态设为 false
+                setRecommendCount(recommendCount + 1);
+            })
+    }
+
+    const fetchRecommendList = () => {
+        setRefreshing(true); // 获取信息时候把刷新状态设为 true
+        fetch(`${backendAddress}/post-login/me/discover/list`, GET(true))
+            .then(response => {
+                if (response.ok)
+                    return response.json();
+                else 
+                    throw new Error(`HTTP ERROR, CODE: ${response.status}`); // 暂时先这样处理错误
+            })
+            .then(data => {
+                // console.log(data);
+                setRecommendList(data);
+            })
+            .catch(error => {
+                console.error(error); // 暂时先这样处理错误
+            })
+            .finally(() => {
+                setRefreshing(false); // 最后把刷新状态设为 false
+            })
+    }
+
+    const fetchServerList = () => {
+        setRefreshing(true); // 获取信息时候把刷新状态设为 true
+        fetch(`${backendAddress}/post-login/me/servers`, GET(true))
+            .then(response => {
+                if (response.ok)
+                    return response.json();
+                else 
+                    throw new Error(`HTTP ERROR, CODE: ${response.status}`); // 暂时先这样处理错误
+            })
+            .then(data => {
+                // console.log(data);
+                setJoinedServersInfo(data);
+                setJoinedServers(data.map((item: ServerInfo) => {return item.server.id}));
+            })
+            .catch(error => {
+                console.error(error); // 暂时先这样处理错误
+            })
+            .finally(() => {
+                setRefreshing(false); // 最后把刷新状态设为 false
+            })
+    }
+
+
 
 /*
     let pingInfo: ServerPingInfo[];
@@ -170,7 +264,7 @@ export default function Page() {
 
     useEffect(() => {
         // 先GET加入服务器和 发现服务器列表，然后对加入服务器中的每一个执行一次ping
-        TESTITEMS.forEach(element => {
+        joinedServersInfo.forEach(element => {
             if (element.server.javaRemote !== null) {
                 const pingOption: mc.PingOptions = {
                     host: element.server.javaRemote.address,
@@ -195,16 +289,18 @@ export default function Page() {
 
     let rendercnt: number = -1;
 */
-    return (
+
+
+    // 在 return 里面加一个加载动画，根据 refreshing 判断
+    return !refreshing && (
         // 一个 Box 放下两栏：“我加入的”和“推荐”
         <Box sx={{display: "flex", flexDirection: "column"}}>
             <Box sx={{display: "flex", flexDirection: "column", height: "40vh"}}>
                 <Box sx={{fontSize: 30}}>{dict.list.subtitle[0]}</Box>
                 <Box paddingY={1}>
                     <Grid container spacing={2}>
-                        {TESTITEMS.map(({server, isOperator}) =>{
+                        {joinedServersInfo.map(({server, isOperator}) =>{
                             //rendercnt += 1;
-
                             return (<Grid item xs={3} key={server.id}>
                                 <Paper elevation={3}>
                                     <ServerName logolink={server.logoLink} name={server.name} id={server.id}/>

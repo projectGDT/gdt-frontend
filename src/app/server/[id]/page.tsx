@@ -738,7 +738,7 @@ export default function Page({ params }:{ params: { id: string } }) {
                                       <Stack spacing={1} paddingY={1}>
                                         {playerInfo.players.map(
                                           (item) => {
-                                            return (<Box sx={{display: "flex", justifyContent: "space-between"}}>
+                                            return (<Box sx={{display: "flex", justifyContent: "space-between"}} key={item.id}>
                                               <Box sx={{display: "flex", alignItems: "center"}}>
                                                 <img src="http://dummyimage.com/128x128" style={{width: 32, height: 32}}/>
                                                 <Box sx={{fontSize: 16, paddingX: 1}}>
