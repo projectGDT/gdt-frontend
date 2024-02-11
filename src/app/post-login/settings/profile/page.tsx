@@ -8,7 +8,7 @@ import {
     ListItem, ListItemAvatar,
     ListItemButton,
     ListItemText,
-    ListSubheader,
+    ListSubheader, Paper,
     Skeleton,
     Typography
 } from "@mui/material";
@@ -23,7 +23,7 @@ type Profile = {
     cachedPlayerName: string
 }
 
-const xboxOauthUri = "https://login.live.com/oauth20_authorize.srf?client_id=9e474b67-edcd-4d23-b2fc-6dc8db5e08f7&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fsettings%2Fprofile%2Fxbox&response_type=code&scope=XboxLive.signin"
+const xboxOauthUri = "https://login.live.com/oauth20_authorize.srf?client_id=9e474b67-edcd-4d23-b2fc-6dc8db5e08f7&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fpost-login%2Fsettings%2Fprofile%2Fxbox&response_type=code&scope=XboxLive.signin"
 
 export default function Page() {
     const [loading, setLoading] = useState(true)
@@ -49,20 +49,20 @@ export default function Page() {
         }
     }, [userModifyFlag])
 
-    return <List>
-        <Box sx={{
-            height: 100
-        }}></Box>
-        <Box sx={{textAlign: "center"}}>
+    return <Paper><List>
+        <Box sx={{textAlign: "center", padding: 2}}>
             <Typography variant={"h5"}>{dict.settings.profile.title}</Typography>
             <Typography variant={"caption"}>{dict.settings.profile.secondary}</Typography>
         </Box>
+
+        <Divider/>
+
         {loading ? <>
             <Skeleton width={"100%"} height={100}/>
             <Skeleton width={"100%"} height={100}/>
             <Skeleton width={"100%"} height={100}/>
         </> : <>
-            <ListSubheader disableGutters>{dict.settings.profile.javaMicrosoft.title}</ListSubheader>
+            <ListSubheader>{dict.settings.profile.javaMicrosoft.title}</ListSubheader>
             {javaMsProfile ? (
                 <ListItem disablePadding
                           key={javaMsProfile.uniqueIdProvider}
@@ -77,12 +77,10 @@ export default function Page() {
                     </ListItemButton>
                 </ListItem>
             ) : (
-                <ListItem disablePadding secondaryAction={<Button href={"profile/java-microsoft"}>
+                <ListItem secondaryAction={<Button href={"profile/java-microsoft"}>
                     {dict.settings.profile.doBind}
                 </Button>}>
-                    <ListItemButton>
-                        <ListItemText secondary={dict.settings.profile.javaMicrosoft.fallback}/>
-                    </ListItemButton>
+                    <ListItemText secondary={dict.settings.profile.javaMicrosoft.fallback}/>
                 </ListItem>
             )}
             <Dialog open={javaDeleteOpen} onClose={() => setJavaDeleteOpen(false)}>
@@ -104,7 +102,7 @@ export default function Page() {
 
             <Divider/>
 
-            <ListSubheader disableGutters>{dict.settings.profile.xbox.title}</ListSubheader>
+            <ListSubheader>{dict.settings.profile.xbox.title}</ListSubheader>
             {xboxProfile ? (
                 <ListItem disablePadding
                           key={xboxProfile.uniqueIdProvider}
@@ -142,7 +140,7 @@ export default function Page() {
 
             <Divider/>
 
-            <ListSubheader disableGutters>{dict.settings.profile.offline.title}</ListSubheader>
+            <ListSubheader>{dict.settings.profile.offline.title}</ListSubheader>
             <ListItem><ListItemText secondary={dict.settings.profile.offline.fallback}/></ListItem>
             {offlineProfiles.map(profile => <ListItem disablePadding key={profile.uniqueIdProvider}>
                 <ListItemButton href={`/server/${profile.uniqueIdProvider}`}>
@@ -151,11 +149,15 @@ export default function Page() {
                 </ListItemButton>
             </ListItem>)}
 
-            <ListItemText>
-                <Typography variant={"caption"}>
-                    Minecraft Head API provided by <Link href="https://minotar.net/">minotar.net</Link>
-                </Typography>
-            </ListItemText>
+            <Divider/>
+
+            <ListItem>
+                <ListItemText>
+                    <Typography variant={"caption"}>
+                        Minecraft Head API provided by <Link href="https://minotar.net/">minotar.net</Link>
+                    </Typography>
+                </ListItemText>
+            </ListItem>
         </>}
-    </List>
+    </List></Paper>
 }

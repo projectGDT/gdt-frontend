@@ -2,10 +2,11 @@
 
 import {dict} from "@/i18n/zh-cn";
 
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
+import '@fontsource-variable/noto-sans-sc';
+import '@fontsource/inter/300.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/700.css';
 
 import React, {useEffect, useState} from "react"
 import {
@@ -32,6 +33,13 @@ import {useSessionStorage} from "usehooks-ts";
 
 // 指定一些主题颜色
 const gdtTheme = createTheme({
+    typography: {
+        fontFamily: [
+            '"Inter"',
+            '"Noto Sans SC Variable"',
+            'sans-serif'
+        ].join(','),
+    },
     palette: {
         mode: 'light',
         primary: {

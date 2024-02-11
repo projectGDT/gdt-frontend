@@ -15,8 +15,10 @@ const settingNavigation = [
 ]
 
 export default function Page() {
-    return <Box sx={{display: "flex", flexDirection: "column", gap: 2, textAlign: "center"}}>
-        <Typography variant={"h5"}>{dict.settings.title}</Typography>
+    return <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
+        <Box sx={{textAlign: "center"}}>
+            <Typography variant={"h5"}>{dict.settings.title}</Typography>
+        </Box>
         <Paper><List>
             {settingNavigation.map(entry => (
                 <ListItemButton key={entry.href} href={entry.href}>

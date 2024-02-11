@@ -75,7 +75,7 @@ export const dict = {
             },
 
             onDelete: {
-                content: "确认解绑此 Profile？",
+                content: "解绑此 Profile？",
                 confirm: "确认",
                 cancel: "取消"
             },
@@ -113,7 +113,7 @@ export const dict = {
                     submit: "开始绑定",
 
                     complete: {
-                        title: "绑定完成",
+                        title: "绑定完成！",
                         content: (xuid: string, playerName: string) => <>
                             你的 XUID 是 <b>{xuid}</b> <br/>
                             你的玩家名是 <b>{playerName}</b><br/>

@@ -10,7 +10,6 @@ import {
     LinkOutlined, ManageAccountsOutlined
 } from "@mui/icons-material";
 import {dict} from "@/i18n/zh-cn";
-import {useSessionStorage} from "usehooks-ts";
 import {useRouter} from "next/navigation";
 
 // 侧边栏导航按钮的基本信息, 通过 map 方法转换成按钮
@@ -50,11 +49,11 @@ const navigation = [
 export default function PostLoginLayout({children}: { children: React.ReactNode }) {
     const router = useRouter()
 
-    const [jwt, _setJWT] = useSessionStorage("jwt", "")
     const [content, setContent] = useState(<></>)
 
     useEffect(() => {
-        if (jwt) setContent(
+        // 这里用 useSessionStorage 会出问题
+        if (sessionStorage.getItem("jwt") !== '""') setContent(
         <Box sx={{display: "flex", flexGrow: 1}}>
             {/* Drawer 形成了左侧侧边栏 */}
             <Drawer variant="permanent" PaperProps={{
@@ -97,7 +96,7 @@ export default function PostLoginLayout({children}: { children: React.ReactNode 
         </Box>
         )
         else router.push("/login")
-    }, [children, jwt]);
+    }, [children, router]);
 
     return content
 }

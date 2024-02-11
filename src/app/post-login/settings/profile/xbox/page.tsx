@@ -20,7 +20,7 @@ export default function Page() {
     const [xuid, setXUID] = useState("")
     const [xboxGamerTag, setXboxGamerTag] = useState("")
 
-    return <Box sx={{display: "flex", flexDirection: "column", gap: 2, textAlign: "center"}}>
+    return <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
         <Snackbar open={errorOpen}
                   autoHideDuration={5000}
                   onClose={() => {setErrorOpen(false)}}
@@ -28,7 +28,9 @@ export default function Page() {
             <Alert severity={"error"} variant={"filled"}>{errorMsg}</Alert>
         </Snackbar>
 
-        <Typography variant={"h5"}>{dict.settings.profile.bind.xbox.title}</Typography>
+        <Box sx={{textAlign: "center"}}>
+            <Typography variant={"h5"}>{dict.settings.profile.bind.xbox.title}</Typography>
+        </Box>
         <Button variant={"contained"} disabled={submitDisabled} sx={{alignSelf: "center"}} onClick={() => {
             setSubmitDisabled(true) // disable itself
             setLoading(true)
@@ -59,11 +61,11 @@ export default function Page() {
         }}>{dict.settings.profile.bind.xbox.submit}</Button>
 
         <Collapse in={loading} sx={{alignSelf: "stretch"}}>
-            <LinearProgress sx={{marginX: "20%"}}/>
+            <LinearProgress/>
         </Collapse>
 
         <Collapse in={showComplete} sx={{alignSelf: "stretch"}}>
-            <Paper elevation={2} sx={{marginX: "20%", padding: 1.5}}>
+            <Paper elevation={2} sx={{padding: 1.5}}>
                 <Typography variant={"h6"}>{dict.settings.profile.bind.xbox.complete.title}</Typography>
                 <Typography>
                     {dict.settings.profile.bind.xbox.complete.content(xuid, xboxGamerTag)}
