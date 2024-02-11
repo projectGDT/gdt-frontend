@@ -37,17 +37,23 @@ export const dict = {
         },
         password: "密码",
         passwordError: "密码为8~20位，包含字母和数字",
-        // confirmPassword: "确认密码",
-        // confirmPasswordRequirement: ["两次输入密码不一致"],
-        inviteCode: "邀请码（可选）",
+        invitationCode: "邀请码（可选）",
         submit: "注册",
 
         fail: {
             title: "注册失败",
-            networkError: "请检查网络连接是否正常。",
-            invalidInfoError: "请检查注册信息是否符合要求。",
-            invalidCaptcha: "验证码无效，请刷新后重试",
-            wrongInvitationCode: "邀请码无效"
+            networkError: "请检查网络连接是否正常",
+            invalidPayload: "注册信息有误，请重试",
+            timeout: "注册超时"
+        },
+
+        verify: {
+            title: "验证",
+            illustrate: "请将验证码发送至：",
+            passkey: "验证码：",
+            hint: "页面会自动跳转",
+            complete: "注册完成",
+            autoJump: "将在5秒后自动跳转至登录页面"
         }
     },
     list: {
