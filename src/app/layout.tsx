@@ -16,12 +16,15 @@ import {
     Box, Button,
     createTheme, CssBaseline,
     IconButton,
+    Menu, MenuItem, ListItemIcon,
     ThemeProvider, Toolbar,
     Typography
 } from '@mui/material'
-import {AccountCircleOutlined} from "@mui/icons-material";
+import {AccountCircleOutlined, Logout} from "@mui/icons-material";
 import {AppRouterCacheProvider} from "@mui/material-nextjs/v13-appRouter";
 import {useSessionStorage} from "usehooks-ts";
+import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
+import {useRouter} from "next/navigation";
 
 // 指定一些主题颜色
 const gdtTheme = createTheme({
@@ -49,21 +52,76 @@ const gdtTheme = createTheme({
     },
 })
 
+// 登录后账户头像处菜单
+function AccountMenu(props: {router: AppRouterInstance}) {
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    }
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    // 注销
+    const handleLogoutClick = () => {
+        // 清空jwt，返回登录页面
+        window.sessionStorage.setItem('jwt', '');
+        setAnchorEl(null);
+        props.router.push("/login");
+        window.location.reload();
+    };
+
+    return (
+        <div>
+            <IconButton
+                size="large"
+                aria-controls="menu-appbar"
+                aria-haspopup={true}
+                color="inherit"
+                onClick={handleClick}
+            ><AccountCircleOutlined /></IconButton>
+            <Menu
+                anchorEl={anchorEl}
+                id="account-menu"
+                open={open}
+                onClose={handleClose}
+                onClick={handleClose}
+            >
+                <MenuItem onClick={handleLogoutClick}>
+                    <ListItemIcon>
+                        <Logout fontSize="small" />
+                    </ListItemIcon>
+                    {dict.logout.title}
+                </MenuItem>
+            </Menu>
+        </div>
+    )
+}
+
+function AccountWidget(jwt: string, router: AppRouterInstance) {
+    // 未登录
+    if (!jwt) {
+        return (
+            <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => router.push("/login")}>
+                {dict.login.title}
+            </Button>
+        );
+    }
+    // 已登录
+    return <AccountMenu router={router}></AccountMenu>
+}
+
 // RootLayout, 所有 UI 的根本框架 (布局), 具体的用户界面在 children 参数中传递, 嵌套在根本框架中
 export default function RootLayout({children}: { children: React.ReactNode }) {
+    const router = useRouter();
+
     // sessionStorage, 浏览器原生特性, 能储存一些全局变量
     // usehooks-ts 提供的特性, 能在 Next 中安全地使用 sessionStorage (否则编译会报错, 虽然不影响正常使用)
     const [jwt, _setJWT] = useSessionStorage("jwt", "")
     const [accountWidget, setAccountWidget] = useState(<></>)
-    
-    useEffect(() => {
-        setAccountWidget(jwt ? <IconButton size="large" aria-controls="menu-appbar" aria-haspopup={true} color="inherit">
-            <AccountCircleOutlined/>
-        </IconButton>: <>
-            <Button href={"/login"} size={"large"} variant={"text"} color={"inherit"}>{dict.login.title}</Button>
-            <Button href={"/register"} size={"large"} variant={"text"} color={"inherit"}>{dict.register.title}</Button>
-        </>)
-    }, [jwt])
+
+    useEffect(() => {setAccountWidget(AccountWidget(jwt, router));}, [jwt, router]);
 
     return <html lang="zh">
     <head><title>projectGDT</title></head>

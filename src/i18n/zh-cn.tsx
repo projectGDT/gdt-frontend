@@ -19,6 +19,9 @@ export const dict = {
         },
         success: "登录成功"
     },
+    logout: {
+        title: "注销"
+    },
     register: {
         title: "注册",
 

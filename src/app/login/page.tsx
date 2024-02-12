@@ -85,9 +85,9 @@ export default function Page() {
                                 else throw "incorrect-credentials"
                             }).then(({jwt}) => {
                                 setJWT(jwt)
-                                // 跳转回主页, 在 /list 写好之后可以考虑跳转到服务器选择页面
-                                router.push("/")
+                                router.push("/post-login/list")
                             }).catch(err => {
+                                setTimeout(() => {setDisabled(false);}, 5000);
                                 if (err === "incorrect-credentials")
                                     setIncorrectCredentialsOpen(true)
                                 else throw err
