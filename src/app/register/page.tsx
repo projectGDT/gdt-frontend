@@ -1,127 +1,189 @@
 "use client"
 
 import {
+    Alert,
     Box,
-    Button, Collapse,
+    Button,
+    Snackbar,
     Stack,
-    TextField,
     Typography
 } from "@mui/material";
 
 import React, {useRef, useState} from "react";
 import {useRouter} from "next/navigation";
-import {useSessionStorage} from "usehooks-ts";
+
+import { io } from "socket.io-client";
 
 import {dict} from "@/i18n/zh-cn"
 
-// @/templates 定义了一些常量和模板
-import {backendAddress, POST} from "@/utils";
-import Script from "next/script";
+// @/utils 定义了一些常量和模板
+import {backendAddress, GET, POST} from "@/utils";
+import InputBox from "@/components/inputbox";
 
-import InputBox from "@/app/register/inputbox";
-import { validateQQ, validateUsername } from "@/app/register/validate";
+import { validatePassword, validateQid, validateUsername } from "@/app/register/validate";
 
-// 定义一种错误, 和网络错误区分开, 后面会有用
-export class IncorrectCredentialsError extends Error {
-    constructor(props?: string | undefined) {
-        super(props || undefined);
-    }
-}
+import { Turnstile } from "@marsidev/react-turnstile";
 
 // 注册页面
 export default function Page() {
-    const router = useRouter()
-    const formRef = useRef()
+    const router = useRouter();
+    const formRef = useRef();
 
-    // React 中的 State, 一种可以在多次渲染之间暂存的变量, 详见文档
-    const [incorrectCredentialsOpen, setIncorrectCredentialsOpen] = useState(false)
-    const [networkErrorOpen, setNetworkErrorOpen] = useState(false)
+    // 警告snackbar
+    const [errMsg, setErrMsg] = useState('');
+    const [errOpen, setErrOpen] = useState(false);
+    const handleErrClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setErrOpen(false);
+    }
 
-    const [_id, setId] = useSessionStorage("id", -1)
-    const [_isSiteAdmin, setIsSiteAdmin] = useSessionStorage("isSiteAdmin", false)
-    const [_jwt, setJWT] = useSessionStorage("jwt", "")
+    // QQ号用户名密码的合法性，同时为true注册按钮才可用
+    const [qidValidity, setQidValidity] = useState(false);
+    const [usernameValidity, setUsernameValidity] = useState(false);
+    const [passwordValidity, setPasswordValidity] = useState(false);
+
+    // 防止重复点击
+    const [notClicked, setNotClicked] = useState(true);
+
+    // 验证信息
+    const [emailAddr, setEmailAddr] = useState('');
+    const [passkey, setPasskey] = useState('');
+    const [showVerifyInfo, setShowVerifyInfo] = useState(false); // 是否展示验证信息
+    const [completed, setCompleted] = useState(false); // 是否显示注册完成
 
     return (
-        <Box sx={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-            {/* 引入 Cloudflare Turnstile */}
-            <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer/>
+        <Box sx={{display: "flex", flexDirection: "row", alignItems: "start"}}>
+            <Box sx={{display: "flex", flexDirection: "column", alignItems: "start"}}>
+                <Box ml={20} sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "20vh" // 用于指定相对尺寸, vh 是一个单位, 等于窗口高度或宽度除以 100
+                }}></Box>
 
-            <Box sx={{
-                display: "flex",
-                flexDirection: "column",
-                height: "25vh" // 用于指定相对尺寸, vh 是一个单位, 等于窗口高度或宽度除以 100
-            }}>
-                {/* 预存两个 Alert, 包含在 Collapse 中, 默认情况下是折叠的 */}
-                <Collapse in={incorrectCredentialsOpen /* 指定控制 Alert 是否展示的变量 */}>
-                    {/* <Alert severity="error">{dict.login.fail.incorrectCredentials}</Alert> */}
-                </Collapse>
-                <Collapse in={networkErrorOpen}>
-                    {/* <Alert severity="error">{dict.login.fail.networkError}</Alert> */}
-                </Collapse>
+                <Snackbar open={errOpen} autoHideDuration={3000} onClose={handleErrClose}>
+                    <Alert severity="error" variant="filled">{errMsg}</Alert>
+                </Snackbar>
+
+                <Box ml={20} component={"form"} ref={formRef}>
+                    {/* 单向纵向排布元素常用 Stack */}
+                    <Stack spacing={3} sx={{alignItems: "start"}}>
+                        <Typography variant={"h4"}>{dict.register.title}</Typography>
+                        <Box>
+                            <InputBox
+                                name={"qid"}
+                                label={dict.register.qid}
+                                sx={{width: "17vh", mr: "1vh"}}
+                                setValidity={setQidValidity}
+                                validator={validateQid}
+                            />
+                            <InputBox
+                                name={"username"}
+                                label={dict.register.username}
+                                sx={{width: "17vh"}}
+                                setValidity={setUsernameValidity}
+                                validator={validateUsername}
+                            />
+                        </Box>
+                        <InputBox
+                            name={"password"}
+                            label={dict.register.password}
+                            setValidity={setPasswordValidity}
+                            isPassword={true}
+                            validator={validatePassword}
+                        />
+                        <InputBox
+                            name={"invitationCode"}
+                            label={dict.register.invitationCode}
+                        />
+                        {/* cf验证码 */}
+                        <Turnstile siteKey="0x4AAAAAAAQCzJ-tEMh00a-r" options={{theme: 'light'}} />
+
+                        <Button
+                            variant={"contained"} size={"large"}
+                            disabled={!(qidValidity && usernameValidity && passwordValidity && notClicked)}
+                            onClick={() => {
+                                // 重置Alert状态
+                                setErrOpen(false);
+
+                                // 禁用注册按钮
+                                setNotClicked(false);
+
+                                const socket = io( `${backendAddress}/register/submit`, {
+                                    autoConnect: false
+                                });
+
+                                // 网络错误、注册信息错误、超时
+                                socket.on("connect_error", (e) => {
+                                    setErrMsg(dict.register.fail.networkError);
+                                    setErrOpen(true);
+                                    setTimeout(() => setNotClicked(true), 3000);
+                                });
+                                socket.on("payload_error", (e) => {
+                                    // socket已由服务端关闭
+                                    setErrMsg(dict.register.fail.invalidPayload);
+                                    setErrOpen(true);
+                                    setTimeout(() => setNotClicked(true), 3000);
+                                });
+                                socket.on("timeout_error", (e) => {
+                                    setErrMsg(dict.register.fail.timeout);
+                                    setErrOpen(true);
+                                    setTimeout(() => setNotClicked(true), 3000);
+                                });
+
+                                // 显示验证信息
+                                socket.on("pre-registered", (verifyInfo: {emailAddr: string, passkey: string}) => {
+                                    setEmailAddr(verifyInfo.emailAddr);
+                                    setPasskey(verifyInfo.passkey);
+                                    setShowVerifyInfo(true);
+                                });
+                                
+                                // 注册成功
+                                socket.on("registered", (e) => {
+                                    setCompleted(true);
+                                    setTimeout(() => {
+                                        router.push("/login");
+                                    }, 5000);
+                                });
+
+                                // 连接并发送注册信息
+                                socket.connect();
+                                socket.emit("payload", Object.fromEntries(new FormData(formRef.current).entries()));
+                            }}
+                        >{dict.register.submit}</Button>
+                    </Stack>
+                </Box>
             </Box>
-
-            <Box component={"form"} ref={formRef}>
-                {/* 单向纵向排布元素常用 Stack */}
-                <Stack spacing={2} sx={{alignItems: "center"}}>
-                    <Typography variant={"h5"}>{dict.register.title}</Typography>
-                    <InputBox
-                        name={"qq"}
-                        label={dict.register.qq}
-                        validator={validateQQ}
-                        helperTextList={dict.register.qqRequirement}
-                    />
-                    <InputBox
-                        name={"username"}
-                        label={dict.register.username}
-                        validator={validateUsername}
-                        helperTextList={dict.register.usernameRequirement}
-                    />
-                    <TextField name={"password"}
-                        label={dict.register.password} type={"password"} variant={"outlined"} sx={{width: "35vh"}}/>
-                    <TextField name={"confirmPassword"}
-                        label={dict.register.confirmPassword} type={"password"} variant={"outlined"} sx={{width: "35vh"}}/>
-                    <TextField name={"inviteCode"}
-                        label={dict.register.inviteCode} variant={"outlined"} sx={{width: "35vh"}}/>
-                    <div className="cf-turnstile" data-sitekey="0x4AAAAAAAQCzJ-tEMh00a-r" data-theme="light"></div>
-                    {/* 这个元素会向 FormData 中注入一个名为 cf-turnstile-response 的属性 */}
-
-                    <Button variant={"contained"} onClick={() => {
-                        // 重置两个 Alert 的状态
-                        setNetworkErrorOpen(false)
-                        setIncorrectCredentialsOpen(false)
-
-                        // API 地址, 使用字符串模板拼接 backendAddress 和 path 而成
-                        fetch(`${backendAddress}/register`, POST(
-                            // 通过 FormData 构造普通对象, 进而以 Json 的形式发送
-                            Object.fromEntries(new FormData(formRef.current).entries()),
-                            false))
-                            .then(response => {
-                                if (response.ok) // 状态码是 2xx / 3xx
-                                    return response.json() // 获取 response 的具体内容, 转化为 json, 并传递给下一个层级
-                                else {
-                                    // 后端返回了内容, 但状态码不是 2xx / 3xx, 显示 "IncorrectCredentials" Alert
-                                    setIncorrectCredentialsOpen(true)
-                                    // 及时中止响应, 抛出的错误被最后的 catch 捕获
-                                    throw new IncorrectCredentialsError()
-                                }
-                            })
-                            .then(({id, isSiteAdmin, jwt}) => {
-                                // 设置 id 等全局变量
-                                setId(id)
-                                setIsSiteAdmin(isSiteAdmin)
-                                setJWT(jwt)
-                                // 跳转回主页, 在 /list 写好之后可以考虑跳转到服务器选择页面
-                                router.push("/")
-                            })
-                            .catch(error => {
-                                // if (error instanceof IncorrectCredentialsError)
-                                //     那么这个错误是有关凭据的, 上面已经显示了相关 Alert
-                                //     这里的 "NetworkError" Alert 就不再显示了
-                                //     否则, 错误就是由网络故障引起的
-                                if (!(error instanceof IncorrectCredentialsError)) setNetworkErrorOpen(true)
-                            })
-                    }}>{dict.register.submit}</Button>
-                </Stack>
+            <Box>
+                {showVerifyInfo?
+                    <Box ml={25} sx={{display: "flex", flexDirection: "column", alignItems: "start"}}>
+                        {completed?
+                            <>
+                                <Box ml={30} sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    height: "30vh"
+                                }}></Box>
+                                <Stack spacing={4} sx={{alignItems: "start"}}>
+                                    <Typography variant={"h3"}>{dict.register.verify.complete}</Typography>
+                                    <Typography variant={"h5"}>{dict.register.verify.autoJump}</Typography>
+                                </Stack>
+                            </> : <>
+                                <Box ml={20} sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    height: "20vh"
+                                }}></Box>
+                                <Stack spacing={4} sx={{alignItems: "start"}}>
+                                    <Typography variant={"h4"}>{dict.register.verify.title}</Typography>
+                                    <Typography variant={"h6"}>{dict.register.verify.illustrate + emailAddr}</Typography>
+                                    <Typography variant={"h6"}>{dict.register.verify.passkey + passkey}</Typography>
+                                    <Typography variant={"h6"}>{dict.register.verify.hint}</Typography>
+                                </Stack>
+                            </>}
+                    </Box>
+                    : <></>}  {/* TODO: 这里加一张图片 */}
             </Box>
         </Box>
     )

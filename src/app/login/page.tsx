@@ -3,7 +3,9 @@
 import {
     Alert,
     Box,
-    Button, Snackbar,
+    Button,
+    Snackbar,
+    Stack,
     TextField,
     Typography
 } from "@mui/material";
@@ -11,25 +13,27 @@ import React, {useRef, useState} from "react";
 import {useRouter} from "next/navigation";
 import {useSessionStorage} from "usehooks-ts";
 
+// cf验证码的轮子
+import { Turnstile } from "@marsidev/react-turnstile";
+
 import {dict} from "@/i18n/zh-cn"
 
+// @/utils 定义了一些常量和模板
 import {backendAddress, POST} from "@/utils";
-import {Turnstile} from "@marsidev/react-turnstile";
 
-
+// 这一块的内容会套在 /src/app/layout.jsx 定义的东西里面
 export default function Page() {
     const router = useRouter()
     const formRef = useRef()
 
+    // React 中的 State, 一种可以在多次渲染之间暂存的变量, 详见文档
     const [incorrectCredentialsOpen, setIncorrectCredentialsOpen] = useState(false)
     const [networkErrorOpen, setNetworkErrorOpen] = useState(false)
 
     const [disabled, setDisabled] = useState(false)
-
     // const [id, setId] = useSessionStorage("id", -1)
     // const [isSiteAdmin, setIsSiteAdmin] = useSessionStorage("isSiteAdmin", false)
     // 以上两个变量不再需要
-
     const [_jwt, setJWT] = useSessionStorage("jwt", "")
 
     return <Box sx={{
@@ -44,20 +48,24 @@ export default function Page() {
             flexGrow: 1
         }}>
             <Box sx={{flexGrow: 1}}>
-                <Snackbar open={incorrectCredentialsOpen}
-                          autoHideDuration={5000}
-                          onClose={() => {setIncorrectCredentialsOpen(false)}}
-                          key={"ic"}>
+                <Snackbar
+                    open={incorrectCredentialsOpen}
+                    autoHideDuration={5000}
+                    onClose={() => {setIncorrectCredentialsOpen(false)}}
+                    key={"ic"}
+                >
                     <Alert severity={"error"} variant={"filled"}>{dict.login.fail.incorrectCredentials}</Alert>
                 </Snackbar>
-                <Snackbar open={networkErrorOpen}
-                          autoHideDuration={5000}
-                          onClose={() => {setNetworkErrorOpen(false)}}
-                          key={"ne"}>
+                <Snackbar
+                    open={networkErrorOpen}
+                    autoHideDuration={5000}
+                    onClose={() => {setNetworkErrorOpen(false)}}
+                    key={"ne"}
+                >
                     <Alert severity={"error"} variant={"filled"}>{dict.login.fail.networkError}</Alert>
                 </Snackbar>
                 <Box component={"form"} ref={formRef}
-                     sx={{display: "flex", flexDirection: "column", alignItems: "center", gap: 2, textAlign: "center"}}>
+                    sx={{display: "flex", flexDirection: "column", alignItems: "center", gap: 2, textAlign: "center"}}>
                     <Typography variant={"h5"}>{dict.login.title}</Typography>
                     <TextField name={"username"} label={dict.login.username} sx={{width: 300}}/>
                     <TextField name={"password"} label={dict.login.password} type={"password"} sx={{width: 300}}/>
@@ -66,7 +74,7 @@ export default function Page() {
                     <Button variant={"contained"} disabled={disabled} onClick={() => {
                         setDisabled(true)
 
-                        console.log(Object.fromEntries(new FormData(formRef.current).entries()))
+                        // console.log(Object.fromEntries(new FormData(formRef.current).entries()))
 
                         // API 地址, 使用字符串模板拼接 backendAddress 和 path 而成
                         fetch(`${backendAddress}/login`, POST(
@@ -91,6 +99,10 @@ export default function Page() {
                             setDisabled(false)
                         })
                     }}>{dict.login.submit}</Button>
+                    <Button
+                        href="#text-buttons"
+                        onClick={() => {router.push("/register")}}
+                    >{dict.register.linkFromLoginPage}</Button>
                 </Box>
             </Box>
         </Box>
