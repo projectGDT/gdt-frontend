@@ -20,23 +20,39 @@ export const dict = {
         success: "登录成功"
     },
     register: {
+        linkFromLoginPage: "注册",
+
         title: "注册",
 
-        qq: "QQ号",
-        qqRequirement: ["", "请输入有效QQ号", "此QQ号已经被注册"],
+        qid: "QQ号",
+        qidError: {
+            invalidQid: "请输入有效QQ号",
+            alreadyExists: "此QQ号已经被注册",
+        },
         username: "用户名",
-        usernameRequirement: ["", "用户名必须以字母开头，长度为3~16字符", "该用户名已被注册"],
+        usernameError: {
+            invalidUsername: "必须以字母开头，3~16字符",
+            alreadyExists: "该用户名已被注册",
+        },
         password: "密码",
-        passwordRequirement: "密码至少为8位，包含字母和数字",
-        confirmPassword: "确认密码",
-        confirmPasswordRequirement: "两次输入密码不一致",
-        inviteCode: "邀请码（可选）",
+        passwordError: "密码为8~20位，包含字母和数字",
+        invitationCode: "邀请码（可选）",
         submit: "注册",
 
         fail: {
             title: "注册失败",
+            networkError: "请检查网络连接是否正常",
+            invalidPayload: "注册信息有误，请重试",
+            timeout: "注册超时"
+        },
 
-            networkError: "请检查网络连接是否正常。",
+        verify: {
+            title: "验证",
+            illustrate: "请将验证码发送至：",
+            passkey: "验证码：",
+            hint: "页面会自动跳转",
+            complete: "注册完成",
+            autoJump: "将在5秒后自动跳转至登录页面"
         }
     },
     list: {
