@@ -23,6 +23,21 @@ type Profile = {
     cachedPlayerName: string
 }
 
+export function JavaMsProfileButton({uuid, playerName}: {uuid: string, playerName: string}) {
+    return <ListItemButton>
+        <ListItemAvatar>
+            <Avatar variant={"square"} src={`https://minotar.net/helm/${uuid}`}/>
+        </ListItemAvatar>
+        <ListItemText primary={playerName} secondary={uuid}/>
+    </ListItemButton>
+}
+
+export function XboxProfileButton({xuid, gtg}: {xuid: string, gtg: string}) {
+    return <ListItemButton>
+        <ListItemText primary={gtg} secondary={xuid}/>
+    </ListItemButton>
+}
+
 const xboxOauthUri = "https://login.live.com/oauth20_authorize.srf?client_id=9e474b67-edcd-4d23-b2fc-6dc8db5e08f7&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fpost-login%2Fsettings%2Fprofile%2Fxbox&response_type=code&scope=XboxLive.signin"
 
 export default function Page() {
@@ -50,13 +65,6 @@ export default function Page() {
     }, [userModifyFlag])
 
     return <Paper><List>
-        <Box sx={{textAlign: "center", padding: 2}}>
-            <Typography variant={"h5"}>{dict.settings.profile.title}</Typography>
-            <Typography variant={"caption"}>{dict.settings.profile.secondary}</Typography>
-        </Box>
-
-        <Divider/>
-
         {loading ? <>
             <Skeleton width={"100%"} height={100}/>
             <Skeleton width={"100%"} height={100}/>
@@ -69,12 +77,7 @@ export default function Page() {
                           secondaryAction={<IconButton onClick={() => setJavaDeleteOpen(true)}>
                               <DeleteOutlineOutlined/>
                           </IconButton>}>
-                    <ListItemButton>
-                        <ListItemAvatar>
-                            <Avatar variant={"square"} src={`https://minotar.net/helm/${javaMsProfile.uniqueId}`}/>
-                        </ListItemAvatar>
-                        <ListItemText primary={javaMsProfile.cachedPlayerName} secondary={javaMsProfile.uniqueId}/>
-                    </ListItemButton>
+                    <JavaMsProfileButton uuid={javaMsProfile.uniqueId} playerName={javaMsProfile.cachedPlayerName}/>
                 </ListItem>
             ) : (
                 <ListItem secondaryAction={<Button href={"profile/java-microsoft"}>
@@ -109,9 +112,7 @@ export default function Page() {
                           secondaryAction={<IconButton onClick={() => setXboxDeleteOpen(true)}>
                               <DeleteOutlineOutlined/>
                           </IconButton>}>
-                    <ListItemButton>
-                        <ListItemText primary={xboxProfile.cachedPlayerName} secondary={xboxProfile.uniqueId}/>
-                    </ListItemButton>
+                    <XboxProfileButton xuid={xboxProfile.uniqueId} gtg={xboxProfile.cachedPlayerName}/>
                 </ListItem>
             ) : (
                 <ListItem disablePadding secondaryAction={<Button
