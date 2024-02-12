@@ -12,6 +12,7 @@
     "@emotion/cache": "^11.11.0",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@fontsource-variable/jetbrains-mono": "^5.0.19",
     "@fontsource-variable/noto-sans-sc": "^5.0.4",
     "@fontsource/inter": "^5.0.16",
     "@fontsource/roboto": "^5.0.8",

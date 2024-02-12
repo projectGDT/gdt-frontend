@@ -20,39 +20,58 @@ export const dict = {
         success: "登录成功"
     },
     register: {
-        linkFromLoginPage: "注册",
-
         title: "注册",
 
-        qid: "QQ号",
-        qidError: {
-            invalidQid: "请输入有效QQ号",
-            alreadyExists: "此QQ号已经被注册",
+        submit: {
+            label: "提交",
+            qid: {
+                title: "QQ 号",
+                error: {
+                    invalid: "请输入有效QQ号",
+                    alreadyExists: "此QQ号已经被注册",
+                }
+            },
+            username: {
+                title: "用户名",
+                error: {
+                    invalid: "必须以字母开头，3~16 字符",
+                    alreadyExists: "该用户名已被注册",
+                }
+            },
+            password: {
+                title: "密码",
+                error: {
+                    invalid: "必须为 8~20 位，包含字母和数字"
+                }
+            },
+            invitationCode: {
+                title: "邀请码（可选）",
+                error: {
+                    invalid: "邀请码格式不正确"
+                }
+            },
+            confirm: "确认",
+            fail: {
+                title: "注册失败",
+                invalidPayload: "注册信息有误，请重试。",
+                timeout: "操作超时。"
+            }
         },
-        username: "用户名",
-        usernameError: {
-            invalidUsername: "必须以字母开头，3~16字符",
-            alreadyExists: "该用户名已被注册",
-        },
-        password: "密码",
-        passwordError: "密码为8~20位，包含字母和数字",
-        invitationCode: "邀请码（可选）",
-        submit: "注册",
-
-        fail: {
-            title: "注册失败",
-            networkError: "请检查网络连接是否正常",
-            invalidPayload: "注册信息有误，请重试",
-            timeout: "注册超时"
-        },
-
         verify: {
-            title: "验证",
-            illustrate: "请将验证码发送至：",
-            passkey: "验证码：",
-            hint: "页面会自动跳转",
-            complete: "注册完成",
-            autoJump: "将在5秒后自动跳转至登录页面"
+            label: "验证",
+            content: (email: string, passkey: string) => <>
+                请在 10 分钟内用 QQ 邮箱将验证码 <b>{passkey}</b> 发送至 <b>{email}</b>。
+            </>,
+            hint: (qid: string) => <>
+                请将验证码写在邮件的<b>标题</b>中。<br/>
+                请使用<b>数字 QQ 邮箱</b>（{qid}@qq.com）而非其他邮箱别名（[字母]@foxmail.com 等）。
+            </>,
+            waiting: "等待服务器回应……",
+            go: "前往 QQ 邮箱"
+        },
+        complete: {
+            title: "注册完成！",
+            redirect: "5 秒后将跳转到服务器列表页面。"
         }
     },
     list: {
