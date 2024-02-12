@@ -9,8 +9,9 @@ export interface ServerInfo {
 }
 
 export interface Server {
-    applyingPolicy: string;
+    coverLink: string;
     id: number;
     name: string;
     logoLink: string;
+    applyingPolicy: string;
 }

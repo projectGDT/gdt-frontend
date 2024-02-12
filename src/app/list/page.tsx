@@ -15,7 +15,7 @@ import {
     TextField,
     Typography
 } from "@mui/material";
-import React, {useEffect, useId, useRef, useState} from "react";
+import React, {use, useEffect, useId, useRef, useState} from "react";
 import {useRouter} from "next/navigation";
 import {useSessionStorage} from "usehooks-ts";
 
@@ -24,12 +24,12 @@ import {dict} from "@/i18n/zh-cn"
 // @/templates 定义了一些常量和模板
 import Script from "next/script";
 import { Image } from "@mui/icons-material";
-import { space } from "postcss/lib/list";
+import list, { space } from "postcss/lib/list";
 
 import mc, { NewPingResult, OldPingResult } from 'minecraft-protocol';
 import { Router, useSearchParams } from "react-router-dom";
 import { GET, POST, backendAddress } from "@/utils";
-import { ServerInfo } from "@/types";
+import { Server, ServerInfo } from "@/types";
 
 // 定义一种错误, 和网络错误区分开, 后面会有用
 class IncorrectCredentialsError extends Error {
@@ -115,12 +115,11 @@ const TESTFINDS = {
     hasNextPage: false
 }
 
-class ServerPingInfo {
-    isJavaEdition: boolean = true;
-    online: number = 0;
-    max: number = 0;
-    latency: number = 0;
-}
+// 每次推荐的时候试图取回几个服务器数据
+const RECOMMENDSIZE = 3;
+// 第一次推荐的时候试图取回几个服务器数据
+const FIRSTRECOMMENDSIZE = 6;
+// 以上两个常量，后者**必须**是前者的倍数，且建议二者都为3的倍数
 
 // 每个卡片上的服务器图标和名称
 function ServerName(props: {logolink: string, name: string, id: number}) {
@@ -160,16 +159,21 @@ export default function Page() {
     const [jwt, setJWT] = useSessionStorage("jwt", "")
 
     const [joinedServers, setJoinedServers] = useSessionStorage("joinedServers", [-1]);
-    const [refreshing, setRefreshing] = useState(true);
+    const [refreshing, setRefreshing] = useState(true); // ???????????????????????????????????????
     const [joinedServersInfo, setJoinedServersInfo] = useState<ServerInfo[]>([]);
 
     // 推荐功能
-    const [recommendedList, setRecommendList] = useState<number[]>([]);
+    const [recommendList, setRecommendList] = useState<number[]>([]);
     const [recommendCount, setRecommendCount] = useState(0);
+    const [recommendInfo, setRecommendInfo] = useState<Server[]>([]);
+    const [hasFirstFetched, setHasFirstFetched] = useState(false); // 为了防止重复调用而设的标志位
     
-    // 这边加一个 useEffect 获得已加入的服务器列表，然后存进 joinedServers
+    // 下拉自动加载新内容
+    const [loading, setLoading] = useState(false); // ????????????????????????????????????????
+    const scrollPos = useRef(0);
+    
+    // 获得已加入的服务器列表
     useEffect(() => {
-        // setJoinedServers(joinedServersInfo.map(({server}) => {return server.id}))
         fetchServerList();
     }, []);
 
@@ -178,21 +182,40 @@ export default function Page() {
         fetchRecommendList();
     }, []);
 
-    // 获取推荐列表中，服务器的信息
+    // 获取推荐列表中，服务器的信息（第一次）
     useEffect(() => {
-        if (recommendedList.length !== 0)
+        if (recommendList.length !== 0 && !hasFirstFetched) {
             fetchRecommendInfo();
-    }, [recommendedList])
-
-    const fetchRecommendInfo = () => {
-        setRefreshing(true); // 获取信息时候把刷新状态设为 true
-
-        const fetchIndex: number[] = [];
-        for (let i = 0; i + recommendCount * 10 < recommendedList.length && i < 10; i++) {
-            fetchIndex.push(recommendedList[i + recommendCount * 10]);
+            setHasFirstFetched(true);
         }
+    }, [recommendList, hasFirstFetched])
+    
+    const handleScroll = () => {  
+        if (loading) return;  
+        const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+        if (scrollTop + clientHeight >= scrollHeight) {  
+            fetchRecommendInfo();
+        }
+    };
 
-        fetch(`${backendAddress}/post-login/me/discover/query`, POST(fetchIndex, true))
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        }
+    }, [recommendList, recommendCount])
+    // 这块必须把 recommendList 和 recommendCount 设置成依赖项，每次他俩变化的时候要重新创建监听函数，否则会导致这个监听函数里
+    // 获取到的 recommendList 和 recommendCount 一直是最初的初始值
+
+    // 每次获取到新内容的时候，恢复指针的位置
+    useEffect(() => {
+        window.scrollTo(0, scrollPos.current);
+    }, [recommendInfo, loading])
+
+    const fetchServerList = () => {
+        setRefreshing(true); // 获取信息时候把刷新状态设为 true
+        fetch(`${backendAddress}/post-login/me/servers`, GET(true))
             .then(response => {
                 if (response.ok)
                     return response.json();
@@ -200,16 +223,14 @@ export default function Page() {
                     throw new Error(`HTTP ERROR, CODE: ${response.status}`); // 暂时先这样处理错误
             })
             .then(data => {
-                console.log(data);
-                // setRecommendList(data);
-                // TODO：设置显示用的recommendinfo
+                setJoinedServersInfo(data);
+                setJoinedServers(data.map((item: ServerInfo) => {return item.server.id}));
             })
             .catch(error => {
                 console.error(error); // 暂时先这样处理错误
             })
             .finally(() => {
                 setRefreshing(false); // 最后把刷新状态设为 false
-                setRecommendCount(recommendCount + 1);
             })
     }
 
@@ -223,7 +244,6 @@ export default function Page() {
                     throw new Error(`HTTP ERROR, CODE: ${response.status}`); // 暂时先这样处理错误
             })
             .then(data => {
-                // console.log(data);
                 setRecommendList(data);
             })
             .catch(error => {
@@ -234,9 +254,34 @@ export default function Page() {
             })
     }
 
-    const fetchServerList = () => {
+    const fetchRecommendInfo = () => {
+        scrollPos.current = window.scrollY;
         setRefreshing(true); // 获取信息时候把刷新状态设为 true
-        fetch(`${backendAddress}/post-login/me/servers`, GET(true))
+        setLoading(true);
+
+        const currentIndex = hasFirstFetched ? recommendCount * RECOMMENDSIZE : recommendCount * FIRSTRECOMMENDSIZE;
+
+        // 已经全都加载完了的情况：
+        if (currentIndex >= recommendList.length) {
+            setRefreshing(false);
+            setLoading(false);
+            return;
+        }
+
+        const fetchIndex: number[] = [];
+        if (hasFirstFetched) {
+            for (let i = 0; i + currentIndex < recommendList.length && i < RECOMMENDSIZE; i++) {
+                fetchIndex.push(recommendList[i + currentIndex]);
+            }
+        }
+        else {
+            for (let i = 0; i + currentIndex < recommendList.length && i < FIRSTRECOMMENDSIZE; i++) {
+                fetchIndex.push(recommendList[i + currentIndex]);
+            }
+        }
+        
+
+        fetch(`${backendAddress}/post-login/me/discover/query`, POST(fetchIndex, true))
             .then(response => {
                 if (response.ok)
                     return response.json();
@@ -244,52 +289,17 @@ export default function Page() {
                     throw new Error(`HTTP ERROR, CODE: ${response.status}`); // 暂时先这样处理错误
             })
             .then(data => {
-                // console.log(data);
-                setJoinedServersInfo(data);
-                setJoinedServers(data.map((item: ServerInfo) => {return item.server.id}));
+                setRecommendInfo(prevInfo => [...prevInfo, ...data]);
             })
             .catch(error => {
                 console.error(error); // 暂时先这样处理错误
             })
             .finally(() => {
                 setRefreshing(false); // 最后把刷新状态设为 false
+                setLoading(false);
+                setRecommendCount(hasFirstFetched ? (prevCount => prevCount + 1) : (FIRSTRECOMMENDSIZE / RECOMMENDSIZE));
             })
     }
-
-
-
-/*
-    let pingInfo: ServerPingInfo[];
-    let cnt: number = 0;
-
-    useEffect(() => {
-        // 先GET加入服务器和 发现服务器列表，然后对加入服务器中的每一个执行一次ping
-        joinedServersInfo.forEach(element => {
-            if (element.server.javaRemote !== null) {
-                const pingOption: mc.PingOptions = {
-                    host: element.server.javaRemote.address,
-                    port: element.server.javaRemote.port
-                }
-                mc.ping(pingOption, (err, pingResults) => {
-                    if (err) console.error('ERROR: ${err.message}');
-                    let result = pingResults as NewPingResult;
-                    pingInfo[cnt].isJavaEdition = true;
-                    pingInfo[cnt].online = result.players.online;
-                    pingInfo[cnt].max = result.players.max;
-                    pingInfo[cnt].latency = result.latency;
-                    cnt += 1;
-                });
-            }
-            else {
-                pingInfo[cnt].isJavaEdition = false;
-                cnt += 1;
-            }
-        });
-    }, [])
-
-    let rendercnt: number = -1;
-*/
-
 
     // 在 return 里面加一个加载动画，根据 refreshing 判断
     return !refreshing && (
@@ -324,19 +334,20 @@ export default function Page() {
                 <Box sx={{fontSize: 30, paddingY: 1}}>{dict.list.subtitle[1]}</Box>
                 <Box paddingY={1}>
                     <Grid container spacing={2}>
-                        {TESTFINDS.servers.map(({id, name, logoLink, coverLink}) =>
-                            <Grid item xs={4} key={id}>
+                        {recommendInfo.map((item) =>
+                            <Grid item xs={4} key={item.id}>
                                 <Paper elevation={3}>
-                                    <ServerName logolink={logoLink} name={name} id={id}/>
+                                    <ServerName logolink={item.logoLink} name={item.name} id={item.id}/>
                                     <Divider variant="middle"/>
                                     <Box sx={{display: "flex", flexDirection: "row", paddingX: 1, paddingY: 1}}>
-                                        <img src={coverLink} style={{width: "100%"}}/>
+                                        <img src={item.coverLink} style={{width: "100%"}}/>
                                     </Box>
                                 </Paper>
                             </Grid>
                         )}
                     </Grid>
                 </Box>
+                {loading && <Box>loading...</Box>}
             </Box>
         </Box>
     )
