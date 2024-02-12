@@ -5,7 +5,6 @@ import {
     Box,
     Button,
     Snackbar,
-    Stack,
     TextField,
     Typography
 } from "@mui/material";
@@ -26,9 +25,7 @@ export default function Page() {
     const router = useRouter()
     const formRef = useRef()
 
-    // React 中的 State, 一种可以在多次渲染之间暂存的变量, 详见文档
     const [incorrectCredentialsOpen, setIncorrectCredentialsOpen] = useState(false)
-    const [networkErrorOpen, setNetworkErrorOpen] = useState(false)
 
     const [disabled, setDisabled] = useState(false)
     // const [id, setId] = useSessionStorage("id", -1)
@@ -56,16 +53,17 @@ export default function Page() {
                 >
                     <Alert severity={"error"} variant={"filled"}>{dict.login.fail.incorrectCredentials}</Alert>
                 </Snackbar>
-                <Snackbar
-                    open={networkErrorOpen}
-                    autoHideDuration={5000}
-                    onClose={() => {setNetworkErrorOpen(false)}}
-                    key={"ne"}
+                <Box
+                    component={"form"}
+                    ref={formRef}
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 2,
+                        textAlign: "center"
+                    }}
                 >
-                    <Alert severity={"error"} variant={"filled"}>{dict.login.fail.networkError}</Alert>
-                </Snackbar>
-                <Box component={"form"} ref={formRef}
-                    sx={{display: "flex", flexDirection: "column", alignItems: "center", gap: 2, textAlign: "center"}}>
                     <Typography variant={"h5"}>{dict.login.title}</Typography>
                     <TextField name={"username"} label={dict.login.username} sx={{width: 300}}/>
                     <TextField name={"password"} label={dict.login.password} type={"password"} sx={{width: 300}}/>
@@ -73,8 +71,6 @@ export default function Page() {
 
                     <Button variant={"contained"} disabled={disabled} onClick={() => {
                         setDisabled(true)
-
-                        // console.log(Object.fromEntries(new FormData(formRef.current).entries()))
 
                         // API 地址, 使用字符串模板拼接 backendAddress 和 path 而成
                         fetch(`${backendAddress}/login`, POST(
@@ -88,21 +84,16 @@ export default function Page() {
                             setJWT(jwt)
                             // 跳转回主页, 在 /list 写好之后可以考虑跳转到服务器选择页面
                             router.push("/")
-                        }).catch(error => {
-                            switch (error) {
-                                case "incorrect-credentials":
-                                    setIncorrectCredentialsOpen(true)
-                                    break
-                                default:
-                                    setNetworkErrorOpen(true)
-                            }
-                            setDisabled(false)
+                        }).catch(err => {
+                            if (err === "incorrect-credentials")
+                                setIncorrectCredentialsOpen(true)
+                            else throw err
                         })
                     }}>{dict.login.submit}</Button>
                     <Button
                         href="#text-buttons"
                         onClick={() => {router.push("/register")}}
-                    >{dict.register.linkFromLoginPage}</Button>
+                    >{dict.register.title}</Button>
                 </Box>
             </Box>
         </Box>
