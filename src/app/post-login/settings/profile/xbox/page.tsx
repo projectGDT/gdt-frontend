@@ -5,6 +5,7 @@ import {Alert, Box, Button, Collapse, LinearProgress, Paper, Snackbar, Typograph
 import {dict} from "@/i18n/zh-cn";
 import {useSearchParams} from "next/navigation";
 import {backendAddress, POST} from "@/utils";
+import {XboxProfileButton} from "@/app/post-login/settings/profile/page";
 
 export default function Page() {
     const params = useSearchParams()
@@ -58,19 +59,22 @@ export default function Page() {
                 }
                 setErrorOpen(true)
             })
-        }}>{dict.settings.profile.bind.xbox.submit}</Button>
+        }}>{dict.settings.profile.bind.submit}</Button>
 
         <Collapse in={loading} sx={{alignSelf: "stretch"}}>
             <LinearProgress/>
         </Collapse>
 
         <Collapse in={showComplete} sx={{alignSelf: "stretch"}}>
-            <Paper elevation={2} sx={{padding: 1.5}}>
-                <Typography variant={"h6"}>{dict.settings.profile.bind.xbox.complete.title}</Typography>
-                <Typography>
-                    {dict.settings.profile.bind.xbox.complete.content(xuid, xboxGamerTag)}
-                </Typography>
-            </Paper>
+            <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
+                <Paper elevation={2} sx={{padding: 1.5}}>
+                    <Typography variant={"h6"}>{dict.settings.profile.bind.xbox.complete}</Typography>
+                    <XboxProfileButton xuid={xuid} gtg={xboxGamerTag}/>
+                </Paper>
+                <Button sx={{alignSelf: "center"}} href={"."}>
+                    {dict.settings.profile.bind.goBack}
+                </Button>
+            </Box>
         </Collapse>
     </Box>
 }

@@ -2,10 +2,22 @@
 
 import {useSessionStorage} from "usehooks-ts";
 import React, {useState} from "react";
-import {Alert, Box, Button, Collapse, LinearProgress, Paper, Snackbar, TextField, Typography} from "@mui/material";
+import {
+    Alert, Avatar,
+    Box,
+    Button,
+    Collapse,
+    LinearProgress, Link, List,
+    ListItemAvatar, ListItemButton, ListItemText,
+    Paper,
+    Snackbar,
+    TextField,
+    Typography
+} from "@mui/material";
 import {dict} from "@/i18n/zh-cn";
 import {io} from "socket.io-client";
 import {backendAddress} from "@/utils";
+import {JavaMsProfileButton} from "@/app/post-login/settings/profile/page";
 
 export default function Page() {
     const [jwt, _setJwt] = useSessionStorage("jwt", "")
@@ -21,7 +33,7 @@ export default function Page() {
     const [userCode, setUserCode] = useState("")
     const [verificationUri, setVerificationUri] = useState("")
 
-    const [showComplete, setShowComplete] = useState(false)
+    const [completed, setCompleted] = useState(false)
     const [uuid, setUUID] = useState("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
     const [playerName, setPlayerName] = useState("")
 
@@ -59,7 +71,7 @@ export default function Page() {
                 setLoading(false)
                 setUUID(payloadUUID)
                 setPlayerName(payloadPlayerName)
-                setShowComplete(true)
+                setCompleted(true)
             })
 
             socket.once("internal-error", () => {
@@ -79,28 +91,33 @@ export default function Page() {
                 setErrorOpen(true)
                 setErrMsg(dict.settings.profile.bind.javaMicrosoft.fail.alreadyExists)
             })
-        }}>{dict.settings.profile.bind.javaMicrosoft.submit}</Button>
+        }}>{dict.settings.profile.bind.submit}</Button>
 
         <Collapse in={loading} sx={{alignSelf: "stretch"}}>
             <LinearProgress/>
         </Collapse>
 
-        <Collapse in={showStep1} sx={{alignSelf: "stretch"}}>
+        <Collapse in={true} sx={{alignSelf: "stretch"}}>
             <Paper elevation={2} sx={{padding: 1.5}}>
                 <Typography variant={"h6"}>{dict.settings.profile.bind.javaMicrosoft.step1.title}</Typography>
                 <Typography>
-                    {dict.settings.profile.bind.javaMicrosoft.step1.content(`${verificationUri}?otc=${userCode}`)}
+                    {dict.settings.profile.bind.javaMicrosoft.step1.hint}
+                    <br/>
+                    <Link href={`${verificationUri}?otc=${userCode}`} target={"_blank"}>{`${verificationUri}?otc=${userCode}`}</Link>
                 </Typography>
             </Paper>
         </Collapse>
 
-        <Collapse in={showComplete} sx={{alignSelf: "stretch"}}>
-            <Paper elevation={2} sx={{padding: 1.5}}>
-                <Typography variant={"h6"}>{dict.settings.profile.bind.javaMicrosoft.complete.title}</Typography>
-                <Typography>
-                    {dict.settings.profile.bind.javaMicrosoft.complete.content(uuid, playerName)}
-                </Typography>
-            </Paper>
+        <Collapse in={completed} sx={{alignSelf: "stretch"}}>
+            <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
+                <Paper elevation={2} sx={{padding: 1.5}}>
+                    <Typography variant={"h6"}>{dict.settings.profile.bind.javaMicrosoft.complete}</Typography>
+                    <JavaMsProfileButton uuid={uuid} playerName={playerName}/>
+                </Paper>
+                <Button sx={{alignSelf: "center"}} href={"."}>
+                    {dict.settings.profile.bind.goBack}
+                </Button>
+            </Box>
         </Collapse>
     </Box>
 }
