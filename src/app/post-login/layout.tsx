@@ -15,32 +15,32 @@ import {useRouter} from "next/navigation";
 // 侧边栏导航按钮的基本信息, 通过 map 方法转换成按钮
 const navigation = [
     {
-        href: "portal",
+        href: "/post-login/portal",
         icon: HomeOutlined,
         display: dict.portal.title
     },
     {
-        href: "list",
+        href: "/post-login/list",
         icon: DashboardCustomizeOutlined,
         display: dict.list.title
     },
     {
-        href: "manage",
+        href: "/post-login/manage",
         icon: DnsOutlined,
         display: dict.manage.title
     },
     {
-        href: "access",
+        href: "/post-login/access",
         icon: LinkOutlined,
         display: dict.access.title
     },
     {
-        href: "settings",
+        href: "/post-login/settings",
         icon: ManageAccountsOutlined,
         display: dict.settings.title
     },
     {
-        href: "tools",
+        href: "/post-login/tools",
         icon: HandymanOutlined,
         display: dict.tools.title
     }
@@ -53,7 +53,12 @@ export default function PostLoginLayout({children}: { children: React.ReactNode 
 
     useEffect(() => {
         // 这里用 useSessionStorage 会出问题
-        if (sessionStorage.getItem("jwt") !== '""') setContent(
+        const jwt = sessionStorage.getItem("jwt")
+
+        // 调试时候注释掉这一行即可去除前端鉴权
+        if (!jwt || jwt === '""') router.push("/login"); else
+
+        setContent(
         <Box sx={{display: "flex", flexGrow: 1}}>
             {/* Drawer 形成了左侧侧边栏 */}
             <Drawer variant="permanent" PaperProps={{
@@ -95,7 +100,6 @@ export default function PostLoginLayout({children}: { children: React.ReactNode 
             </Box>
         </Box>
         )
-        else router.push("/login")
     }, [children, router]);
 
     return content

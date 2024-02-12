@@ -3,6 +3,7 @@
 import {dict} from "@/i18n/zh-cn";
 
 import '@fontsource-variable/noto-sans-sc';
+import '@fontsource-variable/jetbrains-mono';
 import '@fontsource/inter/300.css';
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/500.css';
@@ -14,20 +15,11 @@ import {
     Avatar,
     Box, Button,
     createTheme, CssBaseline,
-    Drawer,
     IconButton,
-    List, ListItem,
-    ListItemButton, ListItemIcon,
-    ListItemText,
     ThemeProvider, Toolbar,
     Typography
 } from '@mui/material'
-import {
-    AccountCircleOutlined, DashboardCustomizeOutlined,
-    DnsOutlined,
-    HandymanOutlined,
-    HomeOutlined, LinkOutlined, ManageAccountsOutlined
-} from "@mui/icons-material";
+import {AccountCircleOutlined} from "@mui/icons-material";
 import {AppRouterCacheProvider} from "@mui/material-nextjs/v13-appRouter";
 import {useSessionStorage} from "usehooks-ts";
 
@@ -52,13 +44,10 @@ const gdtTheme = createTheme({
             default: '#f9f9f9',
         },
         text: {
-            primary: 'rgba(0,0,0,0.75)',
+            primary: 'rgba(0,0,0,0.825)',
         },
     },
 })
-
-// 左侧侧边栏的宽度
-const drawerWidth = 240
 
 // RootLayout, 所有 UI 的根本框架 (布局), 具体的用户界面在 children 参数中传递, 嵌套在根本框架中
 export default function RootLayout({children}: { children: React.ReactNode }) {
