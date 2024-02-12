@@ -24,10 +24,6 @@ import { validatePassword, validateQid, validateUsername } from "@/app/register/
 
 import { Turnstile } from "@marsidev/react-turnstile";
 
-const socket = io(backendAddress + "/register/submit", {
-    autoConnect: false
-});
-
 // 注册页面
 export default function Page() {
     const router = useRouter();
@@ -113,6 +109,10 @@ export default function Page() {
 
                                 // 禁用注册按钮
                                 setNotClicked(false);
+
+                                const socket = io( `${backendAddress}/register/submit`, {
+                                    autoConnect: false
+                                });
 
                                 // 网络错误、注册信息错误、超时
                                 socket.on("connect_error", (e) => {
