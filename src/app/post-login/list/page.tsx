@@ -26,8 +26,6 @@ import Script from "next/script";
 import { Image } from "@mui/icons-material";
 import list, { space } from "postcss/lib/list";
 
-import mc, { NewPingResult, OldPingResult } from 'minecraft-protocol';
-import { Router, useSearchParams } from "react-router-dom";
 import { GET, POST, backendAddress } from "@/utils";
 import { Server, ServerInfo } from "@/types";
 
@@ -128,7 +126,7 @@ function ServerName(props: {logolink: string, name: string, id: number}) {
             <Box sx={{display: "flex", height: "auto"}}>
                 <img src={props.logolink} style={{width: 64, height: 64}}/>
                 {/*<Box sx={{display: "flex", alignItems: "center", paddingX: 1, fontSize: 23}}>{props.name}</Box>*/}
-                <Link href={`/server/${props.id}`} color="inherit" underline="none" sx={{display: "flex", alignItems: "center", paddingX: 1, fontSize: 23}}>{props.name}</Link>
+                <Link href={`/post-login/server/${props.id}`} color="inherit" underline="none" sx={{display: "flex", alignItems: "center", paddingX: 1, fontSize: 23}}>{props.name}</Link>
             </Box>
         </Box>
     )
@@ -140,7 +138,7 @@ function CardButtons(props: {id: number, isOp: boolean}) {
     return (
         <Stack direction="row-reverse" paddingX={1.5} paddingY={1}>
             <Button variant="text" size="small">{dict.list.cardButtons[0]}</Button>
-            {props.isOp && <Button variant="text" size="small" onClick={() => router.replace(`/server/${props.id}/manage`)}>{dict.list.cardButtons[1]}</Button>}
+            {props.isOp && <Button variant="text" size="small" onClick={() => router.replace(`/post-login/server/${props.id}/manage`)}>{dict.list.cardButtons[1]}</Button>}
         </Stack>
     )
 }
