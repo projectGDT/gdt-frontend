@@ -89,7 +89,8 @@ export const dict = {
         modTitle: ["Mod 服", "Mod 列表"],
         support: ["支持", "不支持"],
         authName: ["服主", "管理员"],
-        accessPrompt: ["请申请加入服务器", "请加入服务器"]
+        playerCount: ["（", "人）"],
+        accessPrompt: ["请登录", "请申请加入服务器", "请加入服务器", "，以获取完整玩家列表"]
     },
     manage: {
         title: "服务器管理"

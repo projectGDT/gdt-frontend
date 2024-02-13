@@ -36,83 +36,6 @@ class IncorrectCredentialsError extends Error {
     }
 }
 
-const TESTITEMS = [
-    {
-        server: {
-            id: 0,
-            name: "TimelessMC",
-            logoLink: "http://dummyimage.com/128x128",
-            javaRemote: {
-                address: "mc4.rhymc.com",
-                port: 10155
-            }
-        },
-        isOperator: true
-    },
-    {
-        server: {
-            id: 1,
-            name: "TimelessMC",
-            logoLink: "http://dummyimage.com/128x128",
-            javaRemote: {
-                address: "mc4.rhymc.com",
-                port: 10155
-            }
-        },
-        isOperator: false
-    }
-]
-const TESTFINDS = {
-    servers: [
-        {
-            id: 2,
-            name: "string",
-            logoLink: "http://dummyimage.com/128x128",
-            coverLink: "http://dummyimage.com/1280x720",
-            javaRemote: {
-                address: "mc4.rhymc.com",
-                port: 10155
-            },
-            bedrockRemote: {
-              address: "string",
-              port: 0
-            },
-            applyingPolicy: "CLOSED"
-        },
-        {
-            id: 3,
-            name: "string",
-            logoLink: "http://dummyimage.com/128x128",
-            coverLink: "http://dummyimage.com/1280x720",
-            javaRemote: {
-                address: "mc4.rhymc.com",
-                port: 10155
-            },
-            bedrockRemote: {
-              address: "string",
-              port: 0
-            },
-            applyingPolicy: "CLOSED"
-        },
-        {
-            id: 4,
-            name: "string",
-            logoLink: "http://dummyimage.com/128x128",
-            coverLink: "http://dummyimage.com/1280x720",
-            javaRemote: {
-                address: "mc4.rhymc.com",
-                port: 10155
-            },
-            bedrockRemote: {
-              address: "string",
-              port: 0
-            },
-            applyingPolicy: "CLOSED"
-        }
-    ],
-    hasNextPage: false
-}
-
 // 每次推荐的时候试图取回几个服务器数据
 const RECOMMENDSIZE = 3;
 // 第一次推荐的时候试图取回几个服务器数据
@@ -316,11 +239,6 @@ export default function Page() {
                                     <Box sx={{display: "flex", flexDirection: "row", height: "8vh", paddingX: 2, paddingY: 1, fontSize: 20, justifyContent: "space-between"}}>
                                         <div>0/20</div>
                                         <div>50ms</div>
-                                        {/*pingInfo[rendercnt].isJavaEdition && 
-                                            <div>
-                                                <div>{pingInfo[rendercnt].online} / {pingInfo[rendercnt].max}</div>
-                                                <div>{pingInfo[rendercnt].latency}</div>
-                                        </div>*/}
                                     </Box>
                                     <CardButtons id={server.id} isOp={isOperator}/>
                                 </Paper>

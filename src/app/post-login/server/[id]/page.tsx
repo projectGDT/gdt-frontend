@@ -3,501 +3,18 @@
 import {
     Box, Button, Card, CardContent, CardHeader, Checkbox, Divider, FormControlLabel, Grid, Stack, Typography,
 } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {useRouter} from "next/navigation";
 import {useSessionStorage} from "usehooks-ts";
 
 import {dict} from "@/i18n/zh-cn"
+import { Dependency, ModInfo, PlayerInfo, WholeServer } from "@/types";
+import { GET, backendAddress } from "@/utils";
 
 const ApplyingPolicy = {
     CLOSED: "CLOSED",
     ALL_OPEN: "ALL_OPEN",
     BY_FORM: "BY_FORM"
-}
-
-const TESTINFO = [
-    {
-        id: 0,
-        name: "TimelessMC 建筑/生电",
-        logoLink: "http://dummyimage.com/128x128",
-        coverLink: "http://dummyimage.com/1280x720",
-        introduction: "do aute labore",
-        owner: 1,
-        players: [
-          {
-            id: 1,
-            isManager: true
-          },
-          {
-            id: 49,
-            isManager: false
-          }
-        ],
-        javaRemote: {
-          address: "je.timelessmc.cn",
-          port: 25565,
-          coreVersion: "1.20.1",
-          compatibleVersions: [
-            "1.19",
-            "1.20",
-            [
-              "1.20.2",
-              "1.20.4"
-            ]
-          ],
-          uniqueIdProvider: -1,
-            isModded: false
-        },
-        bedrockRemote: {
-          address: "example.com",
-          port: 12345,
-          coreVersion: "1.20.0",
-          compatibleVersions: [
-            "1.19",
-            "1.20",
-            [
-              "1.20.2",
-              "1.20.4"
-            ]
-          ]
-        },
-        applyingPolicy: "ALL_OPEN"
-    },
-    {
-        id: 1,
-        name: "TimelessMC 建筑/生电",
-        logoLink: "http://dummyimage.com/128x128",
-        coverLink: "http://dummyimage.com/1280x720",
-        introduction: "do aute labore",
-        owner: 1,
-        players: [
-          {
-            id: 1,
-            isManager: true
-          },
-          {
-            id: 49,
-            isManager: false
-          }
-        ],
-        bedrockRemote: {
-          address: "example.com",
-          port: 12345,
-          coreVersion: "1.20.0",
-          compatibleVersions: [
-            "1.19",
-            "1.20",
-            [
-              "1.20.2",
-              "1.20.4"
-            ]
-          ]
-        },
-        applyingPolicy: "ALL_OPEN"
-    },
-    {
-        id: 2,
-        name: "TimelessMC 建筑/生电",
-        logoLink: "http://dummyimage.com/128x128",
-        coverLink: "http://dummyimage.com/1280x720",
-        introduction: "do aute labore",
-        owner: 1,
-        players: [
-          {
-            id: 1,
-            isManager: true
-          },
-          {
-            id: 49,
-            isManager: false
-          }
-        ],
-        javaRemote: {
-          address: "je.timelessmc.cn",
-          port: 25565,
-          coreVersion: "1.20.1",
-          compatibleVersions: [
-            "1.19",
-            "1.20",
-            [
-              "1.20.2",
-              "1.20.4"
-            ]
-          ],
-          uniqueIdProvider: -1,
-            isModded: true
-        },
-        applyingPolicy: "ALL_OPEN"
-    },
-    {
-        id: 3,
-        name: "TimelessMC 建筑/生电",
-        logoLink: "http://dummyimage.com/128x128",
-        coverLink: "http://dummyimage.com/1280x720",
-        introduction: "do aute labore",
-        owner: 1,
-        players: [
-          {
-            id: 1,
-            isManager: true
-          },
-          {
-            id: 49,
-            isManager: false
-          }
-        ],
-        javaRemote: {
-          address: "je.timelessmc.cn",
-          port: 25565,
-          coreVersion: "1.20.1",
-          compatibleVersions: [
-            "1.19",
-            "1.20",
-            [
-              "1.20.2",
-              "1.20.4"
-            ]
-          ],
-          uniqueIdProvider: -1,
-            isModded: true
-        },
-        bedrockRemote: {
-          address: "example.com",
-          port: 12345,
-          coreVersion: "1.20.0",
-          compatibleVersions: [
-            "1.19",
-            "1.20",
-            [
-              "1.20.2",
-              "1.20.4"
-            ]
-          ]
-        },
-        applyingPolicy: "BY_FORM"
-    },
-    {
-        id: 4,
-        name: "TimelessMC 建筑/生电",
-        logoLink: "http://dummyimage.com/128x128",
-        coverLink: "http://dummyimage.com/1280x720",
-        introduction: "do aute labore",
-        owner: 1,
-        players: [
-          {
-            id: 1,
-            isManager: true
-          },
-          {
-            id: 49,
-            isManager: false
-          }
-        ],
-        javaRemote: {
-          address: "je.timelessmc.cn",
-          port: 25565,
-          coreVersion: "1.20.1",
-          compatibleVersions: [
-            "1.19",
-            "1.20",
-            [
-              "1.20.2",
-              "1.20.4"
-            ]
-          ],
-          uniqueIdProvider: -1,
-            isModded: true
-        },
-        bedrockRemote: {
-          address: "example.com",
-          port: 12345,
-          coreVersion: "1.20.0",
-          compatibleVersions: [
-            "1.19",
-            "1.20",
-            [
-              "1.20.2",
-              "1.20.4"
-            ]
-          ]
-        },
-        applyingPolicy: "CLOSED"
-    },
-]
-
-const TESTPLAYER = [
-  {
-    ownerId: 65,
-    players: [
-      {
-        id: 20,
-        profiles: [
-          {
-            uniqueIdProvider: -3,
-            uniqueId: "2562575271538721",
-            cachedPlayerName: "Gi_Hiyo"
-          }
-        ],
-        isOperator: false
-      },
-      {
-        id: 65,
-        profiles: [
-          {
-            uniqueIdProvider: -3,
-            uniqueId: "2562575271538721",
-            cachedPlayerName: "Gi_Hiyo"
-          }
-        ],
-        isOperator: true
-      },
-      {
-        id: 21,
-        profiles: [
-          {
-            uniqueIdProvider: -3,
-            uniqueId: "2562575271538721",
-            cachedPlayerName: "Gi_Hiyo"
-          }
-        ],
-        isOperator: true
-      },
-    ]
-  },
-  {
-    ownerId: 65,
-    players: [
-      {
-        id: 20,
-        profiles: [
-          {
-            uniqueIdProvider: -3,
-            uniqueId: "2562575271538721",
-            cachedPlayerName: "Gi_Hiyo"
-          }
-        ],
-        isOperator: false
-      },
-      {
-        id: 65,
-        profiles: [
-          {
-            uniqueIdProvider: -3,
-            uniqueId: "2562575271538721",
-            cachedPlayerName: "Gi_Hiyo"
-          }
-        ],
-        isOperator: true
-      },
-      {
-        id: 21,
-        profiles: [
-          {
-            uniqueIdProvider: -3,
-            uniqueId: "2562575271538721",
-            cachedPlayerName: "Gi_Hiyo"
-          }
-        ],
-        isOperator: true
-      },
-    ]
-  },
-  {
-    ownerId: 65,
-    players: [
-      {
-        id: 20,
-        profiles: [
-          {
-            uniqueIdProvider: -3,
-            uniqueId: "2562575271538721",
-            cachedPlayerName: "Gi_Hiyo"
-          }
-        ],
-        isOperator: false
-      },
-      {
-        id: 65,
-        profiles: [
-          {
-            uniqueIdProvider: -3,
-            uniqueId: "2562575271538721",
-            cachedPlayerName: "Gi_Hiyo"
-          }
-        ],
-        isOperator: true
-      },
-      {
-        id: 21,
-        profiles: [
-          {
-            uniqueIdProvider: -3,
-            uniqueId: "2562575271538721",
-            cachedPlayerName: "Gi_Hiyo"
-          }
-        ],
-        isOperator: true
-      },
-    ]
-  },
-  {
-    ownerId: 65,
-    players: [
-      {
-        id: 20,
-        profiles: [
-          {
-            uniqueIdProvider: -3,
-            uniqueId: "2562575271538721",
-            cachedPlayerName: "Gi_Hiyo"
-          }
-        ],
-        isOperator: false
-      },
-      {
-        id: 65,
-        profiles: [
-          {
-            uniqueIdProvider: -3,
-            uniqueId: "2562575271538721",
-            cachedPlayerName: "Gi_Hiyo"
-          }
-        ],
-        isOperator: true
-      },
-      {
-        id: 21,
-        profiles: [
-          {
-            uniqueIdProvider: -3,
-            uniqueId: "2562575271538721",
-            cachedPlayerName: "Gi_Hiyo"
-          }
-        ],
-        isOperator: true
-      },
-    ]
-  },
-  {
-    ownerId: 65,
-    players: [
-      {
-        id: 20,
-        profiles: [
-          {
-            uniqueIdProvider: -3,
-            uniqueId: "2562575271538721",
-            cachedPlayerName: "Gi_Hiyo"
-          }
-        ],
-        isOperator: false
-      },
-      {
-        id: 65,
-        profiles: [
-          {
-            uniqueIdProvider: -3,
-            uniqueId: "2562575271538721",
-            cachedPlayerName: "Gi_Hiyo"
-          }
-        ],
-        isOperator: true
-      },
-      {
-        id: 21,
-        profiles: [
-          {
-            uniqueIdProvider: -3,
-            uniqueId: "2562575271538721",
-            cachedPlayerName: "Gi_Hiyo"
-          }
-        ],
-        isOperator: true
-      },
-    ]
-  },
-]
-
-const TESTMOD = {
-  formatVersion: 1,
-  game: "minecraft",
-  versionId: "5.6.4",
-  name: "Fabulously Optimized",
-  summary: "Improve your graphics and performance with this simple modpack.",
-  files: [
-    {
-      path: "mods/animatica-0.6+1.20.jar",
-      hashes: {
-        sha1: "3bcb19c759f313e69d3f7848b03c48f15167b88d",
-        sha512: "7d50f3f34479f8b052bfb9e2482603b4906b8984039777dc2513ecf18e9af2b599c9d094e88cec774f8525345859e721a394c8cd7c14a789c9538d2533c71d65"
-      },
-      downloads: [
-        "https://cdn.modrinth.com/data/PRN43VSY/versions/uNgEPb10/animatica-0.6%2B1.20.jar"
-      ],
-      fileSize: 69810
-    },
-    {
-      path: "mods/bettermounthud-1.2.2.jar",
-      hashes: {
-        sha1: "6942fb39ca2e87208b0b0630a5efc4511c82dcf4",
-        sha512: "1275717f84ece63f59714162a68b4e19ca626f843acefbfca49f4d446665559edd007db20cf4e66abf9ff1e76fe05f36bf5ca88fb1e63ef78c15a6b7fef01bb6"
-      },
-      downloads: [
-        "https://cdn.modrinth.com/data/kqJFAPU9/versions/h1QpxElt/bettermounthud-1.2.2.jar"
-      ],
-      fileSize: 21587
-    },
-    {
-      path: "mods/borderless-mining-1.1.9+1.20.2.jar",
-      hashes: {
-        sha1: "cf26d4615041f2db6df6b6906c5475fac05030e0",
-        sha512: "8b58ab2c2ada9f8267aaf127ba7886c3fa8e915194e95c187fb52c11bb3c0a63d6c6455fc14e5bba2694c848e09c426350b3b00a2267dd0248e9ce670fe2e70a"
-      },
-      download: [
-        "https://cdn.modrinth.com/data/kYq5qkSL/versions/r2hHx4zB/borderless-mining-1.1.9%2B1.20.2.jar",
-        "https://github.com/comp500/BorderlessMining/releases/download/1.1.9%2B1.20.2/borderless-mining-1.1.9%2B1.20.2.jar"
-      ],
-      fileSize: 121765
-    },
-    {
-      path: "mods/capes-1.5.3+1.20.2-fabric.jar",
-      hashes: {
-        sha1: "c1a62a847753d9ae039bff35050326a081d2e500",
-        sha512: "385be9c93aa4d4ed4e8225c9a1ca6c4dc93ed0dfd0d645b3760b7e4bf6288d7bc0d5cbe256c5faffc2b27e9db6905612b7153f56bcc463abfe9e2c66ec9c0b34"
-      },
-      download: [
-        "https://cdn.modrinth.com/data/89Wsn8GD/versions/dEq1ncBU/capes-1.5.3%2B1.20.2-fabric.jar",
-        "https://github.com/CaelTheColher/Capes/releases/download/fabric-1.5.3%2B1.20.2/capes-1.5.3%2B1.20.2-fabric.jar"
-      ],
-      fileSize: 209297
-    },
-    {
-      path: "mods/CITResewn-1.1.3+1.20.jar",
-      hashes: {
-        sha1: "53f036ebe51d7d97afaf44d541775c92c4470dad",
-        sha512: "9cd0d8445e65e530cbe1df26809cdf56b84502146f0dd601c47a7ba5df8dd8b861d1cc0344e06cd5277dac71c448376f01ea12be953644ebcba76a8b63befed5"
-      },
-      download: [
-        "https://cdn.modrinth.com/data/otVJckYQ/versions/c7Lo4vij/CITResewn-1.1.3%2B1.20.jar"
-      ],
-      fileSize: 394652
-    },
-    {
-      path: "resourcepacks/Chat Reporting Helper.zip",
-      hashes: {
-        sha1: "462f8cbc0727b3242b28bd5ed885052b1d197771",
-        sha512: "d84f79af9730a3e5e12363ac3886b7831edecae6c84b65003745d177c4064ee17b5ed6416aed1f8c254d995e2ac5e15d65dc553763d971443539b263bb360d79"
-      },
-      downloads: [
-        "https://cdn.modrinth.com/data/tN4E9NfV/versions/2vSy3UV7/Chat%20Reporting%20Helper.zip"
-      ],
-      fileSize: 53993
-    },
-  ],
-  dependencies: {
-    minecraft: "1.20.2",
-    fabric_loader: "0.15.3"
-  }
 }
 
 // 标题
@@ -539,37 +56,174 @@ function VersionInfo(props: {}) {
 
 }
 
+// 控制 mod 列表每一页的容量
+const modPageSize = 10;
+
 // 这一块的内容会套在 /src/app/layout.jsx 定义的东西里面
 export default function Page({ params }:{ params: { id: string } }) {
     const router = useRouter()
 
     const [joinedServers, setJoinedServers] = useSessionStorage("joinedServers", [-1]);
 
-    const server = TESTINFO[parseInt(params.id)];
-    const playerInfo = TESTPLAYER[parseInt(params.id)];
-    const modInfo = TESTMOD;
+    // 整个页面信息 server
+    const [server, setServer] = useState<WholeServer>(null!);
+    const [refreshing, setRefreshing] = useState(true);
+
+    // 获取 server 信息
+    useEffect(() => {
+        setRefreshing(true); // 获取信息时候把刷新状态设为 true
+        fetch(`${backendAddress}/server-meta/${params.id}`, GET(false))
+            .then(response => {
+                if (response.ok)
+                    return response.json();
+                else 
+                    throw new Error(`HTTP ERROR, CODE: ${response.status}`); // 暂时先这样处理错误
+            })
+            .then(data => {
+                // console.log(data);
+                setServer(data);
+            })
+            .catch(error => {
+                console.error(error); // 暂时先这样处理错误
+            })
+            .finally(() => {
+                setRefreshing(false); // 最后把刷新状态设为 false
+            })
+    }, [])
+
+    // 玩家列表 playerInfo
+    const [playerInfo, setPlayerInfo] = useState<PlayerInfo[]>([]);
+    const [loadingPlayers, setLoadingPlayers] = useState(true);
+
+    // 获取 player 信息
+    useEffect(() => {
+        setLoadingPlayers(true); // 获取信息时候把刷新状态设为 true
+        fetch(`${backendAddress}/post-login/people/server-players/${params.id}`, GET(true))
+            .then(response => {
+                if (response.ok)
+                    return response.json();
+                else 
+                    throw new Error(`HTTP ERROR, CODE: ${response.status}`); // 暂时先这样处理错误
+            })
+            .then(data => {
+                // console.log(data);
+                setPlayerInfo(data);
+            })
+            .catch(error => {
+                console.error(error); // 暂时先这样处理错误
+            })
+            .finally(() => {
+                setLoadingPlayers(false); // 最后把刷新状态设为 false
+            })
+    }, [server])
+
+    // mod 列表 modInfo
+    const [modInfo, setModInfo] = useState<ModInfo[]>([]); // 当前页面上需要渲染的 mod 信息
+    const [nowModPage, setNowModPage] = useState(0);
+    const [loadingMods, setLoadingMods] = useState(true); // 每次获取信息的时候都设为 true，全部获取完毕后设为 false
+    const dependencies = useRef<Dependency[]>([]);
+    
+    // 获取总的依赖信息并缓存
+    useEffect(() => {
+      if (server && server.javaRemote?.modpackInfo) {
+        fetchModpackDependencies();
+      }
+    }, [server])
+
+    const dependenciesInited = useRef(false);
+
+    // 获取 modpack 依赖信息
+    const fetchModpackDependencies = () => {
+//-----------------
+      const idOrSlug = server.javaRemote?.modpackInfo?.split('/')[0];
+      // const version = server.javaRemote?.modpackInfo?.split('/')[1];
+      const version = "vYgYXh6H";
+//-----------------
+
+      fetch(`https://staging-api.modrinth.com/v2/version/${version}`, { method: "GET", headers: { "User-Agent": "projectGDT/get-frontend" }})
+        .then(response => {
+          if (response.ok) 
+            return response.json();
+          else
+            throw new Error(`HTTP ERROR, CODE: ${response.status}`); // 暂时先这样处理错误
+        })
+        .then(data => {
+          dependencies.current = data.dependencies;
+          dependenciesInited.current = true;
+          loadPageOfMods(0);
+        })
+        .catch(error => {
+          console.error(error); // 暂时先这样处理错误
+        })
+    }
+
+    // 加载第 idx 页 mods
+    const loadPageOfMods = (idx: number) => {
+      setLoadingMods(true);
+      const lastModIdx = ((idx + 1) * modPageSize) > dependencies.current.length ? dependencies.current.length : ((idx + 1) * modPageSize);
+      Promise.all(dependencies.current
+        .slice(idx * modPageSize, lastModIdx)
+        .map((item) => {return fetchModInfo(item.project_id, item.version_id)}))
+        .then(newData => {setModInfo(newData)})
+        .catch(error => console.log(error)) // 暂时先这样处理错误
+        .finally(() => setLoadingMods(false));
+    }
+  
+    // 获取一个 mod 的完整信息
+    const fetchModInfo = async (project_id: string, version_id: string) => {
+      const fetchProject = fetch(`https://staging-api.modrinth.com/v2/project/${project_id}`, { method: "GET", headers: { "User-Agent": "projectGDT/get-frontend" }});
+      const fetchVersion = fetch(`https://staging-api.modrinth.com/v2/version/${version_id}`, { method: "GET", headers: { "User-Agent": "projectGDT/get-frontend" }});
+
+      const [projectRes, versionRes] = await Promise.all([fetchProject, fetchVersion]);
+      const [projectInfo, versionInfo] = await Promise.all([
+        projectRes.ok ? projectRes.json() : Promise.reject(new Error(`HTTP ERROR, CODE: ${projectRes.status}`)),
+        versionRes.ok ? versionRes.json() : Promise.reject(new Error(`HTTP ERROR, CODE: ${versionRes.status}`))
+      ]); // 暂时先这样处理错误
+      
+      const modinfo: ModInfo = {
+        name: projectInfo.title,
+        icon_url: projectInfo.icon_url,
+        version_number: versionInfo.version_number
+      };
+
+      return modinfo;
+    }
+
+    // 监测翻页事件
+    useEffect(() => {
+      if (dependenciesInited.current)
+        loadPageOfMods(nowModPage);
+    }, [nowModPage, dependenciesInited])
 
     useEffect(
       () => {
-        playerInfo.players.sort(
-          (a, b) => {
-            if (a.id === playerInfo.ownerId)
-              return -1;
-            if (b.id === playerInfo.ownerId)
-              return 1;
-            if (a.isOperator && !b.isOperator) {  
-              return -1; // a排在b前面  
-            }  
-            if (!a.isOperator && b.isOperator) {  
-              return 1; // b排在a前面  
-            }  
-            return 0;  
-          }
-        )
-      }, []);
+        if (server) {
+          playerInfo.sort(
+            (a, b) => {
+              if (a.id === server.ownerId)
+                return -1;
+              if (b.id === server.ownerId)
+                return 1;
+              if (a.isOperator && !b.isOperator) {  
+                return -1; // a排在b前面  
+              }  
+              if (!a.isOperator && b.isOperator) {  
+                return 1; // b排在a前面  
+              }  
+              return 0;  
+            }
+          )
+        }
+      }, [server, playerInfo]);
 
-    return (
+      console.log(loadingMods);
+      console.log(modInfo);
+
+    return !refreshing && (
         <>
+            {/*测试用*/}
+            <Button onClick={() => {if (nowModPage > 0) setNowModPage((prev) => prev - 1)}}>减</Button>
+            <Button onClick={() => {if ((nowModPage + 1) * modPageSize < dependencies.current.length) setNowModPage((prev) => prev + 1)}}>加</Button>
             <ServerHeader logoLink={server.logoLink} name={server.name} id={parseInt(params.id)} applyingPolicy={server.applyingPolicy}/>
             <Box sx={{display: "flex", height: "100vh"}}>
                 <Grid container>
@@ -648,25 +302,17 @@ export default function Page({ params }:{ params: { id: string } }) {
                                                 </Grid>
                                             </Grid>
                                             {/*mod 信息*/}
-                                            {server.javaRemote.isModded &&
+                                            {server.javaRemote.modpackInfo &&
                                             <div>
                                               <Divider/>
                                               {/*mod 列表*/}
                                               <Typography variant="h6" gutterBottom paddingY={1}>{dict.serverid.modTitle[1]}</Typography>
                                                 <Stack spacing={1}>
                                                    {/*MOD 列表*/} 
-                                                   {modInfo.files.map(
+                                                   {loadingMods ? <div>loading...</div> : modInfo.map(
                                                     (item) => {
                                                       return (
-                                                        //<Card variant="outlined">
-                                                          <Box sx={{display: "flex", alignItems: "center"}}>
-                                                            <Typography variant="body1" gutterBottom paddingX={1}>
-                                                              {item.path[0] === "m" && item.path.slice(5, item.path.length - 4)}
-                                                            </Typography>
-                                                          </Box>
-                                                          
-                                                        //</Card>
-                                                        
+                                                          <div>{item.name}</div>
                                                       )})}
                                                 </Stack>
                                             </div>
@@ -728,41 +374,44 @@ export default function Page({ params }:{ params: { id: string } }) {
                                 </CardContent>
                             </Card>
                             {/*玩家列表*/}
-                            <Card variant="outlined">
-                                <CardContent>
-                                    <Box sx={{display: "flex", justifyContent: "space-between"}}>
-                                        <Typography variant="h5" gutterBottom>{dict.serverid.cardTitle[3]}{`（${playerInfo.players.length}人）`}</Typography>
-                                    </Box>
-                                    {/*玩家列表*/}
-                                    {joinedServers.includes(server.id) ? 
-                                      <Stack spacing={1} paddingY={1}>
-                                        {playerInfo.players.map(
-                                          (item) => {
-                                            return (<Box sx={{display: "flex", justifyContent: "space-between"}} key={item.id}>
-                                              <Box sx={{display: "flex", alignItems: "center"}}>
-                                                <img src="http://dummyimage.com/128x128" style={{width: 32, height: 32}}/>
-                                                <Box sx={{fontSize: 16, paddingX: 1}}>
-                                                  {item.profiles.length == 1 ? item.profiles[0].cachedPlayerName :
-                                                      (item.profiles[0].uniqueId > item.profiles[1].uniqueId) ? item.profiles[0].cachedPlayerName : item.profiles[1].cachedPlayerName
-                                                  }
-                                                </Box>
-                                                
+                            {!loadingPlayers && (
+                              <Card variant="outlined">
+                              <CardContent>
+                                  <Box sx={{display: "flex", justifyContent: "space-between"}}>
+                                      <Typography variant="h5" gutterBottom>{dict.serverid.cardTitle[3]}{`${dict.serverid.playerCount[0]}${playerInfo.length}${dict.serverid.playerCount[1]}`}</Typography>
+                                  </Box>
+                                  {/*玩家列表*/}
+                                  {joinedServers.includes(server.id) ? 
+                                    <Stack spacing={1} paddingY={1}>
+                                      {playerInfo.map(
+                                        (item) => {
+                                          return (<Box sx={{display: "flex", justifyContent: "space-between"}} key={item.id}>
+                                            <Box sx={{display: "flex", alignItems: "center"}}>
+                                              <img src="http://dummyimage.com/128x128" style={{width: 32, height: 32}}/>
+                                              <Box sx={{fontSize: 16, paddingX: 1}}>
+                                                {item.profiles.length == 1 ? item.profiles[0].cachedPlayerName :
+                                                    (item.profiles[0].uniqueId > item.profiles[1].uniqueId) ? item.profiles[0].cachedPlayerName : item.profiles[1].cachedPlayerName
+                                                }
                                               </Box>
-                                              {playerInfo.players.indexOf(item) === 0 ?
-                                                <Box sx={{fontSize: 16, display: "flex", alignItems: "center", color: "secondary.main"}}>{dict.serverid.authName[0]}</Box> :
-                                                item.isOperator && <Box sx={{fontSize: 16, display: "flex", alignItems: "center", color: "secondary.light"}}>{dict.serverid.authName[1]}</Box>
-                                              }
-                                            </Box>)
-                                          }
-                                        )}
-                                      </Stack> :
-                                      <Box>
-                                        {/*提示信息*/}
-                                        <Typography variant="body2" color="GrayText" marginLeft={1}>{`${server.applyingPolicy === ApplyingPolicy.BY_FORM ? dict.serverid.accessPrompt[0] : dict.serverid.accessPrompt[1]}，以获取完整玩家列表`}</Typography>
-                                      </Box>
-                                    }
-                                </CardContent>
-                            </Card>
+                                              
+                                            </Box>
+                                            {playerInfo.indexOf(item) === 0 ?
+                                              <Box sx={{fontSize: 16, display: "flex", alignItems: "center", color: "secondary.main"}}>{dict.serverid.authName[0]}</Box> :
+                                              item.isOperator && <Box sx={{fontSize: 16, display: "flex", alignItems: "center", color: "secondary.light"}}>{dict.serverid.authName[1]}</Box>
+                                            }
+                                          </Box>)
+                                        }
+                                      )}
+                                    </Stack> :
+                                    <Box>
+                                      {/*提示信息*/}
+                                      <Typography variant="body2" color="GrayText" marginLeft={1}>{`${server.applyingPolicy === ApplyingPolicy.BY_FORM ? dict.serverid.accessPrompt[1] : dict.serverid.accessPrompt[2]}${dict.serverid.accessPrompt[3]}`}</Typography>
+                                    </Box>
+                                  }
+                              </CardContent>
+                          </Card>
+                          )}
+                            
                         </Stack>
                     </Grid>
                 </Grid>
