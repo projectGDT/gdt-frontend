@@ -67,33 +67,37 @@ export default function Page() {
                     <Typography variant={"h5"}>{dict.login.title}</Typography>
                     <TextField name={"username"} label={dict.login.username} sx={{width: 300}}/>
                     <TextField name={"password"} label={dict.login.password} type={"password"} sx={{width: 300}}/>
-                    <Turnstile siteKey={"0x4AAAAAAAQCzJ-tEMh00a-r"}/>
+                    <Turnstile siteKey={"0x4AAAAAAAQCzJ-tEMh00a-r"} options={{theme: 'light'}}/>
 
-                    <Button variant={"contained"} disabled={disabled} onClick={() => {
-                        setDisabled(true)
+                    <Box sx={{display: "flex", flexDirection: "row"}}>
+                        <Button variant={"contained"} disabled={disabled} onClick={() => {
+                            setDisabled(true)
 
-                        // API 地址, 使用字符串模板拼接 backendAddress 和 path 而成
-                        fetch(`${backendAddress}/login`, POST(
-                            // 通过 FormData 构造普通对象, 进而以 Json 的形式发送
-                            Object.fromEntries(new FormData(formRef.current).entries()),
-                            false)
-                        ).then(response => {
-                            if (response.ok) return response.json()
-                            else throw "incorrect-credentials"
-                        }).then(({jwt}) => {
-                            setJWT(jwt)
-                            // 跳转回主页, 在 /list 写好之后可以考虑跳转到服务器选择页面
-                            router.push("/")
-                        }).catch(err => {
-                            if (err === "incorrect-credentials")
-                                setIncorrectCredentialsOpen(true)
-                            else throw err
-                        })
-                    }}>{dict.login.submit}</Button>
-                    <Button
-                        href="#text-buttons"
-                        onClick={() => {router.push("/register")}}
-                    >{dict.register.title}</Button>
+                            // console.log(Object.fromEntries(new FormData(formRef.current).entries()))
+
+                            // API 地址, 使用字符串模板拼接 backendAddress 和 path 而成
+                            fetch(`${backendAddress}/login`, POST(
+                                // 通过 FormData 构造普通对象, 进而以 Json 的形式发送
+                                Object.fromEntries(new FormData(formRef.current).entries()),
+                                false)
+                            ).then(response => {
+                                if (response.ok) return response.json()
+                                else throw "incorrect-credentials"
+                            }).then(({jwt}) => {
+                                setJWT(jwt)
+                                router.push("/post-login/list")
+                            }).catch(err => {
+                                setTimeout(() => {setDisabled(false);}, 5000);
+                                if (err === "incorrect-credentials")
+                                    setIncorrectCredentialsOpen(true)
+                                else throw err
+                            })
+                        }}>{dict.login.submit}</Button>
+                        <Button
+                            href="#text-buttons"
+                            onClick={() => {router.push("/register")}}
+                        >{dict.register.title}</Button>
+                    </Box>
                 </Box>
             </Box>
         </Box>
