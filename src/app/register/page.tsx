@@ -3,127 +3,199 @@
 import {
     Alert,
     Box,
-    Button, Collapse,
-    Stack,
-    TextField,
+    Button, LinearProgress, Paper,
+    Snackbar,
+    Step, StepLabel, Stepper,
     Typography
 } from "@mui/material";
-
-import React, {ReactElement, useEffect, useId, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import {useRouter} from "next/navigation";
-import {useSessionStorage} from "usehooks-ts";
-
+import { io } from "socket.io-client";
 import {dict} from "@/i18n/zh-cn"
+import {backendAddress, GET} from "@/utils";
+import { Turnstile } from "@marsidev/react-turnstile";
+import ValidatorTextField, {inOrder} from "@/components/validator-text-field";
 
-// @/templates 定义了一些常量和模板
-import {backendAddress, GET, POST} from "@/utils";
-import Script from "next/script";
+const qidRegex = /^[1-9][0-9]{4,9}$/
+const usernameRegex = /^[a-zA-Z][a-zA-Z0-9_]{2,15}$/
+const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{8,20}$/
+const uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/
 
-import InputBox from "@/app/register/inputbox";
-import { validateQQ, validateUsername } from "@/app/register/validate";
-
-// 定义一种错误, 和网络错误区分开, 后面会有用
-export class IncorrectCredentialsError extends Error {
-    constructor(props?: string | undefined) {
-        super(props || undefined);
-    }
-}
-
-// 注册页面
 export default function Page() {
-    const router = useRouter()
-    const formRef = useRef()
+    const router = useRouter();
+    const formRef = useRef();
 
-    // React 中的 State, 一种可以在多次渲染之间暂存的变量, 详见文档
-    const [incorrectCredentialsOpen, setIncorrectCredentialsOpen] = useState(false)
-    const [networkErrorOpen, setNetworkErrorOpen] = useState(false)
+    const [activeStep, setActiveStep] = useState(0)
 
-    const [id, setId] = useSessionStorage("id", -1)
-    const [isSiteAdmin, setIsSiteAdmin] = useSessionStorage("isSiteAdmin", false)
-    const [jwt, setJWT] = useSessionStorage("jwt", "")
+    // 警告 snackbar
+    const [errMsg, setErrMsg] = useState('');
+    const [errOpen, setErrOpen] = useState(false);
 
-    return (
-        <Box sx={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-            {/* 引入 Cloudflare Turnstile */}
-            <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer/>
+    const [qid, setQid] = useState("")
 
-            <Box sx={{
-                display: "flex",
-                flexDirection: "column",
-                height: "25vh" // 用于指定相对尺寸, vh 是一个单位, 等于窗口高度或宽度除以 100
-            }}>
-                {/* 预存两个 Alert, 包含在 Collapse 中, 默认情况下是折叠的 */}
-                <Collapse in={incorrectCredentialsOpen /* 指定控制 Alert 是否展示的变量 */}>
-                    {/* <Alert severity="error">{dict.login.fail.incorrectCredentials}</Alert> */}
-                </Collapse>
-                <Collapse in={networkErrorOpen}>
-                    {/* <Alert severity="error">{dict.login.fail.networkError}</Alert> */}
-                </Collapse>
+    // QQ 号用户名密码的合法性，同时为 true 注册按钮才可用
+    const [qidValid, setQidValid] = useState(false);
+    const [usernameValid, setUsernameValid] = useState(false);
+    const [passwordValid, setPasswordValid] = useState(false);
+
+    const [invitationCodeValid, setInvitationCodeValid] = useState(true);
+    // 因为一开始邀请码为空，而空邀请码显然是合理的
+
+    // 防止重复点击
+    const [notClicked, setNotClicked] = useState(true);
+
+    // 验证信息
+    const [emailAddr, setEmailAddr] = useState('');
+    const [passkey, setPasskey] = useState('');
+
+    const steps = [
+        <Box key={"submit"} component={"form"} ref={formRef} sx={{display: "flex", flexDirection: "column", gap: 2}}>
+            <Box sx={{display: "flex", gap: 2}}>
+                <ValidatorTextField
+                    name={"qid"}
+                    label={dict.register.submit.qid.title}
+                    validator={inOrder(
+                        {
+                            validator: input => qidRegex.test(input),
+                            hint: dict.register.submit.qid.error.invalid
+                        },
+                        {
+                            validator: input =>
+                                fetch(`${backendAddress}/register/check-qid/${input}`, GET(false))
+                                    .then(res => res.json())
+                                    .then(body => Boolean(body.exists)),
+                            hint: dict.register.submit.qid.error.alreadyExists
+                        }
+                    )}
+                    onVerifyPass={input => setQid(input)}
+                    setValid={setQidValid}
+                    sx={{width: 0.5}}
+                />
+                <ValidatorTextField
+                    name={"username"}
+                    label={dict.register.submit.username.title}
+                    validator={inOrder(
+                        {
+                            validator: input => usernameRegex.test(input),
+                            hint: dict.register.submit.username.error.invalid
+                        },
+                        {
+                            validator: input =>
+                                fetch(`${backendAddress}/register/check-username/${input}`, GET(false))
+                                    .then(res => res.json())
+                                    .then(body => Boolean(body.exists)),
+                            hint: dict.register.submit.qid.error.alreadyExists
+                        }
+                    )}
+                    setValid={setUsernameValid}
+                    sx={{width: 0.5}}
+                />
             </Box>
-
-            <Box component={"form"} ref={formRef}>
-                {/* 单向纵向排布元素常用 Stack */}
-                <Stack spacing={2} sx={{alignItems: "center"}}>
-                    <Typography variant={"h5"}>{dict.register.title}</Typography>
-                    <InputBox
-                        name={"qq"}
-                        label={dict.register.qq}
-                        validator={validateQQ}
-                        helperTextList={dict.register.qqRequirement}
-                    />
-                    <InputBox
-                        name={"username"}
-                        label={dict.register.username}
-                        validator={validateUsername}
-                        helperTextList={dict.register.usernameRequirement}
-                    />
-                    <TextField name={"password"}
-                        label={dict.register.password} type={"password"} variant={"outlined"} sx={{width: "35vh"}}/>
-                    <TextField name={"confirmPassword"}
-                        label={dict.register.confirmPassword} type={"password"} variant={"outlined"} sx={{width: "35vh"}}/>
-                    <TextField name={"inviteCode"}
-                        label={dict.register.inviteCode} variant={"outlined"} sx={{width: "35vh"}}/>
-                    <div className="cf-turnstile" data-sitekey="0x4AAAAAAAQCzJ-tEMh00a-r" data-theme="light"></div>
-                    {/* 这个元素会向 FormData 中注入一个名为 cf-turnstile-response 的属性 */}
-
-                    <Button variant={"contained"} onClick={() => {
-                        // 重置两个 Alert 的状态
-                        setNetworkErrorOpen(false)
-                        setIncorrectCredentialsOpen(false)
-
-                        // API 地址, 使用字符串模板拼接 backendAddress 和 path 而成
-                        fetch(`${backendAddress}/register`, POST(
-                            // 通过 FormData 构造普通对象, 进而以 Json 的形式发送
-                            Object.fromEntries(new FormData(formRef.current).entries()),
-                            false))
-                            .then(response => {
-                                if (response.ok) // 状态码是 2xx / 3xx
-                                    return response.json() // 获取 response 的具体内容, 转化为 json, 并传递给下一个层级
-                                else {
-                                    // 后端返回了内容, 但状态码不是 2xx / 3xx, 显示 "IncorrectCredentials" Alert
-                                    setIncorrectCredentialsOpen(true)
-                                    // 及时中止响应, 抛出的错误被最后的 catch 捕获
-                                    throw new IncorrectCredentialsError()
-                                }
-                            })
-                            .then(({id, isSiteAdmin, jwt}) => {
-                                // 设置 id 等全局变量
-                                setId(id)
-                                setIsSiteAdmin(isSiteAdmin)
-                                setJWT(jwt)
-                                // 跳转回主页, 在 /list 写好之后可以考虑跳转到服务器选择页面
-                                router.push("/")
-                            })
-                            .catch(error => {
-                                // if (error instanceof IncorrectCredentialsError)
-                                //     那么这个错误是有关凭据的, 上面已经显示了相关 Alert
-                                //     这里的 "NetworkError" Alert 就不再显示了
-                                //     否则, 错误就是由网络故障引起的
-                                if (!(error instanceof IncorrectCredentialsError)) setNetworkErrorOpen(true)
-                            })
-                    }}>{dict.register.submit}</Button>
-                </Stack>
+            <ValidatorTextField
+                name={"password"}
+                label={dict.register.submit.password.title}
+                validator={inOrder({
+                    validator: input => passwordRegex.test(input),
+                    hint: dict.register.submit.password.error.invalid
+                })}
+                setValid={setPasswordValid}
+            />
+            <Box sx={{display: "flex", gap: 2}}>
+                <ValidatorTextField
+                    name={"invitationCode"}
+                    label={dict.register.submit.invitationCode.title}
+                    validator={input => (input === "" || uuidRegex.test(input)) ? {
+                        isValid: true
+                    } : {
+                        isValid: false,
+                        hint: dict.register.submit.invitationCode.error.invalid
+                    }}
+                    setValid={setInvitationCodeValid}
+                    sx={{flexGrow: 1}}
+                />
+                <Turnstile siteKey="0x4AAAAAAAQCzJ-tEMh00a-r" options={{theme: 'light'}}/>
+                {/* Turnstile 啊，你让人操碎了心 */}
             </Box>
+            <Button
+                variant={"contained"} size={"large"}
+                disabled={!(
+                    qidValid &&
+                    usernameValid &&
+                    passwordValid &&
+                    invitationCodeValid &&
+                    notClicked
+                )}
+                onClick={() => {
+                    // 禁用注册按钮
+                    setNotClicked(false);
+
+                    const socket = io( `${backendAddress}/register/submit`);
+
+                    socket.on("invalid-payload", _event => {
+                        setErrMsg(dict.register.submit.fail.invalidPayload);
+                        setErrOpen(true);
+                        setNotClicked(true)
+                    });
+                    socket.on("timeout", _event => {
+                        setErrMsg(dict.register.submit.fail.timeout);
+                        setErrOpen(true);
+                        setNotClicked(true);
+                    });
+
+                    socket.on("pre-registered", ({emailAddr, passkey}) => {
+                        setEmailAddr(emailAddr);
+                        setPasskey(passkey);
+                        setActiveStep(step => step + 1)
+                    });
+
+                    // 注册成功
+                    socket.on("registered", _event => {
+                        setActiveStep(step => step + 1)
+                        setTimeout(() => {
+                            router.push("/post-login/list");
+                        }, 5000);
+                    });
+
+                    socket.emit("payload", Object.fromEntries(new FormData(formRef.current).entries()));
+                }}
+                sx={{alignSelf: "center"}}
+            >{dict.register.submit.confirm}</Button>
+        </Box>,
+        <>
+            <Typography>{dict.register.verify.content(emailAddr, passkey)}</Typography>
+            <Typography>{dict.register.verify.hint(qid)}</Typography>
+
+            <Box sx={{display: "flex", alignItems: "center", gap: 1}}>
+                <LinearProgress sx={{flexGrow: 1}}/>
+                <Typography variant={"caption"}>{dict.register.verify.waiting}</Typography>
+            </Box>
+            <Button
+                variant={"contained"}
+                href={"https://mail.qq.com"}
+                sx={{alignSelf: "center"}}
+            >{dict.register.verify.go}</Button>
+        </>,
+        <Box key={"complete"} sx={{textAlign: "center"}}>
+            <Typography variant={"h6"}>{dict.register.complete.title}</Typography>
+            <Typography>{dict.register.complete.redirect}</Typography>
         </Box>
-    )
+    ]
+
+    return <Paper sx={{display: "flex", flexDirection: "column", gap: 2, padding: 2, flexGrow: 1}}>
+        <Snackbar open={errOpen}
+                  autoHideDuration={5000}
+                  onClose={_event => setErrOpen(false)}>
+            <Alert severity="error" variant="filled">{errMsg}</Alert>
+        </Snackbar>
+
+        <Stepper activeStep={activeStep} alternativeLabel>
+            <Step key={"submit"}>
+                <StepLabel>{dict.register.submit.label}</StepLabel>
+            </Step>
+            <Step key={"verify"}>
+                <StepLabel>{dict.register.verify.label}</StepLabel>
+            </Step>
+        </Stepper>
+        {steps[activeStep]}
+    </Paper>
 }
