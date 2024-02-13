@@ -9,10 +9,11 @@ export type ValidationResult = {
     hint: string
 }
 
-export default function ValidatorTextField({validator, setValid, onVerifyPass, ...others}: TextFieldProps & {
+export default function ValidatorTextField({validator, setValid, onVerifyPass, defaultHelperText, ...others}: TextFieldProps & {
     validator: (input: string) => ValidationResult | Promise<ValidationResult>,
     setValid: React.Dispatch<React.SetStateAction<boolean>>,
-    onVerifyPass?: (input: string) => void
+    onVerifyPass?: (input: string) => void,
+    defaultHelperText?: string
 }) {
     const [lastInput, setLastInput] = useState("")
     const [error, setError] = useState(false)
@@ -23,7 +24,7 @@ export default function ValidatorTextField({validator, setValid, onVerifyPass, .
             TextFieldPropsColorOverrides
         >
     >("primary")
-    const [helperText, setHelperText] = useState(<></>)
+    const [helperText, setHelperText] = useState(defaultHelperText ?? "")
 
     return <TextField
         error={error}
@@ -39,13 +40,13 @@ export default function ValidatorTextField({validator, setValid, onVerifyPass, .
                 setError(false)
                 setColor("success")
                 setFocused(true)
-                setHelperText(<></>)
+                setHelperText(defaultHelperText ?? "")
 
                 onVerifyPass?.(input)
             } else {
                 setValid(false)
                 setError(true)
-                setHelperText(<>{result.hint}</>)
+                setHelperText(result.hint)
             }
             setLastInput(input)
         }}
