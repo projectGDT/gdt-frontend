@@ -41,6 +41,8 @@ export default function Page() {
     const [invitationCodeValid, setInvitationCodeValid] = useState(true);
     // 因为一开始邀请码为空，而空邀请码显然是合理的
 
+    const [turnstilePassed, setTurnstilePassed] = useState(false)
+
     // 防止重复点击
     const [notClicked, setNotClicked] = useState(true);
 
@@ -113,7 +115,13 @@ export default function Page() {
                     setValid={setInvitationCodeValid}
                     sx={{flexGrow: 1}}
                 />
-                <Turnstile siteKey="0x4AAAAAAAQCzJ-tEMh00a-r" options={{theme: 'light'}}/>
+                <Turnstile
+                    siteKey="0x4AAAAAAAQCzJ-tEMh00a-r"
+                    options={{theme: 'light'}}
+                    onSuccess={_token => setTurnstilePassed(true)}
+                    onError={() => setTurnstilePassed(false)}
+                    onExpire={() => setTurnstilePassed(false)}
+                />
                 {/* Turnstile 啊，你让人操碎了心 */}
             </Box>
             <Button
@@ -123,6 +131,7 @@ export default function Page() {
                     usernameValid &&
                     passwordValid &&
                     invitationCodeValid &&
+                    turnstilePassed &&
                     notClicked
                 )}
                 onClick={() => {

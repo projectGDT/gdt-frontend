@@ -7,8 +7,18 @@ export const dict = {
     login: {
         title: "登录",
 
-        username: "QQ 号 / 用户名",
-        password: "密码",
+        username: {
+            title: "QQ 号 / 用户名",
+            error: {
+                invalid: "该字段不能为空"
+            }
+        },
+        password: {
+            title: "密码",
+            error: {
+                invalid: "密码不能为空"
+            }
+        },
         submit: "登录",
 
         fail: {
