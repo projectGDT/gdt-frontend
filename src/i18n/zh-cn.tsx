@@ -108,7 +108,6 @@ export const dict = {
     },
     access: {
         title: "申请接入",
-    },
         license: <>
             <Typography variant={"h3"}><b>本网站立足于美利坚合众国</b></Typography>
             <Typography variant={"h4"}>
@@ -158,6 +157,50 @@ export const dict = {
             },
             remote: {
                 title: "远程信息",
+                common: {
+                    address: {
+                        title: "服务器地址",
+                        hint: {
+                            fallback: "域名或 IP",
+                            invalid: "服务器地址格式不正确"
+                        }
+                    },
+                    port: {
+                        title: "服务器端口",
+                        hint: {
+                            fallback: "0~65535 之间的整数",
+                            invalid: "服务器端口格式不正确"
+                        }
+                    },
+                    compatibleVersions: {
+                        title: "兼容版本",
+                        hint: {
+                            atLeastOne: "请选择至少一个版本。"
+                        }
+                    },
+                    coreVersion: "服务端核心版本"
+                },
+                java: {
+                    supports: "支持 Java 版",
+                    mod: {
+                        hint: <>
+                            如果你的服务器是 Mod 服，请在 <Link href={"https://modrinth.com/"}>Modrinth</Link> 上创建包含所需 Mod 和资源包的 Project，并填写以下内容。
+                        </>,
+                        project: {
+                            title: "Project ID 或 Slug",
+                            hint: {
+                                invalid: "ID 或 Slug 不合法或不存在"
+                            }
+                        },
+                        versionId: "版本 ID",
+                        preview: {
+
+                        }
+                    }
+                },
+                bedrock: {
+                    supports: "支持基岩版"
+                }
             },
             applying: {
                 title: "申请政策"

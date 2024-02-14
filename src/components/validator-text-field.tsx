@@ -3,7 +3,8 @@ import {TextField, TextFieldProps, TextFieldPropsColorOverrides} from "@mui/mate
 import {OverridableStringUnion} from "@mui/types";
 
 export type ValidationResult = {
-    isValid: true
+    isValid: true,
+    hint?: string
 } | {
     isValid: false,
     hint: string
@@ -39,7 +40,7 @@ export default function ValidatorTextField({validator, setValid, onVerifyPass, d
                 setError(false)
                 setColor("success")
                 setFocused(true)
-                setHelperText(defaultHelperText ?? "")
+                setHelperText(result.hint ?? (defaultHelperText ?? ""))
 
                 onVerifyPass?.(input)
             } else {

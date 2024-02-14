@@ -12,7 +12,7 @@ import {dict} from "@/i18n/zh-cn"
 import { Dependency, ModInfo, PlayerInfo, WholeServer } from "@/types";
 import { GET, backendAddress } from "@/utils";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
-import { ModList } from "@/components/mod-list";
+import ModList from "@/components/mod-list";
 
 const ApplyingPolicy = {
     CLOSED: "CLOSED",
