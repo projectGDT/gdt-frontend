@@ -3,6 +3,7 @@
 import {
   Avatar,
     Box, Button, Card, CardContent, CardHeader, Checkbox, CircularProgress, Divider, FormControlLabel, Grid, IconButton, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Skeleton, Stack, Typography,
+    darken,
 } from "@mui/material";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {useRouter} from "next/navigation";
@@ -13,6 +14,7 @@ import { Dependency, ModInfo, PlayerInfo, WholeServer } from "@/types";
 import { GET, backendAddress } from "@/utils";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { ModList } from "@/components/mod-list";
+import { MuiMarkdown, getOverrides } from "mui-markdown";
 
 const ApplyingPolicy = {
     CLOSED: "CLOSED",
@@ -155,7 +157,22 @@ export default function Page({ params }:{ params: { id: string } }) {
                                 <Grid item xs={2}/>
                             </Grid>
                             <Divider/>
-                            <p>{server.introduction}</p>
+                            <MuiMarkdown
+                                overrides={{
+                                    ...getOverrides(), // This will keep the other default overrides.
+                                    code: {
+                                        props: {
+                                            style: {
+                                                fontFamily: '"JetBrains Mono Variable"',
+                                                backgroundColor: darken('#f9f9f9', 0.07),
+                                                borderRadius: '0.25rem',
+                                                padding: '0.25rem, 0.5rem',
+                                            },
+                                        } as React.HTMLProps<HTMLParagraphElement>,
+                                    }
+                                }}>
+                                {server.introduction}
+                            </MuiMarkdown>
                         </Box>
                     </Grid>
 
