@@ -20,7 +20,7 @@ import StepBasic from "@/app/post-login/access/steps/step-basic";
 import StepRemote from "@/app/post-login/access/steps/step-remote";
 
 export default function Page() {
-    const [activeStep, setActiveStep] = useState(1)
+    const [activeStep, setActiveStep] = useState(0)
 
     return <Box component={"form"}>
         <Paper sx={{display: "flex", flexDirection: "column", gap: 2, padding: 2}}>
@@ -38,17 +38,7 @@ export default function Page() {
             <Box sx={{display: "flex", flexDirection: "column"}}>
                 {[
                     <StepBasic key={"basic"} setActiveStep={setActiveStep}/>,
-
-                    <> {/* placeholder */}
-                        <Box sx={{display: "flex", flexDirection: "row-reverse", gap: 2}}>
-                            <Button variant={"contained"} onClick={() => setActiveStep(step => step + 1)}>
-                                {dict.access.steps.next}
-                            </Button>
-                            <Button variant={"outlined"} onClick={() => setActiveStep(step => step - 1)}>
-                                {dict.access.steps.previous}
-                            </Button>
-                        </Box>
-                    </>,
+                    <StepRemote key={"remote"} setActiveStep={setActiveStep}/>,
                     <>
                         <Box sx={{display: "flex", flexDirection: "row-reverse", gap: 2}}>
                             <Button variant={"contained"} onClick={() => setActiveStep(step => step + 1)}>

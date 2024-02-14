@@ -3,17 +3,17 @@ import {TextField, TextFieldProps, TextFieldPropsColorOverrides} from "@mui/mate
 import {OverridableStringUnion} from "@mui/types";
 
 export type ValidationResult = {
-    isValid: true
+    isValid: true,
+    hint?: string
 } | {
     isValid: false,
     hint: string
 }
 
-export default function ValidatorTextField({validator, frequency, setValid, onValidationPass, defaultHelperText, ...others}: TextFieldProps & {
+export default function ValidatorTextField({validator, setValid, onVerifyPass, defaultHelperText, ...others}: TextFieldProps & {
     validator: (input: string) => ValidationResult | Promise<ValidationResult>,
-    frequency?: "onChange" | "onBlur",
     setValid: React.Dispatch<React.SetStateAction<boolean>>,
-    onValidationPass?: (input: string) => void,
+    onVerifyPass?: (input: string) => void,
     defaultHelperText?: string
 }) {
     const [lastInput, setLastInput] = useState("")
@@ -31,48 +31,24 @@ export default function ValidatorTextField({validator, frequency, setValid, onVa
         error={error}
         color={color}
         focused={focused}
-        {...frequency === "onChange" ? {
-            onChange: async event => {
-                const input = event.target.value
-                console.log(input)
-                if (lastInput === input) return
-                const result = await validator(input)
-                if (result.isValid) {
-                    setValid(true)
-                    setError(false)
-                    setColor("success")
-                    setFocused(true)
-                    setHelperText(defaultHelperText ?? "")
+        onBlur={async event => {
+            const input = event.target.value
+            if (lastInput === input) return
+            const result = await validator(input)
+            if (result.isValid) {
+                setValid(true)
+                setError(false)
+                setColor("success")
+                setFocused(true)
+                setHelperText(result.hint ?? (defaultHelperText ?? ""))
 
-                    onValidationPass?.(input)
-                } else {
-                    setValid(false)
-                    setError(true)
-                    setHelperText(result.hint)
-                }
-                setLastInput(input)
+                onVerifyPass?.(input)
+            } else {
+                setValid(false)
+                setError(true)
+                setHelperText(result.hint)
             }
-        } : {
-            onBlur: async event => {
-                const input = event.target.value
-                console.log(input)
-                if (lastInput === input) return
-                const result = await validator(input)
-                if (result.isValid) {
-                    setValid(true)
-                    setError(false)
-                    setColor("success")
-                    setFocused(true)
-                    setHelperText(defaultHelperText ?? "")
-
-                    onValidationPass?.(input)
-                } else {
-                    setValid(false)
-                    setError(true)
-                    setHelperText(result.hint)
-                }
-                setLastInput(input)
-            }
+            setLastInput(input)
         }}
         helperText={helperText}
         {...others}
