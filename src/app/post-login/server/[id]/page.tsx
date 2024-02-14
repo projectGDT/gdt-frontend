@@ -1,7 +1,8 @@
 "use client"
 
 import {
-    Box, Button, Card, CardContent, CardHeader, Checkbox, Divider, FormControlLabel, Grid, Stack, Typography,
+  Avatar,
+    Box, Button, Card, CardContent, CardHeader, Checkbox, CircularProgress, Divider, FormControlLabel, Grid, IconButton, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Skeleton, Stack, Typography,
 } from "@mui/material";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {useRouter} from "next/navigation";
@@ -10,6 +11,8 @@ import {useSessionStorage} from "usehooks-ts";
 import {dict} from "@/i18n/zh-cn"
 import { Dependency, ModInfo, PlayerInfo, WholeServer } from "@/types";
 import { GET, backendAddress } from "@/utils";
+import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
+import { ModList } from "@/components/mod-list";
 
 const ApplyingPolicy = {
     CLOSED: "CLOSED",
@@ -55,9 +58,6 @@ function ServerHeader(props: {logoLink: string, name: string, id: number, applyi
 function VersionInfo(props: {}) {
 
 }
-
-// 控制 mod 列表每一页的容量
-const modPageSize = 10;
 
 // 这一块的内容会套在 /src/app/layout.jsx 定义的东西里面
 export default function Page({ params }:{ params: { id: string } }) {
@@ -117,84 +117,7 @@ export default function Page({ params }:{ params: { id: string } }) {
             })
     }, [server])
 
-    // mod 列表 modInfo
-    const [modInfo, setModInfo] = useState<ModInfo[]>([]); // 当前页面上需要渲染的 mod 信息
-    const [nowModPage, setNowModPage] = useState(0);
-    const [loadingMods, setLoadingMods] = useState(true); // 每次获取信息的时候都设为 true，全部获取完毕后设为 false
-    const dependencies = useRef<Dependency[]>([]);
-    
-    // 获取总的依赖信息并缓存
-    useEffect(() => {
-      if (server && server.javaRemote?.modpackInfo) {
-        fetchModpackDependencies();
-      }
-    }, [server])
-
-    const dependenciesInited = useRef(false);
-
-    // 获取 modpack 依赖信息
-    const fetchModpackDependencies = () => {
-//-----------------
-      const idOrSlug = server.javaRemote?.modpackInfo?.split('/')[0];
-      // const version = server.javaRemote?.modpackInfo?.split('/')[1];
-      const version = "vYgYXh6H";
-//-----------------
-
-      fetch(`https://staging-api.modrinth.com/v2/version/${version}`, { method: "GET", headers: { "User-Agent": "projectGDT/get-frontend" }})
-        .then(response => {
-          if (response.ok) 
-            return response.json();
-          else
-            throw new Error(`HTTP ERROR, CODE: ${response.status}`); // 暂时先这样处理错误
-        })
-        .then(data => {
-          dependencies.current = data.dependencies;
-          dependenciesInited.current = true;
-          loadPageOfMods(0);
-        })
-        .catch(error => {
-          console.error(error); // 暂时先这样处理错误
-        })
-    }
-
-    // 加载第 idx 页 mods
-    const loadPageOfMods = (idx: number) => {
-      setLoadingMods(true);
-      const lastModIdx = ((idx + 1) * modPageSize) > dependencies.current.length ? dependencies.current.length : ((idx + 1) * modPageSize);
-      Promise.all(dependencies.current
-        .slice(idx * modPageSize, lastModIdx)
-        .map((item) => {return fetchModInfo(item.project_id, item.version_id)}))
-        .then(newData => {setModInfo(newData)})
-        .catch(error => console.log(error)) // 暂时先这样处理错误
-        .finally(() => setLoadingMods(false));
-    }
-  
-    // 获取一个 mod 的完整信息
-    const fetchModInfo = async (project_id: string, version_id: string) => {
-      const fetchProject = fetch(`https://staging-api.modrinth.com/v2/project/${project_id}`, { method: "GET", headers: { "User-Agent": "projectGDT/get-frontend" }});
-      const fetchVersion = fetch(`https://staging-api.modrinth.com/v2/version/${version_id}`, { method: "GET", headers: { "User-Agent": "projectGDT/get-frontend" }});
-
-      const [projectRes, versionRes] = await Promise.all([fetchProject, fetchVersion]);
-      const [projectInfo, versionInfo] = await Promise.all([
-        projectRes.ok ? projectRes.json() : Promise.reject(new Error(`HTTP ERROR, CODE: ${projectRes.status}`)),
-        versionRes.ok ? versionRes.json() : Promise.reject(new Error(`HTTP ERROR, CODE: ${versionRes.status}`))
-      ]); // 暂时先这样处理错误
-      
-      const modinfo: ModInfo = {
-        name: projectInfo.title,
-        icon_url: projectInfo.icon_url,
-        version_number: versionInfo.version_number
-      };
-
-      return modinfo;
-    }
-
-    // 监测翻页事件
-    useEffect(() => {
-      if (dependenciesInited.current)
-        loadPageOfMods(nowModPage);
-    }, [nowModPage, dependenciesInited])
-
+    // 为 player 排序
     useEffect(
       () => {
         if (server) {
@@ -216,14 +139,9 @@ export default function Page({ params }:{ params: { id: string } }) {
         }
       }, [server, playerInfo]);
 
-      console.log(loadingMods);
-      console.log(modInfo);
-
     return !refreshing && (
         <>
             {/*测试用*/}
-            <Button onClick={() => {if (nowModPage > 0) setNowModPage((prev) => prev - 1)}}>减</Button>
-            <Button onClick={() => {if ((nowModPage + 1) * modPageSize < dependencies.current.length) setNowModPage((prev) => prev + 1)}}>加</Button>
             <ServerHeader logoLink={server.logoLink} name={server.name} id={parseInt(params.id)} applyingPolicy={server.applyingPolicy}/>
             <Box sx={{display: "flex", height: "100vh"}}>
                 <Grid container>
@@ -302,19 +220,14 @@ export default function Page({ params }:{ params: { id: string } }) {
                                                 </Grid>
                                             </Grid>
                                             {/*mod 信息*/}
-                                            {server.javaRemote.modpackInfo &&
+                                            {server.javaRemote.modpackVersionId &&
                                             <div>
-                                              <Divider/>
+                                              <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
+                                                <Divider/>
+                                                <Typography variant="h6">{dict.serverid.modTitle[1]}</Typography>
+                                              </Box>
                                               {/*mod 列表*/}
-                                              <Typography variant="h6" gutterBottom paddingY={1}>{dict.serverid.modTitle[1]}</Typography>
-                                                <Stack spacing={1}>
-                                                   {/*MOD 列表*/} 
-                                                   {loadingMods ? <div>loading...</div> : modInfo.map(
-                                                    (item) => {
-                                                      return (
-                                                          <div>{item.name}</div>
-                                                      )})}
-                                                </Stack>
+                                                <ModList versionId={server.javaRemote.modpackVersionId}/>
                                             </div>
                                               
                                             }

@@ -31,7 +31,7 @@ export interface WholeServer {
         coreVersion: string;
         compatibleVersions: (string | string[])[];
         uniqueIdProvider: number;
-        modpackInfo?: string;
+        modpackVersionId?: string;
         serverId: number;
     };
     bedrockRemote?: {
@@ -56,12 +56,14 @@ export interface PlayerInfo {
 }
 
 export interface ModInfo {
-    name: string;
-    version_number: string;
-    icon_url: string;
+    name?: string;
+    version_number?: string;
+    icon_url?: string;
+    file_name?: string;
 }
 
 export interface Dependency {
     project_id: string;
     version_id: string;
+    file_name: string;
 }
