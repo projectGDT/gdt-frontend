@@ -107,6 +107,65 @@ export const dict = {
     access: {
         title: "申请接入",
     },
+        license: <>
+            <Typography variant={"h3"}><b>本网站立足于美利坚合众国</b></Typography>
+            <Typography variant={"h4"}>
+                未满18岁请勿打开本站 <br/>
+                牢记本站永久域名：<b>localhost</b> <br/>
+                备用域名：<b>127.0.0.1</b>
+            </Typography>
+        </>,
+        confirm: "是的，我已满18岁",
+        go: "开始申请",
+
+        steps: {
+            basic: {
+                title: "基本信息",
+                name: {
+                    title: "服务器名称",
+                    hint: {
+                        invalidLength: "长度必须在 3~30 个字符之间。"
+                    }
+                },
+                logoLink: {
+                    title: "Logo 图片链接",
+                    hint: {
+                        fallback: "请将图片上传至外部图床。建议宽、高相等且大于 64px。",
+                        invalid: "URL 格式不合法"
+                    }
+                },
+                coverLink: {
+                    title: "封面图片链接",
+                    hint: {
+                        fallback: "请将图片上传至外部图床。建议宽高比 16:9。",
+                        invalid: "URL 格式不合法"
+                    },
+                    preview: {
+                        title: "预览",
+                        error: "图片加载出错。",
+                        hint: "若图片宽高比不是 16:9，则在显示时会被裁去一部分。请在此确认渲染效果。"
+                    }
+                },
+                introduction: {
+                    title: "服务器介绍（Markdown 格式）",
+                    hint: {
+                        fallback: "建议在其他的 Markdown 编辑器中编辑后再复制到此处。",
+                        invalidLength: "长度必须在 3000 个字符之内。"
+                    }
+                }
+            },
+            remote: {
+                title: "远程信息",
+            },
+            applying: {
+                title: "申请政策"
+            },
+            next: "下一步",
+            previous: "上一步",
+            complete: "完成"
+        }
+    },
+
     settings: {
         title: "个人设置",
 
