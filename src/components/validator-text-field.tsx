@@ -32,7 +32,6 @@ export default function ValidatorTextField({validator, setValid, onVerifyPass, d
         focused={focused}
         onBlur={async event => {
             const input = event.target.value
-            console.log(input)
             if (lastInput === input) return
             const result = await validator(input)
             if (result.isValid) {
