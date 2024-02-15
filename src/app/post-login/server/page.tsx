@@ -14,6 +14,7 @@ import { GET, backendAddress } from "@/utils";
 import { ModList } from "@/components/mod-list";
 import { MuiMarkdown, getOverrides } from "mui-markdown";
 import Image from "next/image";
+import {useSearchParams} from "next/navigation";
 
 const ApplyingPolicy = {
     CLOSED: "CLOSED",
@@ -23,7 +24,7 @@ const ApplyingPolicy = {
 
 // 页面标题
 function ServerHeader(props: {logoLink: string, name: string, id: number, applyingPolicy: string}) {
-    const [joinedServers, setJoinedServers] = useSessionStorage("joinedServers", [-1]);
+    const [joinedServers, _setJoinedServers] = useSessionStorage("joinedServers", [-1]);
 
     return (
         <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
@@ -135,8 +136,11 @@ function PlayerEntry(props: {player: PlayerInfo, authIdx: number}) {
     )
 }
 
-export default function Page({ params }:{ params: { id: string } }) {
-    const [joinedServers, setJoinedServers] = useSessionStorage("joinedServers", [-1]);
+export default function Page() {
+    const searchParams = useSearchParams()
+    const serverId = searchParams.get("id") ?? "-1"
+
+    const [joinedServers, _setJoinedServers] = useSessionStorage<number[]>("joinedServers", []);
 
     // 整个页面信息 server
     const [server, setServer] = useState<WholeServer>(null!);
@@ -145,7 +149,7 @@ export default function Page({ params }:{ params: { id: string } }) {
     // 获取 server 信息
     useEffect(() => {
         setRefreshing(true); // 获取信息时候把刷新状态设为 true
-        fetch(`${backendAddress}/server-meta/${params.id}`, GET(false))
+        fetch(`${backendAddress}/server-meta/${serverId}`, GET(false))
             .then(response => {
                 if (response.ok)
                     return response.json();
@@ -168,7 +172,7 @@ export default function Page({ params }:{ params: { id: string } }) {
     // 获取 player 信息
     useEffect(() => {
         setLoadingPlayers(true); // 获取信息时候把刷新状态设为 true
-        fetch(`${backendAddress}/post-login/people/server-players/${params.id}`, GET(true))
+        fetch(`${backendAddress}/post-login/people/server-players/${serverId}`, GET(true))
             .then(response => {
                 if (response.ok)
                     return response.json();
@@ -211,7 +215,7 @@ export default function Page({ params }:{ params: { id: string } }) {
         <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
             {/* 上面的标题 */}
             <Paper>
-                <ServerHeader logoLink={server.logoLink} name={server.name} id={parseInt(params.id)} applyingPolicy={server.applyingPolicy}/>
+                <ServerHeader logoLink={server.logoLink} name={server.name} id={parseInt(serverId)} applyingPolicy={server.applyingPolicy}/>
             </Paper>
             
             <Box sx={{display: "flex", flexDirection: "row", gap: 2}}>

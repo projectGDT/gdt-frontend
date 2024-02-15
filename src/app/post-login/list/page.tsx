@@ -14,7 +14,6 @@ import {
     Typography,
 } from "@mui/material";
 import React, {useEffect, useRef, useState} from "react";
-import {useRouter} from "next/navigation";
 import {useSessionStorage} from "usehooks-ts";
 
 import {dict} from "@/i18n/zh-cn"
@@ -31,9 +30,8 @@ const FIRSTRECOMMENDSIZE = 6;
 
 // 每个卡片上的服务器图标和名称
 function ServerName(props: {logolink: string, name: string, id: number}) {
-    const router = useRouter()
     return (
-        <ListItemButton onClick={() => router.push(`/post-login/server/${props.id}`)}>
+        <ListItemButton href={`server?id=${props.id}`}>
             <ListItemAvatar>
                 <Avatar src={props.logolink} style={{width: 52, height: 52}} variant="rounded"/>
             </ListItemAvatar>
@@ -49,19 +47,16 @@ function ServerName(props: {logolink: string, name: string, id: number}) {
 
 // 每个卡片下面的按钮
 function CardButtons(props: {id: number, isOp: boolean}) {
-    const router = useRouter()
     return (
         <Box sx={{display: "flex", flexDirection: "row-reverse", gap: 2, paddingX: 1, paddingY: 1}}>
             <Button variant="text" size="small" sx={{fontSize: 16}}>{dict.list.cardButtons[0]}</Button>
-            {props.isOp && <Button variant="text" size="small" onClick={() => router.push(`/post-login/server/${props.id}/manage`)} sx={{fontSize: 16}}>{dict.list.cardButtons[1]}</Button>}
+            {props.isOp && <Button variant="text" size="small" href={`manage?id=${props.id}`} sx={{fontSize: 16}}>{dict.list.cardButtons[1]}</Button>}
         </Box>
     )
 }
 
 export default function Page() {
-    const router = useRouter()
-
-    const [joinedServers, setJoinedServers] = useSessionStorage("joinedServers", [-1]);
+    const [_joinedServers, setJoinedServers] = useSessionStorage<number[]>("joinedServers", []);
     const [joinedServersInfo, setJoinedServersInfo] = useState<ServerInfo[]>([]);
 
     const [loadingJoinedServers, setLoadingJoinedServers] = useState(true); // 加入的服务器是否在刷新
