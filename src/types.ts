@@ -29,7 +29,7 @@ export interface WholeServer {
         address: string;
         port: number;
         coreVersion: string;
-        compatibleVersions: (string | string[])[];
+        compatibleVersions: string[];
         uniqueIdProvider: number;
         modpackVersionId?: string;
         serverId: number;
@@ -38,7 +38,7 @@ export interface WholeServer {
         address: string;
         port: number;
         coreVersion: string;
-        compatibleVersions: (string | string[])[];
+        compatibleVersions: string[];
     };
     applyingPolicy: string;
 }
@@ -66,4 +66,21 @@ export interface Dependency {
     project_id: string;
     version_id: string;
     file_name: string;
+}
+
+export interface JavaRemote {
+    address: string;
+    port: number;
+    coreVersion: string;
+    compatibleVersions: string[];
+    uniqueIdProvider: number;
+    modpackVersionId?: string;
+    serverId: number;
+}
+
+export interface BedrockRemote {
+    address: string;
+    port: number;
+    coreVersion: string;
+    compatibleVersions: string[];
 }
