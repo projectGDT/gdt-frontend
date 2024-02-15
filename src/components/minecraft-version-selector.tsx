@@ -19,7 +19,7 @@ export default function MinecraftVersionSelector(props: CommonVersionSelectorPro
 
     useEffect(() => {
         props.fetchVersions().then(versions => setVersions(versions))
-    }, []);
+    }, [props]);
 
     return <Box sx={{display: "flex", gap: 2}}>
         <FormControl sx={{width: 0.5}}>
@@ -54,10 +54,12 @@ export default function MinecraftVersionSelector(props: CommonVersionSelectorPro
                     ))}
                 </Box>,
                 MenuProps: {
-                    PaperProps: { // deprecated 就 deprecated 吧
-                        style: {
-                            maxHeight: "20vh"
-                        },
+                    slotProps: {
+                        paper: {
+                            style: {
+                                maxHeight: "20vh"
+                            },
+                        }
                     }
                 }
             } as SelectProps<string[]>}>
@@ -77,10 +79,12 @@ export default function MinecraftVersionSelector(props: CommonVersionSelectorPro
                     setSelectedCoreVersion(value)
                 },
                 MenuProps: {
-                    PaperProps: { // deprecated 就 deprecated 吧，MUI 的文档上面写的还有
-                        style: {
-                            maxHeight: "20vh"
-                        },
+                    slotProps: {
+                        paper: {
+                            style: {
+                                maxHeight: "20vh"
+                            },
+                        }
                     }
                 }
             } as SelectProps<string>}>
