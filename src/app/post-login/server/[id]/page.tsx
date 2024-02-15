@@ -23,7 +23,7 @@ const ApplyingPolicy = {
 
 // 页面标题
 function ServerHeader(props: {logoLink: string, name: string, id: number, applyingPolicy: string}) {
-    const [joinedServers, setJoinedServers] = useSessionStorage("joinedServers", [-1]);
+    const [joinedServers, _setJoinedServers] = useSessionStorage("joinedServers", [-1]);
 
     return (
         <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
@@ -109,15 +109,10 @@ function VersionInfo(props: {javaRemote?: JavaRemote, bedrockRemote?: BedrockRem
 
 // authIdx 为 0 是腐竹，1 是 op，2 是普通玩家
 function PlayerEntry(props: {player: PlayerInfo, authIdx: number}) {
-    const name = props.player.profiles.length === 1 ? props.player.profiles[0].cachedPlayerName :
-        (props.player.profiles[0].uniqueIdProvider > props.player.profiles[1].uniqueIdProvider) ? 
-        props.player.profiles[0].cachedPlayerName : props.player.profiles[1].cachedPlayerName;
-    const uniqueIdProvider = props.player.profiles.length === 1 ? props.player.profiles[0].uniqueIdProvider :
-        (props.player.profiles[0].uniqueIdProvider > props.player.profiles[1].uniqueIdProvider) ? 
-        props.player.profiles[0].uniqueIdProvider : props.player.profiles[1].uniqueIdProvider;
-    const uniqueId = props.player.profiles.length === 1 ? props.player.profiles[0].uniqueId :
-        (props.player.profiles[0].uniqueIdProvider > props.player.profiles[1].uniqueIdProvider) ? 
-        props.player.profiles[0].uniqueId : props.player.profiles[1].uniqueId;
+    const {cachedPlayerName: name, uniqueIdProvider, uniqueId}
+        = props.player.profiles.length === 1 ? props.player.profiles[0] :
+            (props.player.profiles[0].uniqueIdProvider > props.player.profiles[1].uniqueIdProvider) ?
+                props.player.profiles[0] : props.player.profiles[1]
     return (
         <ListItem disablePadding
             secondaryAction={props.authIdx === 0 ? 
@@ -136,7 +131,7 @@ function PlayerEntry(props: {player: PlayerInfo, authIdx: number}) {
 }
 
 export default function Page({ params }:{ params: { id: string } }) {
-    const [joinedServers, setJoinedServers] = useSessionStorage("joinedServers", [-1]);
+    const [joinedServers, _setJoinedServers] = useSessionStorage("joinedServers", [-1]);
 
     // 整个页面信息 server
     const [server, setServer] = useState<WholeServer>(null!);
@@ -158,7 +153,7 @@ export default function Page({ params }:{ params: { id: string } }) {
             .finally(() => {
                 setRefreshing(false); // 最后把刷新状态设为 false
             })
-    }, [])
+    }, [params.id])
 
     // 玩家列表 playerInfo
     const [playerInfo, setPlayerInfo] = useState<PlayerInfo[]>([]);
@@ -181,7 +176,7 @@ export default function Page({ params }:{ params: { id: string } }) {
             .finally(() =>{
                 setLoadingPlayers(false);
             })
-    }, [server])
+    }, [params.id, server])
     
     // 为 player 排序
     useEffect(
@@ -205,7 +200,7 @@ export default function Page({ params }:{ params: { id: string } }) {
                 )
                 setPlayerInfo(tmpArray);
             }
-        }, [rawPlayerInfo]);
+        }, [rawPlayerInfo, server.ownerId]);
 
     return !refreshing ? (
         <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
