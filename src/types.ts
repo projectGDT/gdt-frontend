@@ -84,3 +84,57 @@ export interface BedrockRemote {
     coreVersion: string;
     compatibleVersions: string[];
 }
+export interface Form {
+    title: string
+    preface: string
+    questions: Question[]
+}
+
+export interface Question {
+    root: {
+        content: string
+        hint?: string
+        required: boolean
+    }
+    branches:
+        ChoiceBranches |
+        NumberBranches |
+        DateFullBranches |
+        DateYearMonthBranches |
+        OpenBranches
+}
+
+export interface ChoiceBranches {
+    type: "choice"
+    choices: string[]
+    allowMultipleChoices: boolean
+    hasBlank: boolean
+}
+
+export interface ChoiceResponse {
+    chosenIndexes: number[]
+    other?: string
+}
+
+export interface NumberBranches {
+    type: "number"
+}
+
+export interface DateFullBranches {
+    type: "dateFull"
+}
+
+export interface DateYearMonthBranches {
+    type: "dateYearMonth"
+}
+
+export interface OpenBranches {
+    type: "open"
+    allowMultipleLines: boolean
+}
+
+export type FormResponse = (
+    ChoiceResponse |
+    string | // for open questions
+    number // for number, dateFull and dateYearMonth questions
+)[]
