@@ -41,6 +41,7 @@ const gdtTheme = createTheme({
             main: '#2a9849',
         },
         secondary: {
+            light: '#ee9611',
             main: '#ac01b1',
         },
         background: {
@@ -49,6 +50,7 @@ const gdtTheme = createTheme({
         text: {
             primary: 'rgba(0,0,0,0.825)',
         },
+
     },
 })
 

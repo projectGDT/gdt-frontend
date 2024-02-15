@@ -89,6 +89,19 @@ export const dict = {
     },
     list: {
         title: "服务器列表",
+        subtitle: ["我加入的", "发现"],
+        cardButtons: ["设置", "管理"],
+    },
+    serverid: {
+        headerButtons: ["登入", "设置", "申请", "加入"],
+        cardTitle: ["状态", "Java 版", "基岩版", "玩家列表"],
+        cardSubtitle: ["核心版本", "兼容版本"],
+        modTitle: ["Mod 服", "Mod 列表"],
+        support: ["支持", "不支持"],
+        authName: ["服主", "管理员"],
+        playerCount: (count: number) => `（${count}人）`,
+        accessPrompt: ["请登录", "请申请加入服务器", "请加入服务器", "，以获取完整玩家列表"],
+        modList: ["上传的文件"]
     },
     manage: {
         title: "服务器管理"
