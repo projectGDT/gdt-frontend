@@ -1,13 +1,17 @@
 "use client"
 
 import {
+    Avatar,
     Box,
     Button,
+    CircularProgress,
     Divider,
     Grid,
-    Link,
+    ListItemAvatar,
+    ListItemButton,
+    ListItemText,
     Paper,
-    Stack,
+    Typography,
 } from "@mui/material";
 import React, {useEffect, useRef, useState} from "react";
 import {useRouter} from "next/navigation";
@@ -17,6 +21,7 @@ import {dict} from "@/i18n/zh-cn"
 
 import { GET, POST, backendAddress } from "@/utils";
 import { Server, ServerInfo } from "@/types";
+import Image from "next/image";
 
 // 每次推荐的时候试图取回几个服务器数据
 const RECOMMENDSIZE = 3;
@@ -26,14 +31,19 @@ const FIRSTRECOMMENDSIZE = 6;
 
 // 每个卡片上的服务器图标和名称
 function ServerName(props: {logolink: string, name: string, id: number}) {
+    const router = useRouter()
     return (
-        <Box sx={{paddingX: 1.5, paddingY: 1}}>
-            <Box sx={{display: "flex", height: "auto"}}>
-                <img src={props.logolink} style={{width: 64, height: 64}}/>
-                {/*<Box sx={{display: "flex", alignItems: "center", paddingX: 1, fontSize: 23}}>{props.name}</Box>*/}
-                <Link href={`/post-login/server/${props.id}`} color="inherit" underline="none" sx={{display: "flex", alignItems: "center", paddingX: 1, fontSize: 23}}>{props.name}</Link>
-            </Box>
-        </Box>
+        <ListItemButton onClick={() => router.push(`/post-login/server/${props.id}`)}>
+            <ListItemAvatar>
+                <Avatar src={props.logolink} style={{width: 52, height: 52}} variant="rounded"/>
+            </ListItemAvatar>
+            {/* 等人数和延迟的 API 做好了再替换此处 secondary 的内容 */}
+            <ListItemText 
+                primary={props.name} primaryTypographyProps={{fontSize: 20, fontWeight: "medium"}}
+                secondary={"0/20 50ms"}
+                sx={{paddingX: 1}}
+            />
+        </ListItemButton>
     )
 }
 
@@ -41,10 +51,10 @@ function ServerName(props: {logolink: string, name: string, id: number}) {
 function CardButtons(props: {id: number, isOp: boolean}) {
     const router = useRouter()
     return (
-        <Stack direction="row-reverse" paddingX={1.5} paddingY={1}>
-            <Button variant="text" size="small">{dict.list.cardButtons[0]}</Button>
-            {props.isOp && <Button variant="text" size="small" onClick={() => router.replace(`/post-login/server/${props.id}/manage`)}>{dict.list.cardButtons[1]}</Button>}
-        </Stack>
+        <Box sx={{display: "flex", flexDirection: "row-reverse", gap: 2, paddingX: 1, paddingY: 1}}>
+            <Button variant="text" size="small" sx={{fontSize: 16}}>{dict.list.cardButtons[0]}</Button>
+            {props.isOp && <Button variant="text" size="small" onClick={() => router.push(`/post-login/server/${props.id}/manage`)} sx={{fontSize: 16}}>{dict.list.cardButtons[1]}</Button>}
+        </Box>
     )
 }
 
@@ -187,46 +197,44 @@ export default function Page() {
 
     return (
         // 一个 Box 放下两栏：“我加入的”和“推荐”
-        <Box sx={{display: "flex", flexDirection: "column"}}>
-            <Box sx={{display: "flex", flexDirection: "column", height: "40vh"}}>
-                <Box sx={{fontSize: 30}}>{dict.list.subtitle[0]}</Box>
-                <Box paddingY={1}>
-                    {!loadingJoinedServers && <Grid container spacing={2}>
-                        {joinedServersInfo.map(({server, isOperator}) =>{
-                            //rendercnt += 1;
+        <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
+            {/* 我加入的 */}
+            <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
+                <Typography variant="h4">{dict.list.subtitle[0]}</Typography>
+                <Box sx={{display: "flex"}}>
+                    {!loadingJoinedServers ? <Grid container spacing={2}>
+                        {joinedServersInfo.map(({server, isOperator}) => {
                             return (<Grid item xs={3} key={server.id}>
-                                <Paper elevation={3}>
+                                <Paper elevation={3} sx={{display: "flex", flexDirection: "column"}}>
                                     <ServerName logolink={server.logoLink} name={server.name} id={server.id}/>
-                                    <Divider variant="middle"/>
-                                    <Box sx={{display: "flex", flexDirection: "row", height: "8vh", paddingX: 2, paddingY: 1, fontSize: 20, justifyContent: "space-between"}}>
-                                        <div>0/20</div>
-                                        <div>50ms</div>
-                                    </Box>
+                                    <Divider/>
                                     <CardButtons id={server.id} isOp={isOperator}/>
                                 </Paper>
                             </Grid>)
                         })}
-                    </Grid>}
+                    </Grid> : <Box sx={{display: "flex", justifyContent: "center", alignItems: "center"}}><CircularProgress/></Box>}
                 </Box>
-                <Divider variant="middle" sx={{paddingY: 1}}/>
-                <Box sx={{fontSize: 30, paddingY: 1}}>{dict.list.subtitle[1]}</Box>
-                <Box paddingY={1}>
+            </Box>
+
+            {/* 发现 */}
+            <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
+                <Typography variant="h4">{dict.list.subtitle[1]}</Typography>
+                <Box sx={{display: "flex"}}>
                     <Grid container spacing={2}>
-                        {recommendInfo.map((item) =>
-                            <Grid item xs={4} key={item.id}>
-                                <Paper elevation={3}>
-                                    <ServerName logolink={item.logoLink} name={item.name} id={item.id}/>
-                                    <Divider variant="middle"/>
-                                    <Box sx={{display: "flex", flexDirection: "row", paddingX: 1, paddingY: 1}}>
-                                        <img src={item.coverLink} style={{width: "100%"}}/>
-                                    </Box>
-                                </Paper>
-                            </Grid>
-                        )}
+                        {recommendInfo.map((item) => {
+                            return (
+                                <Grid item xs={4} key={item.id}>
+                                    <Paper elevation={3} sx={{display: "flex", flexDirection: "column"}}>
+                                        <ServerName logolink={item.logoLink} name={item.name} id={item.id}/>
+                                        <Box sx={{aspectRatio: 16/9, position: "relative"}}>
+                                            <Image src={item.coverLink} alt={"Cover"} fill style={{objectFit: "cover"}}/>
+                                        </Box>
+                                    </Paper>
+                                </Grid>
+                            )})}
                     </Grid>
-                    
                 </Box>
-                {loadingRecommend && <Box>loading...</Box>}
+                {loadingRecommend && <Box sx={{display: "flex", justifyContent: "center", alignItems: "center"}}><CircularProgress/></Box>}
             </Box>
         </Box>
     )
