@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import React, {useEffect, useRef, useState} from "react";
 import {useRouter} from "next/navigation";
+import {useSessionStorage} from "usehooks-ts";
 
 import {dict} from "@/i18n/zh-cn"
 
@@ -23,18 +24,18 @@ import { Server, ServerInfo } from "@/types";
 import Image from "next/image";
 
 // 每次推荐的时候试图取回几个服务器数据
-const RECOMMENDATION_SIZE = 3;
+const RECOMMENDSIZE = 3;
 // 第一次推荐的时候试图取回几个服务器数据
-const FIRST_RECOMMENDATION_SIZE = 6;
+const FIRSTRECOMMENDSIZE = 6;
 // 以上两个常量，后者**必须**是前者的倍数，且建议二者都为3的倍数
 
 // 每个卡片上的服务器图标和名称
-function ServerName(props: {logoLink: string, name: string, id: number}) {
+function ServerName(props: {logolink: string, name: string, id: number}) {
     const router = useRouter()
     return (
         <ListItemButton onClick={() => router.push(`/post-login/server/${props.id}`)}>
             <ListItemAvatar>
-                <Avatar src={props.logoLink} style={{width: 52, height: 52}} variant="rounded"/>
+                <Avatar src={props.logolink} style={{width: 52, height: 52}} variant="rounded"/>
             </ListItemAvatar>
             {/* 等人数和延迟的 API 做好了再替换此处 secondary 的内容 */}
             <ListItemText 
@@ -58,6 +59,9 @@ function CardButtons(props: {id: number, isOp: boolean}) {
 }
 
 export default function Page() {
+    const router = useRouter()
+
+    const [joinedServers, setJoinedServers] = useSessionStorage("joinedServers", [-1]);
     const [joinedServersInfo, setJoinedServersInfo] = useState<ServerInfo[]>([]);
 
     const [loadingJoinedServers, setLoadingJoinedServers] = useState(true); // 加入的服务器是否在刷新
@@ -127,6 +131,7 @@ export default function Page() {
             })
             .then(data => {
                 setJoinedServersInfo(data);
+                setJoinedServers(data.map((item: ServerInfo) => {return item.server.id}));
             })
             .finally(() => {
                 setLoadingJoinedServers(false); // 最后把刷新状态设为 false
@@ -154,7 +159,7 @@ export default function Page() {
     // 获取推荐的服务器
     const fetchRecommendInfo = () => {
         scrollPos.current = window.scrollY;
-        const currentIndex = hasFirstFetched ? recommendCount * RECOMMENDATION_SIZE : recommendCount * FIRST_RECOMMENDATION_SIZE;
+        const currentIndex = hasFirstFetched ? recommendCount * RECOMMENDSIZE : recommendCount * FIRSTRECOMMENDSIZE;
 
         // 已经全都加载完了的情况：
         if (currentIndex >= recommendList.length) {
@@ -164,12 +169,12 @@ export default function Page() {
         setLoadingRecommend(true);
         const fetchIndex: number[] = [];
         if (hasFirstFetched) {
-            for (let i = 0; i + currentIndex < recommendList.length && i < RECOMMENDATION_SIZE; i++) {
+            for (let i = 0; i + currentIndex < recommendList.length && i < RECOMMENDSIZE; i++) {
                 fetchIndex.push(recommendList[i + currentIndex]);
             }
         }
         else {
-            for (let i = 0; i + currentIndex < recommendList.length && i < FIRST_RECOMMENDATION_SIZE; i++) {
+            for (let i = 0; i + currentIndex < recommendList.length && i < FIRSTRECOMMENDSIZE; i++) {
                 fetchIndex.push(recommendList[i + currentIndex]);
             }
         }
@@ -186,7 +191,7 @@ export default function Page() {
             })
             .finally(() => {
                 setLoadingRecommend(false);
-                setRecommendCount(hasFirstFetched ? (prevCount => prevCount + 1) : (FIRST_RECOMMENDATION_SIZE / RECOMMENDATION_SIZE));
+                setRecommendCount(hasFirstFetched ? (prevCount => prevCount + 1) : (FIRSTRECOMMENDSIZE / RECOMMENDSIZE));
             })
     }
 
@@ -201,7 +206,7 @@ export default function Page() {
                         {joinedServersInfo.map(({server, isOperator}) => {
                             return (<Grid item xs={3} key={server.id}>
                                 <Paper elevation={3} sx={{display: "flex", flexDirection: "column"}}>
-                                    <ServerName logoLink={server.logoLink} name={server.name} id={server.id}/>
+                                    <ServerName logolink={server.logoLink} name={server.name} id={server.id}/>
                                     <Divider/>
                                     <CardButtons id={server.id} isOp={isOperator}/>
                                 </Paper>
@@ -220,7 +225,7 @@ export default function Page() {
                             return (
                                 <Grid item xs={4} key={item.id}>
                                     <Paper elevation={3} sx={{display: "flex", flexDirection: "column"}}>
-                                        <ServerName logoLink={item.logoLink} name={item.name} id={item.id}/>
+                                        <ServerName logolink={item.logoLink} name={item.name} id={item.id}/>
                                         <Box sx={{aspectRatio: 16/9, position: "relative"}}>
                                             <Image src={item.coverLink} alt={"Cover"} fill style={{objectFit: "cover"}}/>
                                         </Box>
