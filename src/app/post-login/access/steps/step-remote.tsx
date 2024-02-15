@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Box, Button, Checkbox, Collapse, FormControlLabel, FormGroup, TextField, Typography} from "@mui/material";
+import {Box, Button, Checkbox, Collapse, FormControlLabel, FormGroup, Typography} from "@mui/material";
 import {dict} from "@/i18n/zh-cn";
 import ValidatorTextField, {inOrder} from "@/components/validator-text-field";
 import MinecraftVersionSelector from "@/components/minecraft-version-selector";

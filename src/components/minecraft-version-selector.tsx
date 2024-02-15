@@ -2,7 +2,6 @@
 import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {Box, Chip, FormControl, InputLabel, MenuItem, OutlinedInput, Select, SelectProps} from "@mui/material";
 import {dict} from "@/i18n/zh-cn";
-import ValidatorTextField, {inOrder} from "@/components/validator-text-field";
 
 type CommonVersionSelectorProps = {
     fetchVersions: () => Promise<string[]>,
@@ -10,24 +9,6 @@ type CommonVersionSelectorProps = {
     coreVersionInputName: string,
     setCompatibleVersionsValid: Dispatch<SetStateAction<boolean>>
 }
-
-type JEVersion = {
-    id: string,
-    type: string,
-    url: string,
-    time: string,
-    releaseTime: string
-}
-
-type JEVersionMeta = {
-    latest: {
-        release: string,
-        snapshot: string
-    },
-    versions: JEVersion[]
-}
-
-type BEVersion = [string, string, number]
 
 export default function MinecraftVersionSelector(props: CommonVersionSelectorProps) {
     const [versions, setVersions] = useState<string[]>([])

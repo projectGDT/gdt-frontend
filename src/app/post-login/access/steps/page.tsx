@@ -4,16 +4,11 @@ import React, {useState} from "react";
 import {
     Box,
     Button,
-    Checkbox,
     Collapse,
-    FormControlLabel,
-    FormGroup,
     Paper,
     Step,
     StepLabel,
-    Stepper,
-    TextField,
-    Typography,
+    Stepper
 } from "@mui/material";
 import {dict} from "@/i18n/zh-cn";
 import StepBasic from "@/app/post-login/access/steps/step-basic";
