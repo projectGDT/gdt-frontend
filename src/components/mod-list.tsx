@@ -106,12 +106,10 @@ export default function ModList(props: { versionId: string, pageSize?: number })
     // Skeletons 组件，用于占位
     function Skeletons() {
         const countToLoad = ((nowModPage) * modPageSize < dependencies.current.length && (nowModPage + 1) * modPageSize >= dependencies.current.length) ? (dependencies.current.length - nowModPage * modPageSize) : modPageSize;
-        let key = 0; // 为了消除警告
-
         return <List sx={{display: "flex", flexDirection: "column", gap: 0.4}}>{ // gap 是为了消除 skeleton 之间距离比 listbuttons 窄导致的伸缩，不知道是否有更好的方法
-            Array.from({length: countToLoad}).map(() => {
+            Array.from({length: countToLoad}).map((_item, index) => {
                 return (
-                    <ListItem key={key++}>
+                    <ListItem key={index}>
                         <ListItemAvatar>
                             <Skeleton style={{width: 48, height: 48}} variant="rounded"/>
                         </ListItemAvatar>
