@@ -1,14 +1,20 @@
 "use client"
 
 import {
-    Avatar,
-    Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Divider, IconButton,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    Divider,
+    IconButton,
     Link,
     List,
-    ListItem, ListItemAvatar,
+    ListItem,
     ListItemButton,
     ListItemText,
-    ListSubheader, Paper,
+    ListSubheader,
+    Paper,
     Skeleton,
     Typography
 } from "@mui/material";
@@ -16,26 +22,13 @@ import {dict} from "@/i18n/zh-cn";
 import React, {useEffect, useState} from "react";
 import {backendAddress, GET, POST} from "@/utils";
 import {DeleteOutlineOutlined} from "@mui/icons-material";
+import {JavaMsProfileButton} from "@/components/profile-display/java-ms-profile-button";
+import {XboxProfileButton} from "@/components/profile-display/xbox-profile-button";
 
 type Profile = {
     uniqueIdProvider: number,
     uniqueId: string,
     cachedPlayerName: string
-}
-
-export function JavaMsProfileButton({uuid, playerName}: {uuid: string, playerName: string}) {
-    return <ListItemButton>
-        <ListItemAvatar>
-            <Avatar variant={"square"} src={`https://minotar.net/helm/${uuid}`}/>
-        </ListItemAvatar>
-        <ListItemText primary={playerName} secondary={uuid}/>
-    </ListItemButton>
-}
-
-export function XboxProfileButton({xuid, gtg}: {xuid: string, gtg: string}) {
-    return <ListItemButton>
-        <ListItemText primary={gtg} secondary={xuid}/>
-    </ListItemButton>
 }
 
 const xboxOauthUri = "https://login.live.com/oauth20_authorize.srf?client_id=9e474b67-edcd-4d23-b2fc-6dc8db5e08f7&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fpost-login%2Fsettings%2Fprofile%2Fxbox&response_type=code&scope=XboxLive.signin"

@@ -3,21 +3,19 @@
 import {useSessionStorage} from "usehooks-ts";
 import React, {useState} from "react";
 import {
-    Alert, Avatar,
+    Alert,
     Box,
     Button,
     Collapse,
-    LinearProgress, Link, List,
-    ListItemAvatar, ListItemButton, ListItemText,
+    LinearProgress, Link,
     Paper,
     Snackbar,
-    TextField,
     Typography
 } from "@mui/material";
 import {dict} from "@/i18n/zh-cn";
 import {io} from "socket.io-client";
 import {backendAddress} from "@/utils";
-import {JavaMsProfileButton} from "@/app/post-login/settings/profile/page";
+import {JavaMsProfileButton} from "@/components/profile-display/java-ms-profile-button";
 
 export default function Page() {
     const [jwt, _setJwt] = useSessionStorage("jwt", "")
@@ -97,7 +95,7 @@ export default function Page() {
             <LinearProgress/>
         </Collapse>
 
-        <Collapse in={true} sx={{alignSelf: "stretch"}}>
+        <Collapse in={showStep1} sx={{alignSelf: "stretch"}}>
             <Paper elevation={2} sx={{padding: 1.5}}>
                 <Typography variant={"h6"}>{dict.settings.profile.bind.javaMicrosoft.step1.title}</Typography>
                 <Typography>

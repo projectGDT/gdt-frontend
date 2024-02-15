@@ -5,7 +5,8 @@ import {Alert, Box, Button, Collapse, LinearProgress, Paper, Snackbar, Typograph
 import {dict} from "@/i18n/zh-cn";
 import {useSearchParams} from "next/navigation";
 import {backendAddress, POST} from "@/utils";
-import {XboxProfileButton} from "@/app/post-login/settings/profile/page";
+
+import {XboxProfileButton} from "@/components/profile-display/xbox-profile-button";
 
 export default function Page() {
     const params = useSearchParams()
