@@ -65,11 +65,11 @@ export default function Page() {
                             validator: input =>
                                 fetch(`${backendAddress}/register/check-qid/${input}`, GET(false))
                                     .then(res => res.json())
-                                    .then(body => body.exists),
+                                    .then(body => !body.exists),
                             hint: dict.register.submit.qid.error.alreadyExists
                         }
                     )}
-                    onVerifyPass={input => setQid(input)}
+                    onValidationPass={input => setQid(input)}
                     setValid={setQidValid}
                     sx={{width: 0.5}}
                 />
@@ -85,7 +85,7 @@ export default function Page() {
                             validator: input =>
                                 fetch(`${backendAddress}/register/check-username/${input}`, GET(false))
                                     .then(res => res.json())
-                                    .then(body => body.exists),
+                                    .then(body => !body.exists),
                             hint: dict.register.submit.username.error.alreadyExists
                         }
                     )}
@@ -107,12 +107,10 @@ export default function Page() {
                 <ValidatorTextField
                     name={"invitationCode"}
                     label={dict.register.submit.invitationCode.title}
-                    validator={input => (input === "" || uuidRegex.test(input)) ? {
-                        isValid: true
-                    } : {
-                        isValid: false,
+                    validator={inOrder({
+                        validator: input => input === "" || uuidRegex.test(input),
                         hint: dict.register.submit.invitationCode.error.invalid
-                    }}
+                    })}
                     setValid={setInvitationCodeValid}
                     sx={{flexGrow: 1}}
                 />
