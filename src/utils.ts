@@ -29,5 +29,4 @@ export const POST = (dataObject: any, withJWT: boolean = true): RequestInit => {
     }
 }
 
-export const backendAddress = "http://localhost:14590"
-// export const backendAddress = "http://127.0.0.1:4523/m1/3898612-0-default"  // 测试用
+export const backendAddress = process.env.BACKEND_ADDRESS
