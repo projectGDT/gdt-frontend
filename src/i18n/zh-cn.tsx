@@ -1,5 +1,3 @@
-import {Link, Typography} from "@mui/material";
-
 export const dict = {
     portal: {
         title: "门户页面",

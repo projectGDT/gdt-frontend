@@ -69,7 +69,7 @@ export default function Page() {
                             hint: dict.register.submit.qid.error.alreadyExists
                         }
                     )}
-                    onVerifyPass={input => setQid(input)}
+                    onValidationPass={input => setQid(input)}
                     setValid={setQidValid}
                     sx={{width: 0.5}}
                 />
