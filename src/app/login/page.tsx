@@ -5,7 +5,6 @@ import {
     Box,
     Button,
     Snackbar,
-    TextField,
     Typography
 } from "@mui/material";
 import React, {useRef, useState} from "react";
@@ -60,6 +59,7 @@ export default function Page() {
             <Typography variant={"h5"}>{dict.login.title}</Typography>
             <ValidatorTextField
                 name={"username"}
+                frequency={"onChange"}
                 label={dict.login.username.title}
                 validator={inOrder({
                     validator: input => input !== "",
@@ -70,6 +70,8 @@ export default function Page() {
             />
             <ValidatorTextField
                 name={"password"}
+                type={"password"}
+                frequency={"onChange"}
                 label={dict.login.password.title}
                 validator={inOrder({
                     validator: input => input !== "",

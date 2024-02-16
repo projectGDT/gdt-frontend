@@ -65,11 +65,11 @@ export default function Page() {
                             validator: input =>
                                 fetch(`${backendAddress}/register/check-qid/${input}`, GET(false))
                                     .then(res => res.json())
-                                    .then(body => Boolean(body.exists)),
+                                    .then(body => body.exists),
                             hint: dict.register.submit.qid.error.alreadyExists
                         }
                     )}
-                    onVerifyPass={input => setQid(input)}
+                    onValidationPass={input => setQid(input)}
                     setValid={setQidValid}
                     sx={{width: 0.5}}
                 />
@@ -85,8 +85,8 @@ export default function Page() {
                             validator: input =>
                                 fetch(`${backendAddress}/register/check-username/${input}`, GET(false))
                                     .then(res => res.json())
-                                    .then(body => Boolean(body.exists)),
-                            hint: dict.register.submit.qid.error.alreadyExists
+                                    .then(body => body.exists),
+                            hint: dict.register.submit.username.error.alreadyExists
                         }
                     )}
                     setValid={setUsernameValid}
@@ -95,6 +95,7 @@ export default function Page() {
             </Box>
             <ValidatorTextField
                 name={"password"}
+                type={"password"}
                 label={dict.register.submit.password.title}
                 validator={inOrder({
                     validator: input => passwordRegex.test(input),

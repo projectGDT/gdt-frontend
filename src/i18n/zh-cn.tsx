@@ -1,5 +1,3 @@
-import {Link, Typography} from "@mui/material";
-
 export const dict = {
     portal: {
         title: "门户页面",
@@ -40,8 +38,8 @@ export const dict = {
             qid: {
                 title: "QQ 号",
                 error: {
-                    invalid: "请输入有效QQ号",
-                    alreadyExists: "此QQ号已经被注册",
+                    invalid: "请输入有效 QQ 号",
+                    alreadyExists: "此 QQ 号已经被注册",
                 }
             },
             username: {
