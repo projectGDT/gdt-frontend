@@ -70,6 +70,7 @@ export default function Page() {
             />
             <ValidatorTextField
                 name={"password"}
+                type={"password"}
                 label={dict.login.password.title}
                 validator={inOrder({
                     validator: input => input !== "",
