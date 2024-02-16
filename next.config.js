@@ -19,7 +19,7 @@ const nextConfig = {
         unoptimized: true
     },
     env: {
-        BACKEND_ADDRESS: "http://localhost:14590"
+        BACKEND_ADDRESS: ""
     }
 }
 
