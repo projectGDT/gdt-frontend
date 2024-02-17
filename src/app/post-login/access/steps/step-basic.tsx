@@ -20,24 +20,24 @@ export default function StepBasic({setActiveStep}: {
     return <>
         <ValidatorTextField
             name={"name"}
-            label={dict.access.steps.basic.name.title}
+            label={dict.access.basic.name.title}
             validator={inOrder({
                 validator: input => input.length >= 3 && input.length <= 30,
-                hint: dict.access.steps.basic.name.hint.invalidLength
+                hint: dict.access.basic.name.hint.invalidLength
             })}
             setValid={setNameValid}
         />
         <Box sx={{display: "flex", gap: 2}}>
             <ValidatorTextField
                 name={"logoLink"}
-                label={dict.access.steps.basic.logoLink.title}
+                label={dict.access.basic.logoLink.title}
                 validator={inOrder({
                     validator: input => urlRegex.test(input),
-                    hint: dict.access.steps.basic.logoLink.hint.invalid
+                    hint: dict.access.basic.logoLink.hint.invalid
                 })}
-                onVerifyPass={setLogoSrc}
+                onValidationPass={setLogoSrc}
                 setValid={setLogoLinkValid}
-                defaultHelperText={dict.access.steps.basic.logoLink.hint.fallback}
+                defaultHelperText={dict.access.basic.logoLink.hint.fallback}
                 sx={{flexGrow: 1}}
             />
             <Avatar variant={"rounded"} alt={"?"} src={logoSrc} sx={{
@@ -48,12 +48,12 @@ export default function StepBasic({setActiveStep}: {
         </Box>
         <ValidatorTextField
             name={"coverLink"}
-            label={dict.access.steps.basic.coverLink.title}
+            label={dict.access.basic.coverLink.title}
             validator={inOrder({
                 validator: input => urlRegex.test(input),
-                hint: dict.access.steps.basic.coverLink.hint.invalid
+                hint: dict.access.basic.coverLink.hint.invalid
             })}
-            onVerifyPass={inputSrc => setCoverImage(
+            onValidationPass={inputSrc => setCoverImage(
                 <Image
                     src={inputSrc}
                     alt={"Cover"}
@@ -66,7 +66,7 @@ export default function StepBasic({setActiveStep}: {
                 />
             )}
             setValid={setCoverLinkValid}
-            defaultHelperText={dict.access.steps.basic.coverLink.hint.fallback}
+            defaultHelperText={dict.access.basic.coverLink.hint.fallback}
         />
         <Snackbar
             key={"ple"}
@@ -75,24 +75,24 @@ export default function StepBasic({setActiveStep}: {
             onClose={() => setPictureLoadingErrorOpen(false)}
         >
             <Alert variant={"filled"} severity={"error"}>
-                {dict.access.steps.basic.coverLink.preview.error}
+                {dict.access.basic.coverLink.preview.error}
             </Alert>
         </Snackbar>
         <Collapse in={coverLinkValid}>
             <Typography variant={"body2"}>
-                {dict.access.steps.basic.coverLink.preview.title}
+                {dict.access.basic.coverLink.preview.title}
             </Typography>
             <Box sx={{aspectRatio: 16/9, position: "relative"}}>
                 {coverImage}
             </Box>
             <Typography variant={"caption"}>
-                {dict.access.steps.basic.coverLink.preview.hint}
+                {dict.access.basic.coverLink.preview.hint}
             </Typography>
         </Collapse>
         <ValidatorTextField
             multiline
             rows={10}
-            label={dict.access.steps.basic.introduction.title}
+            label={dict.access.basic.introduction.title}
             InputProps={{
                 sx: {
                     fontFamily: [
@@ -104,10 +104,10 @@ export default function StepBasic({setActiveStep}: {
             }}
             validator={inOrder({
                 validator: input => input.length <= 3000,
-                hint: dict.access.steps.basic.introduction.hint.invalidLength
+                hint: dict.access.basic.introduction.hint.invalidLength
             })}
             setValid={setIntroductionValid}
-            defaultHelperText={dict.access.steps.basic.introduction.hint.fallback}
+            defaultHelperText={dict.access.basic.introduction.hint.fallback}
         />
         <Box sx={{display: "flex", flexDirection: "row-reverse", gap: 2}}>
             <Button
@@ -120,7 +120,7 @@ export default function StepBasic({setActiveStep}: {
                 )}
                 onClick={() => setActiveStep(step => step + 1)}
             >
-                {dict.access.steps.next}
+                {dict.access.next}
             </Button>
         </Box>
     </>

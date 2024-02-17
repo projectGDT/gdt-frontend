@@ -46,33 +46,33 @@ export default function StepRemote({setActiveStep}: {
                 onChange={event => {
                     setSupportsJava(event.target.checked)
                 }}
-            />} label={dict.access.steps.remote.java.supports}/>
+            />} label={dict.access.remote.java.supports}/>
             <Collapse in={supportsJava}>
                 <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
                     <Box sx={{display: "flex", gap: 2}}>
                         <ValidatorTextField
                             name={"java.address"}
-                            label={dict.access.steps.remote.common.address.title}
+                            label={dict.access.remote.common.address.title}
                             validator={inOrder({
                                 validator: input => domainRegex.test(input),
-                                hint: dict.access.steps.remote.common.address.hint.invalid
+                                hint: dict.access.remote.common.address.hint.invalid
                             })}
                             setValid={setJavaAddressValid}
-                            defaultHelperText={dict.access.steps.remote.common.address.hint.fallback}
+                            defaultHelperText={dict.access.remote.common.address.hint.fallback}
                             sx={{width: 0.75}}
                         />
                         <ValidatorTextField
                             name={"java.port"}
-                            label={dict.access.steps.remote.common.port.title}
+                            label={dict.access.remote.common.port.title}
                             validator={inOrder(
                                 {
                                     validator: input => portRegex.test(input),
-                                    hint: dict.access.steps.remote.common.port.hint.invalid
+                                    hint: dict.access.remote.common.port.hint.invalid
                                 }
                             )}
                             setValid={setJavaPortValid}
                             defaultValue={"25565"}
-                            defaultHelperText={dict.access.steps.remote.common.port.hint.fallback}
+                            defaultHelperText={dict.access.remote.common.port.hint.fallback}
                             sx={{width: 0.25}}
                         />
                     </Box>
@@ -88,7 +88,7 @@ export default function StepRemote({setActiveStep}: {
                         coreVersionInputName={"java.coreVersion"}
                         setCompatibleVersionsValid={setJavaCompatibleVersionsValid}
                     />
-                    <Typography variant={"body2"}>{dict.access.steps.remote.java.mod.hint}</Typography>
+                    <Typography variant={"body2"}>{dict.access.remote.java.mod.hint}</Typography>
                     <Collapse in={!supportsBedrock && supportsJava}>
                         <ModrinthVersionSelector/>
                     </Collapse>
@@ -99,33 +99,33 @@ export default function StepRemote({setActiveStep}: {
                 onChange={event => {
                     setSupportsBedrock(event.target.checked)
                 }}
-            />} label={dict.access.steps.remote.bedrock.supports}/>
+            />} label={dict.access.remote.bedrock.supports}/>
             <Collapse in={supportsBedrock}>
                 <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
                     <Box sx={{display: "flex", gap: 2}}>
                         <ValidatorTextField
                             name={"bedrock.address"}
-                            label={dict.access.steps.remote.common.address.title}
+                            label={dict.access.remote.common.address.title}
                             validator={inOrder({
                                 validator: input => domainRegex.test(input),
-                                hint: dict.access.steps.remote.common.address.hint.invalid
+                                hint: dict.access.remote.common.address.hint.invalid
                             })}
                             setValid={setBedrockAddressValid}
-                            defaultHelperText={dict.access.steps.remote.common.address.hint.fallback}
+                            defaultHelperText={dict.access.remote.common.address.hint.fallback}
                             sx={{width: 0.75}}
                         />
                         <ValidatorTextField
                             name={"bedrock.port"}
-                            label={dict.access.steps.remote.common.port.title}
+                            label={dict.access.remote.common.port.title}
                             validator={inOrder(
                                 {
                                     validator: input => portRegex.test(input),
-                                    hint: dict.access.steps.remote.common.port.hint.invalid
+                                    hint: dict.access.remote.common.port.hint.invalid
                                 }
                             )}
                             setValid={setBedrockPortValid}
                             defaultValue={"19132"}
-                            defaultHelperText={dict.access.steps.remote.common.port.hint.fallback}
+                            defaultHelperText={dict.access.remote.common.port.hint.fallback}
                             sx={{width: 0.25}}
                         />
                     </Box>
@@ -171,10 +171,10 @@ export default function StepRemote({setActiveStep}: {
                     )
                 )}
                 onClick={() => setActiveStep(step => step + 1)}>
-                {dict.access.steps.next}
+                {dict.access.next}
             </Button>
             <Button variant={"outlined"} onClick={() => setActiveStep(step => step - 1)}>
-                {dict.access.steps.previous}
+                {dict.access.previous}
             </Button>
         </Box>
     </>

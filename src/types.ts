@@ -91,11 +91,9 @@ export interface Form {
 }
 
 export interface Question {
-    root: {
-        content: string
-        hint?: string
-        required: boolean
-    }
+    content: string
+    hint?: string
+    required: boolean
     branches:
         ChoiceBranches |
         NumberBranches |

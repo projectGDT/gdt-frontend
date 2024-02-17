@@ -27,7 +27,7 @@ export default function MinecraftVersionSelector(props: CommonVersionSelectorPro
                 id={"cpv-il"}
                 color={error ? "error" : (success ? "success" : undefined)}
                 focused={error || success}
-            >{dict.access.steps.remote.common.compatibleVersions.title}</InputLabel>
+            >{dict.access.remote.common.compatibleVersions.title}</InputLabel>
             <Select {...{
                 name: props.compatibleVersionsInputName,
                 error: error,
@@ -35,7 +35,7 @@ export default function MinecraftVersionSelector(props: CommonVersionSelectorPro
                 multiple: true,
                 labelId: "cpv-il",
                 input: <OutlinedInput
-                    label={dict.access.steps.remote.common.compatibleVersions.title}
+                    label={dict.access.remote.common.compatibleVersions.title}
                     error={error}
                 />,
                 value: selectedVersions,
@@ -69,11 +69,11 @@ export default function MinecraftVersionSelector(props: CommonVersionSelectorPro
             </Select>
         </FormControl>
         <FormControl sx={{width: 0.5}}>
-            <InputLabel id={"crv-il"}>{dict.access.steps.remote.common.coreVersion}</InputLabel>
+            <InputLabel id={"crv-il"}>{dict.access.remote.common.coreVersion}</InputLabel>
             <Select {...{
                 name: props.coreVersionInputName,
                 labelId: "crv-il",
-                input: <OutlinedInput label={dict.access.steps.remote.common.coreVersion}/>,
+                input: <OutlinedInput label={dict.access.remote.common.coreVersion}/>,
                 value: selectedCoreVersion,
                 onChange: ({target: {value}}, _child) => {
                     setSelectedCoreVersion(value)

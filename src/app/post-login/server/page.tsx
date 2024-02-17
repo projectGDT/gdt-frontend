@@ -11,7 +11,7 @@ import {useSessionStorage} from "usehooks-ts";
 import {dict} from "@/i18n/zh-cn"
 import { BedrockRemote, JavaRemote, PlayerInfo, WholeServer } from "@/types";
 import { GET, backendAddress } from "@/utils";
-import { ModList } from "@/components/mod-list";
+import ModList from "@/components/mod-list";
 import { MuiMarkdown, getOverrides } from "mui-markdown";
 import Image from "next/image";
 import {useSearchParams} from "next/navigation";

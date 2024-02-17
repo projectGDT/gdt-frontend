@@ -25,7 +25,7 @@ export default function ModrinthVersionSelector() {
     return <Box sx={{display: "flex", flexDirection: "column"}}>
         <Box sx={{display: "flex", gap: 2}}>
             <ValidatorTextField
-                label={dict.access.steps.remote.java.mod.project.title}
+                label={dict.access.remote.java.mod.project.title}
                 validator={input => (
                     fetch(`https://api.modrinth.com/v2/project/${input}`).then(
                         res => res.ok ?
@@ -43,7 +43,7 @@ export default function ModrinthVersionSelector() {
                         if (err === 404) {
                             return {
                                 isValid: false,
-                                hint: dict.access.steps.remote.java.mod.project.hint.invalid
+                                hint: dict.access.remote.java.mod.project.hint.invalid
                             }
                         } else throw err
                     })
@@ -52,11 +52,11 @@ export default function ModrinthVersionSelector() {
                 sx={{width: 0.5}}
             />
             <FormControl sx={{width: 0.5}}>
-                <InputLabel id={"jmvs-il"}>{dict.access.steps.remote.java.mod.versionId}</InputLabel>
+                <InputLabel id={"jmvs-il"}>{dict.access.remote.java.mod.versionId}</InputLabel>
                 <Select {...{
                     name: "java.modrinthVersionId",
                     labelId: "jmvs-il",
-                    input: <OutlinedInput label={dict.access.steps.remote.java.mod.versionId}/>,
+                    input: <OutlinedInput label={dict.access.remote.java.mod.versionId}/>,
                     value: selectedVersionId,
                     onChange: ({target: {value}}, _child) => {
                         setSelectedVersionId(value)

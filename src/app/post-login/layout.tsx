@@ -56,7 +56,7 @@ export default function PostLoginLayout({children}: { children: React.ReactNode 
         const jwt = sessionStorage.getItem("jwt")
 
         // 调试时候注释掉这一行即可去除前端鉴权
-        if (!jwt || jwt === '""') router.push("/login"); else
+        // if (!jwt || jwt === '""') router.push("/login"); else
 
         setContent(
         <Box sx={{display: "flex", flexGrow: 1}}>
