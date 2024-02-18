@@ -91,11 +91,9 @@ export interface Form {
 }
 
 export interface Question {
-    root: {
-        content: string
-        hint?: string
-        required: boolean
-    }
+    content: string
+    hint?: string
+    required: boolean
     branches:
         ChoiceBranches |
         NumberBranches |
@@ -138,3 +136,38 @@ export type FormResponse = (
     string | // for open questions
     number // for number, dateFull and dateYearMonth questions
 )[]
+
+export type AccessApplyPayload = {
+    basic: {
+        name: string,
+        logoLink: string,
+        coverLink: string,
+        introduction: string
+    },
+    remote: {
+        java?: AccessApplyJavaRemoteMeta,
+        bedrock?: BedrockRemote
+    },
+    applying: {
+        policy: ApplyingPolicy,
+        form?: Form
+    }
+}
+
+type RemoteCommonMeta = {
+    address: string,
+    port: number,
+    compatibleVersions: string[],
+    coreVersion: string
+}
+
+export type AccessApplyJavaRemoteMeta = RemoteCommonMeta & {
+    auth: JavaAuthType,
+    modpackVersionId?: string
+}
+
+export type JavaAuthType = "microsoft" | "littleSkin" | "offline"
+
+export type AccessApplyBedrockRemoteMeta = RemoteCommonMeta
+
+export type ApplyingPolicy = "allOpen" | "byForm"
