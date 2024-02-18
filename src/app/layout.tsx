@@ -18,7 +18,7 @@ import {
     IconButton,
     Menu, MenuItem, ListItemIcon,
     ThemeProvider, Toolbar,
-    Typography
+    Typography, GlobalStyles
 } from '@mui/material'
 import {AccountCircleOutlined, Logout} from "@mui/icons-material";
 import {AppRouterCacheProvider} from "@mui/material-nextjs/v13-appRouter";
@@ -131,6 +131,11 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
     {/* 这种 Provider 是很常见的, 可以把一些参数 / 属性往下层层传递 */}
     <AppRouterCacheProvider options={{ enableCssLayer: true }}><ThemeProvider theme={gdtTheme}>
         <CssBaseline/>
+        <GlobalStyles styles={{
+            code: {
+                "font-family": '"JetBrains Mono Variable", "Noto Sans SC Variable", monospace, sans-serif'
+            }
+        }}/>
 
         {/* AppBar 形成了页面最上方的那一大团 */}
         <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
