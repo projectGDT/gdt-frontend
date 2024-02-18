@@ -3,14 +3,16 @@ import ValidatorTextField, {inOrder} from "@/components/validator-text-field";
 import {dict} from "@/i18n/zh-cn";
 import {Alert, Avatar, Box, Button, Collapse, Snackbar, Typography} from "@mui/material";
 import Image from "next/image";
+import {AccessApplyPayload} from "@/types";
 
 const urlRegex = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_+.~#?&\/=]*)$/
 
-export default function StepBasic({setActiveStep}: {
+export default function StepBasic({current, setActiveStep}: {
+    current: AccessApplyPayload
     setActiveStep: React.Dispatch<React.SetStateAction<number>>
 }) {
     const [nameValid, setNameValid] = useState(false)
-    const [introductionValid, setIntroductionValid] = useState(false)
+    const [introductionValid, setIntroductionValid] = useState(true)
     const [logoSrc, setLogoSrc] = useState("")
     const [logoLinkValid, setLogoLinkValid] = useState(false)
     const [coverImage, setCoverImage] = useState(<></>)
@@ -19,24 +21,26 @@ export default function StepBasic({setActiveStep}: {
 
     return <>
         <ValidatorTextField
-            name={"name"}
             label={dict.access.basic.name.title}
             validator={inOrder({
                 validator: input => input.length >= 3 && input.length <= 30,
                 hint: dict.access.basic.name.hint.invalidLength
             })}
             setValid={setNameValid}
+            onValidationPass={input => current.basic.name = input}
         />
         <Box sx={{display: "flex", gap: 2}}>
             <ValidatorTextField
-                name={"logoLink"}
                 label={dict.access.basic.logoLink.title}
                 validator={inOrder({
                     validator: input => urlRegex.test(input),
                     hint: dict.access.basic.logoLink.hint.invalid
                 })}
-                onValidationPass={setLogoSrc}
                 setValid={setLogoLinkValid}
+                onValidationPass={input => {
+                    setLogoSrc(input)
+                    current.basic.logoLink = input
+                }}
                 defaultHelperText={dict.access.basic.logoLink.hint.fallback}
                 sx={{flexGrow: 1}}
             />
@@ -47,15 +51,14 @@ export default function StepBasic({setActiveStep}: {
             }}/>
         </Box>
         <ValidatorTextField
-            name={"coverLink"}
             label={dict.access.basic.coverLink.title}
             validator={inOrder({
                 validator: input => urlRegex.test(input),
                 hint: dict.access.basic.coverLink.hint.invalid
             })}
-            onValidationPass={inputSrc => setCoverImage(
-                <Image
-                    src={inputSrc}
+            onValidationPass={input => {
+                setCoverImage(<Image
+                    src={input}
                     alt={"Cover"}
                     fill
                     style={{objectFit: "cover"}}
@@ -63,8 +66,9 @@ export default function StepBasic({setActiveStep}: {
                         console.log(event)
                         setPictureLoadingErrorOpen(true)
                     }}
-                />
-            )}
+                />)
+                current.basic.coverLink = input
+            }}
             setValid={setCoverLinkValid}
             defaultHelperText={dict.access.basic.coverLink.hint.fallback}
         />
@@ -107,6 +111,7 @@ export default function StepBasic({setActiveStep}: {
                 hint: dict.access.basic.introduction.hint.invalidLength
             })}
             setValid={setIntroductionValid}
+            onValidationPass={input => current.basic.introduction = input}
             defaultHelperText={dict.access.basic.introduction.hint.fallback}
         />
         <Box sx={{display: "flex", flexDirection: "row-reverse", gap: 2}}>

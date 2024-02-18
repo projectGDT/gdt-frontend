@@ -145,6 +145,7 @@ export const dict = {
                 }
             }
         },
+
         remote: {
             title: "远程信息",
             common: {
@@ -172,6 +173,11 @@ export const dict = {
             },
             java: {
                 supports: "支持 Java 版",
+                auth: {
+                    microsoft: "正版验证",
+                    littleSkin: "LittleSkin 外置登录",
+                    offline: "离线(盗版)"
+                },
                 mod: {
                     hint: "如果你的服务器是 Mod 服，请在 Modrinth 上创建包含所需 Mod 和资源包的 Project，并填写以下内容。",
                     project: {
@@ -189,6 +195,10 @@ export const dict = {
         },
         applying: {
             title: "申请政策",
+            policy: {
+                allOpen: "无需审核",
+                byForm: "需要填写问卷"
+            },
             design: {
                 formTitle: {
                     title: "标题",

@@ -18,7 +18,9 @@ type ProjectMeta = {
     versions: string[]
 } & any
 
-export default function ModrinthVersionSelector() {
+export default function ModrinthVersionSelector({onChange}: {
+    onChange: (value: string) => void
+}) {
     const [versions, setVersions] = useState<string[]>([])
     const [selectedVersionId, setSelectedVersionId] = useState("")
 
@@ -54,18 +56,20 @@ export default function ModrinthVersionSelector() {
             <FormControl sx={{width: 0.5}}>
                 <InputLabel id={"jmvs-il"}>{dict.access.remote.java.mod.versionId}</InputLabel>
                 <Select {...{
-                    name: "java.modrinthVersionId",
                     labelId: "jmvs-il",
                     input: <OutlinedInput label={dict.access.remote.java.mod.versionId}/>,
                     value: selectedVersionId,
                     onChange: ({target: {value}}, _child) => {
                         setSelectedVersionId(value)
+                        onChange(value)
                     },
                     MenuProps: {
-                        PaperProps: {
-                            style: {
-                                maxHeight: "20vh"
-                            },
+                        slotProps: {
+                            paper: {
+                                style: {
+                                    maxHeight: "20vh"
+                                }
+                            }
                         }
                     }
                 } as SelectProps<string>}>
@@ -78,7 +82,7 @@ export default function ModrinthVersionSelector() {
         <Collapse in={selectedVersionId !== ""}>
             {selectedVersionId === "" ?
                 <></> : // load nothing
-                <ModList versionId={selectedVersionId}/>
+                <ModList key={"modList"} versionId={selectedVersionId}/>
             }
         </Collapse>
     </Box>

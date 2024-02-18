@@ -6,7 +6,7 @@ import {
     Checkbox,
     Chip,
     Collapse,
-    Divider, FormControl,
+    Divider,
     FormControlLabel,
     FormGroup,
     IconButton,
@@ -94,31 +94,23 @@ function newOpenQuestion(): Question {
     }
 }
 
-export default function FormDesigner({onChange, setValid}: {
-    onChange: (formMeta: Form) => void,
+export default function FormDesigner({current, setValid}: {
+    current: Form
     setValid: (isValid: boolean) => void
 }) {
-    const nextKey = useRef(0);
-    const [formTitle, setFormTitle] = useState("")
-    const [preface, setPreface] = useState("")
+    const nextKey = useRef(0)
     const [formTitleValid, setFormTitleValid] = useState(false)
     const [prefaceValid, setPrefaceValid] = useState(true)
     const [questions, setQuestions] = useImmer<QuestionWrapper[]>([]);
 
     useEffect(() => {
-        const allValid =
-            formTitleValid &&
+        const isValid = formTitleValid &&
             prefaceValid &&
-            questions.length !== 0 &&
-            allTrue(questions.map(wrapper => wrapper.isValid));
-        setValid(allValid);
-        if (allValid)
-            onChange({
-                title: formTitle,
-                preface,
-                questions: questions.map(entry => entry.question)
-            });
-    }, [formTitle, formTitleValid, onChange, preface, prefaceValid, questions, setValid]);
+            questions.length > 0 &&
+            allTrue(questions.map(wrapper => wrapper.isValid))
+        setValid(isValid)
+        if (isValid) current.questions = questions.map(wrapper => wrapper.question)
+    }, [current, formTitleValid, prefaceValid, questions, setValid]);
 
     return <Box sx={{display: "flex", flexDirection: "column"}}>
         <Box sx={{display: "flex", flexDirection: "column", gap: 2, marginBottom: 1}}>
@@ -129,7 +121,9 @@ export default function FormDesigner({onChange, setValid}: {
                     hint: dict.access.applying.design.formTitle.hint.invalidLength
                 })}
                 setValid={setFormTitleValid}
-                onValidationPass={setFormTitle}
+                onValidationPass={input => {
+                    current.title = input
+                }}
             />
             <ValidatorTextField
                 multiline
@@ -140,7 +134,9 @@ export default function FormDesigner({onChange, setValid}: {
                     hint: dict.access.applying.design.preface.hint.invalidLength
                 })}
                 setValid={setPrefaceValid}
-                onValidationPass={setPreface}
+                onValidationPass={input => {
+                    current.preface = input
+                }}
             />
         </Box>
         <Divider/>
@@ -242,11 +238,10 @@ function QuestionDesigner({type, setValid}: {
     const [branchesValid, setBranchesValid] = useState(
         type !== "choice" // type 是 choice（选择题）的时候初始不合法，因为不能没有选项
     );
-    const allValid = contentValid && hintValid && branchesValid
 
-    function updateOuterValid() {
-        setValid(allValid)
-    }
+    useEffect(() => {
+        setValid(contentValid && hintValid && branchesValid)
+    }, [contentValid, hintValid, branchesValid, setValid]);
 
     return <Box sx={{display: "flex", flexDirection: "column", gap: 2, marginBottom: 1}}>
         <ValidatorTextField
@@ -258,7 +253,6 @@ function QuestionDesigner({type, setValid}: {
             })}
             setValid={value => {
                 setContentValid(value)
-                updateOuterValid()
             }}
             onValidationPass={input => setQuestions(draft => {
                 draft[index].question.content = input
@@ -273,7 +267,6 @@ function QuestionDesigner({type, setValid}: {
             })}
             setValid={value => {
                 setHintValid(value)
-                updateOuterValid()
             }}
             onValidationPass={input => setQuestions(draft => {
                 draft[index].question.hint = input
@@ -283,7 +276,6 @@ function QuestionDesigner({type, setValid}: {
             key={`question${key}.choiceDesigner`}
             setValid={value => {
                 setBranchesValid(value)
-                updateOuterValid()
             }}
         /> : <></>}
         {type === "open" ? <OpenSubDesigner
@@ -308,17 +300,16 @@ function ChoiceSubDesigner({setValid}: {
 
     const [choices, setChoices] = useImmer<ChoiceWrapper[]>([])
     const [allowMultipleChoices, setAllowMultipleChoices] = useState(false)
-    const isValid = choices.length !== 0 && allTrue(choices.map(entry => entry.isValid))
 
-    function updateOuterValid() {
-        setValid(isValid)
-    }
+    useEffect(() => {
+        setValid(choices.length > 0 && allTrue(choices.map(entry => entry.isValid)))
+    }, [choices, setValid]);
 
-    function updateOuterChoices() {
+    useEffect(() => {
         setQuestions(draft => {
             (draft[index].question.branches as Draft<ChoiceBranches>).choices = choices.map(entry => entry.choice)
         })
-    }
+    }, [choices, index, setQuestions]);
 
     return <>
         <TransitionGroup>
@@ -338,13 +329,11 @@ function ChoiceSubDesigner({setValid}: {
                             setChoices(draft => {
                                 draft[index].isValid = value
                             })
-                            updateOuterValid()
                         }}
                         onValidationPass={input => {
                             setChoices(draft => {
                                 draft[index].choice = input
                             })
-                            updateOuterChoices()
                         }}
                         sx={{flexGrow: 1}}
                     />

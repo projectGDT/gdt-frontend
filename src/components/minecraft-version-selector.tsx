@@ -7,7 +7,9 @@ type CommonVersionSelectorProps = {
     fetchVersions: () => Promise<string[]>,
     compatibleVersionsInputName: string,
     coreVersionInputName: string,
-    setCompatibleVersionsValid: Dispatch<SetStateAction<boolean>>
+    setValid: Dispatch<SetStateAction<boolean>>,
+    onCompatibleVersionsChange: (value: string[]) => void,
+    onCoreVersionChange: (value: string) => void
 }
 
 export default function MinecraftVersionSelector(props: CommonVersionSelectorProps) {
@@ -27,11 +29,13 @@ export default function MinecraftVersionSelector(props: CommonVersionSelectorPro
                 id={"cpv-il"}
                 color={error ? "error" : (success ? "success" : undefined)}
                 focused={error || success}
+                // 这里会产生一个 Warning: Received `false` for a non-boolean attribute `focused`.
+                // 没找到怎么解决，对显示也没有影响，先放在这吧
             >{dict.access.remote.common.compatibleVersions.title}</InputLabel>
             <Select {...{
                 name: props.compatibleVersionsInputName,
                 error: error,
-                focused: error || success,
+                focused: (error || success),
                 multiple: true,
                 labelId: "cpv-il",
                 input: <OutlinedInput
@@ -40,13 +44,18 @@ export default function MinecraftVersionSelector(props: CommonVersionSelectorPro
                 />,
                 value: selectedVersions,
                 onChange: ({target: {value}}, _child) => {
-                    const err = value.length === 0
-                    setError(err)
-                    setSuccess(!err)
-                    props.setCompatibleVersionsValid(!err)
-                    const valueAsArray = (typeof value === "string" ? [value] : value).sort(versionComparator)
-                    setSelectedVersions(valueAsArray)
-                    setSelectedCoreVersion(valueAsArray[0] ?? "")
+                    const isValid = value.length !== 0
+                    setError(!isValid)
+                    setSuccess(isValid)
+                    props.setValid(isValid)
+
+                    if (isValid) {
+                        const valueAsArray = (typeof value === "string" ? [value] : value).sort(versionComparator)
+                        setSelectedVersions(valueAsArray)
+                        props.onCompatibleVersionsChange(valueAsArray)
+                        setSelectedCoreVersion(valueAsArray[0])
+                        props.onCoreVersionChange(valueAsArray[0])
+                    }
                 },
                 renderValue: selected => <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5}}>
                     {selected.map((version) => (
@@ -77,6 +86,7 @@ export default function MinecraftVersionSelector(props: CommonVersionSelectorPro
                 value: selectedCoreVersion,
                 onChange: ({target: {value}}, _child) => {
                     setSelectedCoreVersion(value)
+                    props.onCoreVersionChange(value)
                 },
                 MenuProps: {
                     slotProps: {
