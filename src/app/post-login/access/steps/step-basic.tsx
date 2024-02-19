@@ -1,9 +1,11 @@
-import React, {useState} from "react";
+import React, {Fragment, useState} from "react";
 import ValidatorTextField, {inOrder} from "@/components/validator-text-field";
 import {dict} from "@/i18n/zh-cn";
-import {Alert, Avatar, Box, Button, Collapse, Snackbar, Typography} from "@mui/material";
+import {Alert, Avatar, Box, Button, Collapse, Paper, Snackbar, Typography} from "@mui/material";
 import Image from "next/image";
 import {AccessApplyPayload} from "@/types";
+import Markdown from "markdown-to-jsx";
+import MarkdownCustom from "@/components/markdown-custom";
 
 const urlRegex = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_+.~#?&\/=]*)$/
 
@@ -18,6 +20,7 @@ export default function StepBasic({current, setActiveStep}: {
     const [coverImage, setCoverImage] = useState(<></>)
     const [coverLinkValid, setCoverLinkValid] = useState(false)
     const [pictureLoadingErrorOpen, setPictureLoadingErrorOpen] = useState(false)
+    const [introductionRawText, setIntroductionRawText] = useState("")
 
     return <>
         <ValidatorTextField
@@ -93,27 +96,47 @@ export default function StepBasic({current, setActiveStep}: {
                 {dict.access.basic.coverLink.preview.hint}
             </Typography>
         </Collapse>
-        <ValidatorTextField
-            multiline
-            rows={10}
-            label={dict.access.basic.introduction.title}
-            InputProps={{
-                sx: {
-                    fontFamily: [
-                        '"JetBrains Mono Variable"',
-                        '"Noto Sans SC Variable"',
-                        'Monospace'
-                    ]
-                }
-            }}
-            validator={inOrder({
-                validator: input => input.length <= 3000,
-                hint: dict.access.basic.introduction.hint.invalidLength
-            })}
-            setValid={setIntroductionValid}
-            onValidationPass={input => current.basic.introduction = input}
-            defaultHelperText={dict.access.basic.introduction.hint.fallback}
-        />
+        <Box sx={{display: "flex", gap: 2, alignItems: "start"}}>
+            <ValidatorTextField
+                multiline
+                rows={25}
+                label={dict.access.basic.introduction.title}
+                frequency={"onChange"}
+                InputProps={{
+                    sx: {
+                        fontFamily: [
+                            '"JetBrains Mono Variable"',
+                            '"Noto Sans SC Variable"',
+                            'Monospace'
+                        ]
+                    }
+                }}
+                validator={inOrder({
+                    validator: input => input.length <= 3000,
+                    hint: dict.access.basic.introduction.hint.invalidLength
+                })}
+                setValid={setIntroductionValid}
+                onValidationPass={input => {
+                    setIntroductionRawText(input)
+                    current.basic.introduction = input
+                }}
+                defaultHelperText={dict.access.basic.introduction.hint.fallback}
+                sx={{width: 0.5}}
+            />
+            <Paper sx={{
+                width: 0.5,
+                overflow: "auto",
+                height: 608, // 与文本框相同,
+                paddingX: 2,
+                paddingY: 1
+            }}>
+                <Typography sx={{width: "100%"}}>
+                    <MarkdownCustom>
+                        {introductionRawText}
+                    </MarkdownCustom>
+                </Typography>
+            </Paper>
+        </Box>
         <Box sx={{display: "flex", flexDirection: "row-reverse", gap: 2}}>
             <Button
                 variant={"contained"}

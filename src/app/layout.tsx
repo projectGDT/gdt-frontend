@@ -18,7 +18,7 @@ import {
     IconButton,
     Menu, MenuItem, ListItemIcon,
     ThemeProvider, Toolbar,
-    Typography, GlobalStyles
+    Typography, GlobalStyles, darken
 } from '@mui/material'
 import {AccountCircleOutlined, Logout} from "@mui/icons-material";
 import {AppRouterCacheProvider} from "@mui/material-nextjs/v13-appRouter";
@@ -133,7 +133,24 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
         <CssBaseline/>
         <GlobalStyles styles={{
             code: {
-                "font-family": '"JetBrains Mono Variable", "Noto Sans SC Variable", monospace, sans-serif'
+                fontFamily: '"JetBrains Mono Variable", "Noto Sans SC Variable", monospace, sans-serif',
+                backgroundColor: darken(gdtTheme.palette.background.default, 0.07),
+                borderRadius: '0.25rem',
+                padding: '0.25rem 0.5rem'
+            },
+            pre: {
+                backgroundColor: darken(gdtTheme.palette.background.default, 0.07),
+                borderRadius: '0.25rem',
+                padding: '0.25rem 0.5rem'
+            },
+            "pre > code": {
+                borderRadius: '0',
+                padding: '0'
+            },
+            blockquote: {
+                margin: 0,
+                backgroundColor: darken(gdtTheme.palette.background.default, 0.07),
+                padding: '0.25rem 0.5rem'
             }
         }}/>
 
