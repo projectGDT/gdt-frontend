@@ -18,13 +18,14 @@ import {
     IconButton,
     Menu, MenuItem, ListItemIcon,
     ThemeProvider, Toolbar,
-    Typography, GlobalStyles, darken
+    Typography, GlobalStyles, darken, Drawer, Divider
 } from '@mui/material'
-import {AccountCircleOutlined, Logout} from "@mui/icons-material";
+import {AccountCircleOutlined, HelpOutline, Logout, NavigateBefore} from "@mui/icons-material";
 import {AppRouterCacheProvider} from "@mui/material-nextjs/v13-appRouter";
 import {useSessionStorage} from "usehooks-ts";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
+import MarkdownCustom from "@/components/markdown-custom";
 
 // 指定一些主题颜色
 const gdtTheme = createTheme({
@@ -123,7 +124,25 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
     const [jwt, _setJWT] = useSessionStorage("jwt", "")
     const [accountWidget, setAccountWidget] = useState(<></>)
 
+    const pathName = usePathname()
+    const [showDocumentWidget, setShowDocumentWidget] = useState(false)
+    const [showDocument, setShowDocument] = useState(false)
+    const [documentMdText, setDocumentMdText] = useState("")
+
     useEffect(() => {setAccountWidget(AccountWidget(jwt, router));}, [jwt, router]);
+
+    useEffect(() => {
+        fetch(`/docs${pathName}.md`)
+            .then(res => {
+                if (res.status === 404) return Promise.reject("not-found")
+                return res.text()
+            })
+            .then(text => {
+                setDocumentMdText(text)
+                setShowDocumentWidget(true)
+            })
+            .catch(_err => setShowDocumentWidget(false))
+    }, [pathName]);
 
     return <html lang="zh">
     <head><title>projectGDT</title></head>
@@ -156,12 +175,32 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
 
         {/* AppBar 形成了页面最上方的那一大团 */}
         <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-            <Toolbar>
+            <Toolbar disableGutters sx={{paddingX: 2}}>
                 <Avatar src="/logo.svg" sx={{ width: 40, height: 40 }} variant={"square"}/>
                 <Typography variant={"h6"} sx={{paddingX: 1, flexGrow: 1}}>projectGDT</Typography>
+                {showDocumentWidget ? <IconButton color={"inherit"} onClick={() => setShowDocument(true)}>
+                    <HelpOutline/>
+                </IconButton> : <></>}
                 {accountWidget}
             </Toolbar>
         </AppBar>
+
+        <Drawer
+            open={showDocument}
+            anchor={"right"}
+            onClose={() => setShowDocument(false)}
+            sx={{ zIndex: (theme) => theme.zIndex.drawer + 2 }}
+        >
+            <Toolbar disableGutters sx={{paddingX: 1}}>
+                <IconButton onClick={() => setShowDocument(false)}>
+                    <NavigateBefore/>
+                </IconButton>
+                <Typography>{dict.docs.title}</Typography>
+            </Toolbar>
+            <Divider/>
+            <Box padding={2}><MarkdownCustom>{documentMdText}</MarkdownCustom></Box>
+        </Drawer>
+
         <Box sx={{display: "flex", height: "100vh", backgroundColor: "background.default", flexDirection: "column", alignItems: "stretch"}}>
             <Toolbar/>
             {children}

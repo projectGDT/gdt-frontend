@@ -4,7 +4,6 @@ import {dict} from "@/i18n/zh-cn";
 import {Alert, Avatar, Box, Button, Collapse, Paper, Snackbar, Typography} from "@mui/material";
 import Image from "next/image";
 import {AccessApplyPayload} from "@/types";
-import Markdown from "markdown-to-jsx";
 import MarkdownCustom from "@/components/markdown-custom";
 
 const urlRegex = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_+.~#?&\/=]*)$/

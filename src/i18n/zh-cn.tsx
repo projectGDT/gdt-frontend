@@ -325,5 +325,8 @@ export const dict = {
         pcl2Subscription: {
             title: "PCL2 订阅"
         }
+    },
+    docs: {
+        title: "页面文档"
     }
 }
