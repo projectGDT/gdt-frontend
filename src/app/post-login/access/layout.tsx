@@ -8,7 +8,7 @@ export default function AccessLayout({children}: { children: React.ReactNode }) 
         display: "flex",
         flexDirection: "column",
         alignItems: "stretch",
-        paddingX: "20%",
+        paddingX: 1,
         flexGrow: 1
     }}>
         <Box sx={{

@@ -3,7 +3,6 @@
 import {
   Avatar,
     Box, Button, CardContent, Checkbox, Chip, CircularProgress, Divider, FormControlLabel, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper, Typography,
-    darken,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import {useSessionStorage} from "usehooks-ts";
@@ -12,9 +11,9 @@ import {dict} from "@/i18n/zh-cn"
 import { BedrockRemote, JavaRemote, PlayerInfo, WholeServer } from "@/types";
 import { GET, backendAddress } from "@/utils";
 import ModList from "@/components/mod-list";
-import { MuiMarkdown, getOverrides } from "mui-markdown";
 import Image from "next/image";
 import {useSearchParams} from "next/navigation";
+import MarkdownCustom from "@/components/markdown-custom";
 
 const ApplyingPolicy = {
     CLOSED: "CLOSED",
@@ -162,7 +161,7 @@ export default function Page() {
             .finally(() => {
                 setRefreshing(false); // 最后把刷新状态设为 false
             })
-    }, [])
+    }, [serverId])
 
     // 玩家列表 playerInfo
     const [playerInfo, setPlayerInfo] = useState<PlayerInfo[]>([]);
@@ -185,7 +184,7 @@ export default function Page() {
             .finally(() =>{
                 setLoadingPlayers(false);
             })
-    }, [server])
+    }, [server, serverId])
     
     // 为 player 排序
     useEffect(
@@ -209,7 +208,7 @@ export default function Page() {
                 )
                 setPlayerInfo(tmpArray);
             }
-        }, [rawPlayerInfo]);
+        }, [rawPlayerInfo, server.ownerId]);
 
     return !refreshing ? (
         <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
@@ -234,20 +233,7 @@ export default function Page() {
                         </Paper>
                         <Paper>
                             <Box sx={{display: "flex", padding: 1}}>
-                                <MuiMarkdown
-                                    overrides={{
-                                        ...getOverrides(),
-                                        code: {
-                                            props: {
-                                                style: {
-                                                    fontFamily: '"JetBrains Mono Variable"',
-                                                    backgroundColor: darken('#f9f9f9', 0.07),
-                                                    borderRadius: '0.25rem',
-                                                    padding: '0.25rem, 0.5rem',
-                                                },
-                                            } as React.HTMLProps<HTMLParagraphElement>,
-                                        }
-                                    }}>{server.introduction}</MuiMarkdown>
+                                <MarkdownCustom>{server.introduction}</MarkdownCustom>
                             </Box>
                         </Paper>
                     </Box>

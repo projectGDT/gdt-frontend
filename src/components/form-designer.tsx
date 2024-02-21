@@ -211,6 +211,7 @@ export default function FormDesigner({current, setValid}: {
                 const newQuestion = provider()
                 return <Button
                     key={index}
+                    disabled={questions.length >= 20}
                     onClick={() => setQuestions(draft => {
                         draft.push({
                             key: nextKey.current++,
@@ -380,6 +381,7 @@ function ChoiceSubDesigner({setValid}: {
                 />
             </FormGroup>
             <IconButton
+                disabled={choices.length >= 10}
                 onClick={() => setChoices(draft => {
                     draft.push({
                         key: nextKey.current++,
