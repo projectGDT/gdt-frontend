@@ -5,7 +5,12 @@ export default function MarkdownCustom({children}: {children: string}) {
     return <Markdown options={{
         disableParsingRawHTML: true,
         overrides: {
-            a: Link
+            a: {
+                component: Link,
+                props: {
+                    target: "_blank"
+                }
+            }
         }
     }}>{children}</Markdown>
 }

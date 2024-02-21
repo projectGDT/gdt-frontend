@@ -12,7 +12,7 @@
 
 ### Mod 服信息——`Project ID/Slug` 和 `Version ID`
 
-Modrinth 是一个大型的 Java 版国际版 Mod、资源包和整合包发布网站。
+[Modrinth](https://modrinth.com/) 是一个大型的 Java 版国际版 Mod、资源包和整合包发布网站。
 
 将你的 Mod 服务器整合包所需文件托管在 Modrinth 上（创建一个 Project，添加 Dependencies 并等待审核通过），在申请页面中填入你的 Project ID 或 Slug，页面会自动加载 Project 的各个 Version ID。选择合适的 Version ID，页面会显示该 Version 中包含的各个 Mod。
 

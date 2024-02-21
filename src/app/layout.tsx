@@ -18,9 +18,9 @@ import {
     IconButton,
     Menu, MenuItem, ListItemIcon,
     ThemeProvider, Toolbar,
-    Typography, GlobalStyles, darken, Drawer, Divider
+    Typography, GlobalStyles, darken, Drawer
 } from '@mui/material'
-import {AccountCircleOutlined, HelpOutline, Logout, NavigateBefore} from "@mui/icons-material";
+import {AccountCircleOutlined, HelpOutline, Logout} from "@mui/icons-material";
 import {AppRouterCacheProvider} from "@mui/material-nextjs/v13-appRouter";
 import {useSessionStorage} from "usehooks-ts";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
@@ -155,7 +155,8 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
                 fontFamily: '"JetBrains Mono Variable", "Noto Sans SC Variable", monospace, sans-serif',
                 backgroundColor: darken(gdtTheme.palette.background.default, 0.07),
                 borderRadius: '0.25rem',
-                padding: '0.25rem 0.5rem'
+                padding: '0.25rem 0.5rem',
+                margin: '0 0.25rem'
             },
             pre: {
                 backgroundColor: darken(gdtTheme.palette.background.default, 0.07),
@@ -178,7 +179,7 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
             <Toolbar disableGutters sx={{paddingX: 2}}>
                 <Avatar src="/logo.svg" sx={{ width: 40, height: 40 }} variant={"square"}/>
                 <Typography variant={"h6"} sx={{paddingX: 1, flexGrow: 1}}>projectGDT</Typography>
-                {showDocumentWidget ? <IconButton color={"inherit"} onClick={() => setShowDocument(true)}>
+                {showDocumentWidget ? <IconButton color={"inherit"} onClick={() => setShowDocument(prev => !prev)}>
                     <HelpOutline/>
                 </IconButton> : <></>}
                 {accountWidget}
@@ -189,16 +190,10 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
             open={showDocument}
             anchor={"right"}
             onClose={() => setShowDocument(false)}
-            sx={{ zIndex: (theme) => theme.zIndex.drawer + 2 }}
+            sx={{ zIndex: (theme) => theme.zIndex.drawer }}
         >
-            <Toolbar disableGutters sx={{paddingX: 1}}>
-                <IconButton onClick={() => setShowDocument(false)}>
-                    <NavigateBefore/>
-                </IconButton>
-                <Typography>{dict.docs.title}</Typography>
-            </Toolbar>
-            <Divider/>
-            <Box padding={2}><MarkdownCustom>{documentMdText}</MarkdownCustom></Box>
+            <Toolbar/>
+            <Box padding={2} width={"40vw"}><MarkdownCustom>{documentMdText}</MarkdownCustom></Box>
         </Drawer>
 
         <Box sx={{display: "flex", height: "100vh", backgroundColor: "background.default", flexDirection: "column", alignItems: "stretch"}}>
