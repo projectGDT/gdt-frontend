@@ -303,15 +303,18 @@ export const dict = {
                     complete: "...没有 Step 2！已经完成啦！",
                     fail: {
                         internalError: "服务器出现了内部错误。请检查你的微软账号是否拥有 Minecraft。",
-                        timeout: "操作超时。",
-                        alreadyExists: "该 Profile 已经被其他人（也可能是你自己！）绑定。"
+                        timeout: "操作超时。"
                     }
                 },
                 xbox: {
                     title: "基岩版（Xbox）Profile 绑定",
                     complete: "绑定完成！",
                     fail: {
-                        internalError: "服务器出现了内部错误。请检查你的微软账号年龄是否超过 18 岁，以及你的家庭组设置。",
+                        internalError: "服务器出现了内部错误。请检查你的微软账号年龄是否超过 18 岁，以及你的家庭组设置。"
+                    }
+                },
+                common: {
+                    fail: {
                         alreadyExists: "该 Profile 已经被其他人（也可能是你自己！）绑定。"
                     }
                 },

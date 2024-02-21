@@ -50,7 +50,7 @@ export default function Page() {
             }).catch(errMsg => {
                 switch (errMsg) {
                     case "already-exists": {
-                        setErrMsg(dict.settings.profile.bind.xbox.fail.alreadyExists)
+                        setErrMsg(dict.settings.profile.bind.common.fail.alreadyExists)
                         break
                     }
                     case "internal-error": {

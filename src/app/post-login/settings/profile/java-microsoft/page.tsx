@@ -87,7 +87,7 @@ export default function Page() {
             socket.once("already-exists", () => {
                 setLoading(false)
                 setErrorOpen(true)
-                setErrMsg(dict.settings.profile.bind.javaMicrosoft.fail.alreadyExists)
+                setErrMsg(dict.settings.profile.bind.common.fail.alreadyExists)
             })
         }}>{dict.settings.profile.bind.submit}</Button>
 
