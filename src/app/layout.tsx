@@ -58,6 +58,7 @@ const gdtTheme = createTheme({
 // 登录后账户头像处菜单
 function AccountMenu(props: {router: AppRouterInstance}) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const pathName = usePathname()
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
@@ -71,7 +72,7 @@ function AccountMenu(props: {router: AppRouterInstance}) {
         // 清空jwt，返回登录页面
         window.sessionStorage.setItem('jwt', '');
         setAnchorEl(null);
-        props.router.push("/login");
+        props.router.push(`/login?postLogin=${pathName}`);
         window.location.reload();
     };
 

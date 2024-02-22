@@ -10,7 +10,7 @@ import {
     LinkOutlined, ManageAccountsOutlined
 } from "@mui/icons-material";
 import {dict} from "@/i18n/zh-cn";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 
 // 侧边栏导航按钮的基本信息, 通过 map 方法转换成按钮
 const navigation = [
@@ -48,6 +48,7 @@ const navigation = [
 
 export default function PostLoginLayout({children}: { children: React.ReactNode }) {
     const router = useRouter()
+    const pathName = usePathname()
 
     const [content, setContent] = useState(<></>)
 
@@ -56,7 +57,7 @@ export default function PostLoginLayout({children}: { children: React.ReactNode 
         const jwt = sessionStorage.getItem("jwt")
 
         // 调试时候注释掉这一行即可去除前端鉴权
-        if (!jwt || jwt === '""') router.push("/login"); else
+        if (!jwt || jwt === '""') router.push(`/login?postLogin=${pathName}`); else
 
         setContent(
         <Box sx={{display: "flex", flexGrow: 1}}>
@@ -100,7 +101,7 @@ export default function PostLoginLayout({children}: { children: React.ReactNode 
             </Box>
         </Box>
         )
-    }, [children, router]);
+    }, [children, pathName, router]);
 
     return content
 }
