@@ -64,7 +64,7 @@ export const dict = {
             confirm: "确认",
             fail: {
                 title: "注册失败",
-                invalidPayload: "注册信息有误，请重试。",
+                invalidPayload: "注册信息有误，请检查你的邀请码以及其他信息是否正确。",
                 timeout: "操作超时。"
             }
         },
