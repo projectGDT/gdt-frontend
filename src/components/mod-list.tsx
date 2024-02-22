@@ -126,7 +126,7 @@ export default function ModList({versionId, pageSize}: { versionId: string, page
                         <ListItemText
                             primary={item.name ? item.name : item.file_name}
                             primaryTypographyProps={{fontSize: 16, fontWeight: "bold"}}
-                            secondary={item.version_number ? item.version_number : `${dict.serverid.modList[0]}`}
+                            secondary={item.version_number ? item.version_number : `${dict.server.modList[0]}`}
                             secondaryTypographyProps={{fontSize: 14}}
                         />
                     </ListItemButton>

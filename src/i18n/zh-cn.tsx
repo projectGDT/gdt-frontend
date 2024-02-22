@@ -90,7 +90,7 @@ export const dict = {
         subtitle: ["我加入的", "发现"],
         cardButtons: ["设置", "管理"],
     },
-    serverid: {
+    server: {
         headerButtons: ["登入", "设置", "申请", "加入"],
         cardTitle: ["状态", "Java 版", "基岩版", "玩家列表"],
         cardSubtitle: ["核心版本", "兼容版本"],
