@@ -149,8 +149,6 @@ export default function StepRemote({current, setActiveStep}: {
                             .map(({id}) => id)
                         )
                     }
-                    compatibleVersionsInputName={"java.compatibleVersions"}
-                    coreVersionInputName={"java.coreVersion"}
                     setValid={setJavaCompatibleVersionsValid}
                     onCompatibleVersionsChange={value => {
                         cachedJavaRef.current.compatibleVersions = value
@@ -242,8 +240,6 @@ export default function StepRemote({current, setActiveStep}: {
                                 .map(str => str.slice(0, str.lastIndexOf(".")))
                             )
                         }
-                        compatibleVersionsInputName={"bedrock.compatibleVersions"}
-                        coreVersionInputName={"bedrock.coreVersion"}
                         setValid={setBedrockCompatibleVersionsValid}
                         onCompatibleVersionsChange={value => {
                             cachedBedrockRef.current.compatibleVersions = value

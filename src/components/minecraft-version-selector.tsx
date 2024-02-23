@@ -5,8 +5,6 @@ import {dict} from "@/i18n/zh-cn";
 
 type CommonVersionSelectorProps = {
     fetchVersions: () => Promise<string[]>,
-    compatibleVersionsInputName: string,
-    coreVersionInputName: string,
     setValid: Dispatch<SetStateAction<boolean>>,
     onCompatibleVersionsChange: (value: string[]) => void,
     onCoreVersionChange: (value: string) => void
@@ -33,7 +31,6 @@ export default function MinecraftVersionSelector(props: CommonVersionSelectorPro
                 // 没找到怎么解决，对显示也没有影响，先放在这吧
             >{dict.access.remote.common.compatibleVersions.title}</InputLabel>
             <Select {...{
-                name: props.compatibleVersionsInputName,
                 error: error,
                 focused: (error || success),
                 multiple: true,
@@ -80,7 +77,6 @@ export default function MinecraftVersionSelector(props: CommonVersionSelectorPro
         <FormControl sx={{width: 0.5}}>
             <InputLabel id={"crv-il"}>{dict.access.remote.common.coreVersion}</InputLabel>
             <Select {...{
-                name: props.coreVersionInputName,
                 labelId: "crv-il",
                 input: <OutlinedInput label={dict.access.remote.common.coreVersion}/>,
                 value: selectedCoreVersion,
