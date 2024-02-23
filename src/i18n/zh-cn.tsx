@@ -1,4 +1,5 @@
 export const dict = {
+    navigation: "导航",
     portal: {
         title: "门户页面",
     },
