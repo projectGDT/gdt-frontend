@@ -200,6 +200,13 @@ export const dict = {
                 byForm: "需要填写问卷"
             },
             design: {
+                common: {
+                    required: "必填",
+                    up: "上移",
+                    down: "下移",
+                    add: "添加",
+                    delete: "删除"
+                },
                 formTitle: {
                     title: "标题",
                     hint: {

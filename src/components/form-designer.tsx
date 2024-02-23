@@ -9,11 +9,11 @@ import {
     Divider,
     FormControlLabel,
     FormGroup,
-    IconButton,
+    IconButton, ListItem, ListItemButton,
     ListItemText,
     Radio,
     SvgIcon,
-    Switch
+    Switch, Tooltip
 } from "@mui/material";
 import ValidatorTextField, {inOrder} from "@/components/validator-text-field";
 import {dict} from "@/i18n/zh-cn";
@@ -22,8 +22,6 @@ import {
     ArrowDownwardOutlined,
     ArrowUpwardOutlined,
     Delete,
-    UnfoldLessOutlined,
-    UnfoldMoreOutlined
 } from "@mui/icons-material";
 import {Updater, useImmer} from 'use-immer';
 import {TransitionGroup} from "react-transition-group";
@@ -144,45 +142,56 @@ export default function FormDesigner({current, setValid}: {
             <TransitionGroup>
                 {questions.map(({key, question, detailsExpanded}, index) => <Collapse key={key}>
                     <Box sx={{display: "flex", flexDirection: "column"}}>
-                        <Box sx={{display: "flex", alignItems: "center", gap: 0.5, marginY: 1}}>
-                            <IconButton onClick={() => setQuestions(draft => {
+                        <ListItem
+                            disablePadding
+                            secondaryAction={<>
+                                <Chip label={toDisplayText(question.branches.type)}/>
+                                <Tooltip title={dict.access.applying.design.common.required}>
+                                    <IconButton onClick={() => setQuestions(draft => {
+                                        draft[index].question.required = !draft[index].question.required
+                                    })}>
+                                        <SvgIcon color={question.required ? "error" : "inherit"}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                                <path fill="currentColor"
+                                                      d="M11 21v-6.6l-4.65 4.675l-1.425-1.425L9.6 13H3v-2h6.6L4.925 6.35L6.35 4.925L11 9.6V3h2v6.6l4.65-4.675l1.425 1.425L14.4 11H21v2h-6.6l4.675 4.65l-1.425 1.425L13 14.4V21z"/>
+                                            </svg>
+                                        </SvgIcon>
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title={dict.access.applying.design.common.up}>
+                                    <IconButton
+                                        disabled={index === 0}
+                                        onClick={() => setQuestions(draft => {
+                                            [draft[index], draft[index - 1]] = [draft[index - 1], draft[index]]
+                                        })}
+                                    ><ArrowUpwardOutlined/></IconButton>
+                                </Tooltip>
+                                <Tooltip title={dict.access.applying.design.common.down}>
+                                    <IconButton
+                                        disabled={index === questions.length - 1}
+                                        onClick={() => setQuestions(draft => {
+                                            [draft[index], draft[index + 1]] = [draft[index + 1], draft[index]]
+                                        })}
+                                    ><ArrowDownwardOutlined/></IconButton>
+                                </Tooltip>
+                                <Tooltip title={dict.access.applying.design.common.delete}>
+                                    <IconButton
+                                        onClick={() => setQuestions(draft => {
+                                            draft.splice(index, 1)
+                                        })}
+                                    ><Delete/></IconButton>
+                                </Tooltip>
+                            </>}
+                        >
+                            <ListItemButton onClick={() => setQuestions(draft => {
                                 draft[index].detailsExpanded = !draft[index].detailsExpanded
                             })}>
-                                {detailsExpanded ? <UnfoldLessOutlined/> : <UnfoldMoreOutlined/>}
-                            </IconButton>
-                            <ListItemText
-                                primary={<><b>{index + 1}. </b>{question.content}</>}
-                                secondary={question.hint ?? ""}
-                            />
-                            <Chip label={toDisplayText(question.branches.type)}/>
-                            <IconButton onClick={() => setQuestions(draft => {
-                                draft[index].question.required = !draft[index].question.required
-                            })}>
-                                <SvgIcon color={question.required ? "error" : "inherit"}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                        <path fill="currentColor"
-                                              d="M11 21v-6.6l-4.65 4.675l-1.425-1.425L9.6 13H3v-2h6.6L4.925 6.35L6.35 4.925L11 9.6V3h2v6.6l4.65-4.675l1.425 1.425L14.4 11H21v2h-6.6l4.675 4.65l-1.425 1.425L13 14.4V21z"/>
-                                    </svg>
-                                </SvgIcon>
-                            </IconButton>
-                            <IconButton
-                                disabled={index === 0}
-                                onClick={() => setQuestions(draft => {
-                                    [draft[index], draft[index - 1]] = [draft[index - 1], draft[index]]
-                                })}
-                            ><ArrowUpwardOutlined/></IconButton>
-                            <IconButton
-                                disabled={index === questions.length - 1}
-                                onClick={() => setQuestions(draft => {
-                                    [draft[index], draft[index + 1]] = [draft[index + 1], draft[index]]
-                                })}
-                            ><ArrowDownwardOutlined/></IconButton>
-                            <IconButton
-                                onClick={() => setQuestions(draft => {
-                                    draft.splice(index, 1)
-                                })}
-                            ><Delete/></IconButton>
-                        </Box>
+                                <ListItemText
+                                    primary={<><b>{index + 1}. </b>{question.content}</>}
+                                    secondary={question.hint ?? ""}
+                                />
+                            </ListItemButton>
+                        </ListItem>
                         <Collapse in={detailsExpanded}>
                             <QuestionIndexContext.Provider value={index}>
                             <QuestionKeyContext.Provider value={key}>
@@ -244,7 +253,7 @@ function QuestionDesigner({type, setValid}: {
         setValid(contentValid && hintValid && branchesValid)
     }, [contentValid, hintValid, branchesValid, setValid]);
 
-    return <Box sx={{display: "flex", flexDirection: "column", gap: 2, marginBottom: 1}}>
+    return <Box sx={{display: "flex", flexDirection: "column", gap: 2, marginY: 1}}>
         <ValidatorTextField
             label={dict.access.applying.design.question.content.title}
             frequency={"onChange"}
@@ -338,23 +347,29 @@ function ChoiceSubDesigner({setValid}: {
                         }}
                         sx={{flexGrow: 1}}
                     />
-                    <IconButton
-                        disabled={index === 0}
-                        onClick={() => setChoices(draft => {
-                            [draft[index], draft[index - 1]] = [draft[index - 1], draft[index]]
-                        })}
-                    ><ArrowUpwardOutlined/></IconButton>
-                    <IconButton
-                        disabled={index === choices.length - 1}
-                        onClick={() => setChoices(draft => {
-                            [draft[index], draft[index + 1]] = [draft[index + 1], draft[index]]
-                        })}
-                    ><ArrowDownwardOutlined/></IconButton>
-                    <IconButton
-                        onClick={() => setChoices(draft => {
-                            draft.splice(index, 1)
-                        })}
-                    ><Delete/></IconButton>
+                    <Tooltip title={dict.access.applying.design.common.up}>
+                        <IconButton
+                            disabled={index === 0}
+                            onClick={() => setChoices(draft => {
+                                [draft[index], draft[index - 1]] = [draft[index - 1], draft[index]]
+                            })}
+                        ><ArrowUpwardOutlined/></IconButton>
+                    </Tooltip>
+                    <Tooltip title={dict.access.applying.design.common.down}>
+                        <IconButton
+                            disabled={index === choices.length - 1}
+                            onClick={() => setChoices(draft => {
+                                [draft[index], draft[index + 1]] = [draft[index + 1], draft[index]]
+                            })}
+                        ><ArrowDownwardOutlined/></IconButton>
+                    </Tooltip>
+                    <Tooltip title={dict.access.applying.design.common.delete}>
+                        <IconButton
+                            onClick={() => setChoices(draft => {
+                                draft.splice(index, 1)
+                            })}
+                        ><Delete/></IconButton>
+                    </Tooltip>
                 </Box>
             </Collapse>)}
         </TransitionGroup>
@@ -363,7 +378,7 @@ function ChoiceSubDesigner({setValid}: {
                 <FormControlLabel
                     control={<Switch
                         onChange={(_event, checked) => {
-                            setAllowMultipleChoices(true)
+                            setAllowMultipleChoices(checked)
                             setQuestions(draft => {
                                 (draft[index].question.branches as Draft<ChoiceBranches>).allowMultipleChoices = checked
                             })
@@ -380,16 +395,18 @@ function ChoiceSubDesigner({setValid}: {
                     label={dict.access.applying.design.question.branches.choice.hasBlank}
                 />
             </FormGroup>
-            <IconButton
-                disabled={choices.length >= 10}
-                onClick={() => setChoices(draft => {
-                    draft.push({
-                        key: nextKey.current++,
-                        choice: "",
-                        isValid: false
-                    })
-                })}
-            ><AddOutlined/></IconButton>
+            <Tooltip title={dict.access.applying.design.common.add}>
+                <IconButton
+                    disabled={choices.length >= 10}
+                    onClick={() => setChoices(draft => {
+                        draft.push({
+                            key: nextKey.current++,
+                            choice: "",
+                            isValid: false
+                        })
+                    })}
+                ><AddOutlined/></IconButton>
+            </Tooltip>
         </Box>
     </>
 }
