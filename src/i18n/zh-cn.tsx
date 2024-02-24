@@ -92,6 +92,7 @@ export const dict = {
         cardButtons: ["设置", "管理"],
     },
     server: {
+        title: "服务器信息",
         headerButtons: ["登入", "设置", "申请", "加入"],
         cardTitle: ["状态", "Java 版", "基岩版", "玩家列表"],
         cardSubtitle: ["核心版本", "兼容版本"],
