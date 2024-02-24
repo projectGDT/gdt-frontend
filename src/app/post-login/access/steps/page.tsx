@@ -1,7 +1,7 @@
 "use client"
 
 import React, {Fragment, useRef, useState} from "react";
-import {Box, Button, Collapse, Paper, Step, StepLabel, Stepper} from "@mui/material";
+import {Box, Button, Collapse, Paper, Step, StepLabel, Stepper, Typography} from "@mui/material";
 import {dict} from "@/i18n/zh-cn";
 import StepBasic from "@/app/post-login/access/steps/step-basic";
 import StepRemote from "@/app/post-login/access/steps/step-remote";
@@ -9,6 +9,7 @@ import StepApplying from "@/app/post-login/access/steps/step-applying";
 import {AccessApplyPayload} from "@/types";
 import {useRouter} from "next/navigation";
 import {backendAddress, POST} from "@/utils";
+import AccessPayloadReviewer from "@/components/access-payload-reviewer";
 
 export default function Page() {
     const router = useRouter()
@@ -49,6 +50,8 @@ export default function Page() {
                 <StepRemote key={"remote"} current={payloadRef.current} setActiveStep={setActiveStep}/>,
                 <StepApplying key={"applying"} current={payloadRef.current} setActiveStep={setActiveStep}/>,
                 <Fragment key={"complete"}>
+                    <Typography>{dict.access.finalConfirm}</Typography>
+                    <AccessPayloadReviewer {...payloadRef.current}/>
                     <Box sx={{display: "flex", justifyContent: "space-between"}}>
                         <Button variant={"outlined"} onClick={() => setActiveStep(step => step - 1)}>
                             {dict.access.previous}

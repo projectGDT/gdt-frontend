@@ -266,6 +266,7 @@ export const dict = {
         },
         next: "下一步",
         previous: "上一步",
+        finalConfirm: "以下是你将要提交的信息预览，请再次确认。确认后，点击“完成”提交。",
         complete: "完成"
     },
 

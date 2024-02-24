@@ -434,7 +434,7 @@ function allTrue(booleans: boolean[]) {
     return true;
 }
 
-function toDisplayText(typeName: "choice" | "number" | "dateFull" | "dateYearMonth" | "open") {
+export function toDisplayText(typeName: "choice" | "number" | "dateFull" | "dateYearMonth" | "open") {
     switch (typeName) {
         case "choice": return dict.access.applying.design.question.branches.choice.name;
         case "number": return dict.access.applying.design.question.branches.number.name;
