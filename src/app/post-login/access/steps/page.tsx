@@ -55,7 +55,7 @@ export default function Page() {
                         </Button>
                         <Button variant={"contained"} disabled={submitClicked} onClick={() => {
                             setSubmitClicked(true)
-                            fetch(`${backendAddress}/post-login/access/apply`, POST(
+                            fetch(`${backendAddress}/post-login/access/submit`, POST(
                                 payloadRef.current
                             )).then(_res => {
                                 router.push(".")
