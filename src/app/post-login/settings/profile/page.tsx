@@ -22,8 +22,7 @@ import {dict} from "@/i18n/zh-cn";
 import React, {useEffect, useState} from "react";
 import {backendAddress, GET, POST} from "@/utils";
 import {DeleteOutlineOutlined} from "@mui/icons-material";
-import {JavaMsProfileButton} from "@/components/profile-display/java-ms-profile-button";
-import {XboxProfileButton} from "@/components/profile-display/xbox-profile-button";
+import ProfileDisplayButton from "@/components/profile-display-button";
 
 type Profile = {
     uniqueIdProvider: number,
@@ -70,7 +69,7 @@ export default function Page() {
                           secondaryAction={<IconButton onClick={() => setJavaDeleteOpen(true)}>
                               <DeleteOutlineOutlined/>
                           </IconButton>}>
-                    <JavaMsProfileButton uuid={javaMsProfile.uniqueId} playerName={javaMsProfile.cachedPlayerName}/>
+                    <ProfileDisplayButton {...javaMsProfile}/>
                 </ListItem>
             ) : (
                 <ListItem secondaryAction={<Button href={"profile/java-microsoft"}>
@@ -105,7 +104,7 @@ export default function Page() {
                           secondaryAction={<IconButton onClick={() => setXboxDeleteOpen(true)}>
                               <DeleteOutlineOutlined/>
                           </IconButton>}>
-                    <XboxProfileButton xuid={xboxProfile.uniqueId} gtg={xboxProfile.cachedPlayerName}/>
+                    <ProfileDisplayButton {...xboxProfile}/>
                 </ListItem>
             ) : (
                 <ListItem disablePadding secondaryAction={<Button

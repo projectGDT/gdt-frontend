@@ -43,7 +43,7 @@ export interface WholeServer {
     applyingPolicy: string;
 }
 
-interface Profile {
+export interface Profile {
     uniqueIdProvider: number;
     uniqueId: string;
     cachedPlayerName: string;
@@ -84,6 +84,7 @@ export interface BedrockRemote {
     coreVersion: string;
     compatibleVersions: string[];
 }
+
 export interface Form {
     title: string
     preface: string

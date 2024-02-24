@@ -15,7 +15,7 @@ import {
 import {dict} from "@/i18n/zh-cn";
 import {io} from "socket.io-client";
 import {backendAddress} from "@/utils";
-import {JavaMsProfileButton} from "@/components/profile-display/java-ms-profile-button";
+import ProfileDisplayButton from "@/components/profile-display-button";
 
 export default function Page() {
     const [jwt, _setJwt] = useSessionStorage("jwt", "")
@@ -110,7 +110,7 @@ export default function Page() {
             <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
                 <Paper elevation={2} sx={{padding: 1.5}}>
                     <Typography variant={"h6"}>{dict.settings.profile.bind.javaMicrosoft.complete}</Typography>
-                    <JavaMsProfileButton uuid={uuid} playerName={playerName}/>
+                    <ProfileDisplayButton uniqueIdProvider={-1} uniqueId={uuid} cachedPlayerName={playerName}/>
                 </Paper>
                 <Button sx={{alignSelf: "center"}} href={"."}>
                     {dict.settings.profile.bind.goBack}
