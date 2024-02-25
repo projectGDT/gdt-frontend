@@ -1,4 +1,9 @@
 export const dict = {
+    common: {
+        confirm: "确定进行操作？",
+        ok: "确定",
+        cancel: "取消"
+    },
     navigation: "导航",
     portal: {
         title: "门户页面",
@@ -111,7 +116,7 @@ export const dict = {
         license: "",
         confirm: "是的，我已满18岁",
         go: "开始申请",
-
+        steps: "填写信息",
         basic: {
             title: "基本信息",
             name: {
@@ -147,7 +152,6 @@ export const dict = {
                 }
             }
         },
-
         remote: {
             title: "远程信息",
             common: {
@@ -269,7 +273,6 @@ export const dict = {
         finalConfirm: "以下是你将要提交的信息预览，请再次确认。确认后，点击“完成”提交。",
         complete: "完成"
     },
-
     settings: {
         title: "个人设置",
 
@@ -295,13 +298,7 @@ export const dict = {
                 fallback: "要增删和管理离线 Profile，请进入对应的服务器页面。",
                 secondary: (serverId: number) => `服务器 ID #${serverId}`
             },
-
-            onDelete: {
-                content: "解绑此 Profile？",
-                confirm: "确认",
-                cancel: "取消"
-            },
-
+            onDelete: "解绑此 Profile？",
             bind: {
                 submit: "开始绑定",
                 javaMicrosoft: {

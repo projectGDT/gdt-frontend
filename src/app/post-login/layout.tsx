@@ -73,6 +73,7 @@ const breadcrumbsMapping = (() => {
     const map = new Map<string, string>()
 
     map.set("access", dict.access.title)
+        map.set("steps", dict.access.steps)
     map.set("list", dict.list.title)
     map.set("manage", dict.manage.title)
     map.set("server", dict.server.title)

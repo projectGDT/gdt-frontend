@@ -2,10 +2,6 @@
 
 import {
     Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
     Divider,
     IconButton,
     Link,
@@ -23,6 +19,7 @@ import React, {useEffect, useState} from "react";
 import {backendAddress, GET, POST} from "@/utils";
 import {DeleteOutlineOutlined} from "@mui/icons-material";
 import ProfileDisplayButton from "@/components/profile-display-button";
+import {useConfirm} from "material-ui-confirm";
 
 type Profile = {
     uniqueIdProvider: number,
@@ -33,13 +30,12 @@ type Profile = {
 const xboxOauthUri = "https://login.live.com/oauth20_authorize.srf?client_id=9e474b67-edcd-4d23-b2fc-6dc8db5e08f7&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fpost-login%2Fsettings%2Fprofile%2Fxbox&response_type=code&scope=XboxLive.signin"
 
 export default function Page() {
+    const confirm = useConfirm()
+
     const [loading, setLoading] = useState(true)
     const [javaMsProfile, setJavaMsProfile] = useState<Profile>()
     const [xboxProfile, setXboxProfile] = useState<Profile>()
     const [offlineProfiles, setOfflineProfiles] = useState<Profile[]>([])
-
-    const [javaDeleteOpen, setJavaDeleteOpen] = useState(false)
-    const [xboxDeleteOpen, setXboxDeleteOpen] = useState(false)
 
     const [userModifyFlag, setUserModifyFlag] = useState(0)
 
@@ -66,7 +62,15 @@ export default function Page() {
             {javaMsProfile ? (
                 <ListItem disablePadding
                           key={javaMsProfile.uniqueIdProvider}
-                          secondaryAction={<IconButton onClick={() => setJavaDeleteOpen(true)}>
+                          secondaryAction={<IconButton onClick={() => confirm({
+                              description: dict.settings.profile.onDelete,
+                          }).then(() => {
+                              setLoading(true) // 因为内容发生改变，所以先“掩人耳目”
+                              fetch(`${backendAddress}/post-login/profile/delete`, POST({
+                                  uniqueIdProvider: -1
+                              })).then(_response => setUserModifyFlag(prev => prev + 1))
+                              // 这会让 useEffect 重新执行一遍
+                          })}>
                               <DeleteOutlineOutlined/>
                           </IconButton>}>
                     <ProfileDisplayButton {...javaMsProfile}/>
@@ -78,22 +82,6 @@ export default function Page() {
                     <ListItemText secondary={dict.settings.profile.javaMicrosoft.fallback}/>
                 </ListItem>
             )}
-            <Dialog open={javaDeleteOpen} onClose={() => setJavaDeleteOpen(false)}>
-                <DialogContent>
-                    <DialogContentText>{dict.settings.profile.onDelete.content}</DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setJavaDeleteOpen(false)}>{dict.settings.profile.onDelete.cancel}</Button>
-                    <Button onClick={() => {
-                        setLoading(true) // 因为内容发生改变，所以先“掩人耳目”
-                        setJavaDeleteOpen(false)
-                        fetch(`${backendAddress}/post-login/profile/delete`, POST({
-                            uniqueIdProvider: -1
-                        })).then(_response => setUserModifyFlag(prev => prev + 1))
-                        // 这会让 useEffect 重新执行一遍
-                    }}>{dict.settings.profile.onDelete.confirm}</Button>
-                </DialogActions>
-            </Dialog>
 
             <Divider/>
 
@@ -101,7 +89,14 @@ export default function Page() {
             {xboxProfile ? (
                 <ListItem disablePadding
                           key={xboxProfile.uniqueIdProvider}
-                          secondaryAction={<IconButton onClick={() => setXboxDeleteOpen(true)}>
+                          secondaryAction={<IconButton onClick={() => confirm({
+                              description: dict.settings.profile.onDelete,
+                          }).then(() => {
+                              setLoading(true)
+                              fetch(`${backendAddress}/post-login/profile/delete`, POST({
+                                  uniqueIdProvider: -3
+                              })).then(_response => setUserModifyFlag(prev => prev + 1))
+                          })}>
                               <DeleteOutlineOutlined/>
                           </IconButton>}>
                     <ProfileDisplayButton {...xboxProfile}/>
@@ -115,21 +110,6 @@ export default function Page() {
                     </ListItemButton>
                 </ListItem>
             )}
-            <Dialog open={xboxDeleteOpen} onClose={() => setXboxDeleteOpen(false)}>
-                <DialogContent>
-                    <DialogContentText>{dict.settings.profile.onDelete.content}</DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setXboxDeleteOpen(false)}>{dict.settings.profile.onDelete.cancel}</Button>
-                    <Button onClick={() => {
-                        setLoading(true)
-                        setXboxDeleteOpen(false)
-                        fetch(`${backendAddress}/post-login/profile/delete`, POST({
-                            uniqueIdProvider: -3
-                        })).then(_response => setUserModifyFlag(prev => prev + 1))
-                    }}>{dict.settings.profile.onDelete.confirm}</Button>
-                </DialogActions>
-            </Dialog>
 
             <Divider/>
 

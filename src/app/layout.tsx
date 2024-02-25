@@ -26,6 +26,7 @@ import {useSessionStorage} from "usehooks-ts";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {usePathname, useRouter} from "next/navigation";
 import MarkdownCustom from "@/components/markdown-custom";
+import {ConfirmProvider} from "material-ui-confirm";
 
 // 指定一些主题颜色
 const gdtTheme = createTheme({
@@ -149,7 +150,13 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
     <head><title>projectGDT</title></head>
     <body>
     {/* 这种 Provider 是很常见的, 可以把一些参数 / 属性往下层层传递 */}
-    <AppRouterCacheProvider options={{ enableCssLayer: true }}><ThemeProvider theme={gdtTheme}>
+    <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+    <ThemeProvider theme={gdtTheme}>
+    <ConfirmProvider defaultOptions={{
+        title: dict.common.confirm,
+        confirmationText: dict.common.ok,
+        cancellationText: dict.common.cancel
+    }}>
         <CssBaseline/>
         <GlobalStyles styles={{
             code: {
@@ -201,7 +208,9 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
             <Toolbar/>
             {children}
         </Box>
-    </ThemeProvider></AppRouterCacheProvider>
+    </ConfirmProvider>
+    </ThemeProvider>
+    </AppRouterCacheProvider>
     </body>
     </html>
 }
