@@ -12,21 +12,29 @@ import '@fontsource/inter/700.css';
 import React, {useEffect, useState} from "react"
 import {
     AppBar,
-    Avatar,
-    Box, Button,
-    createTheme, CssBaseline,
+    Avatar, Badge,
+    Box,
+    Button,
+    createTheme,
+    CssBaseline,
+    darken,
+    Drawer,
+    GlobalStyles,
     IconButton,
-    Menu, MenuItem, ListItemIcon,
-    ThemeProvider, Toolbar,
-    Typography, GlobalStyles, darken, Drawer
+    ListItemIcon, ListItemText,
+    Menu,
+    MenuItem, NoSsr,
+    ThemeProvider,
+    Toolbar,
+    Typography
 } from '@mui/material'
-import {AccountCircleOutlined, HelpOutline, Logout} from "@mui/icons-material";
+import {AccountCircleOutlined, HelpOutline, Logout, MailOutline} from "@mui/icons-material";
 import {AppRouterCacheProvider} from "@mui/material-nextjs/v13-appRouter";
 import {useSessionStorage} from "usehooks-ts";
-import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {usePathname, useRouter} from "next/navigation";
 import MarkdownCustom from "@/components/markdown-custom";
 import {ConfirmProvider} from "material-ui-confirm";
+import {backendAddress, GET} from "@/utils";
 
 // 指定一些主题颜色
 const gdtTheme = createTheme({
@@ -57,81 +65,79 @@ const gdtTheme = createTheme({
 })
 
 // 登录后账户头像处菜单
-function AccountMenu(props: {router: AppRouterInstance}) {
+function AccountMenu() {
+    const router = useRouter()
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const pathName = usePathname()
     const open = Boolean(anchorEl);
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-    }
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
 
-    // 注销
-    const handleLogoutClick = () => {
-        // 清空jwt，返回登录页面
-        window.sessionStorage.setItem('jwt', '');
-        setAnchorEl(null);
-        props.router.push(`/login?postLogin=${pathName}`);
-        window.location.reload();
-    };
+    const [jwt, setJWT] = useSessionStorage("jwt", "")
 
-    return (
-        <div>
-            <IconButton
-                size="large"
-                aria-controls="menu-appbar"
-                aria-haspopup={true}
-                color="inherit"
-                onClick={handleClick}
-            ><AccountCircleOutlined /></IconButton>
-            <Menu
-                anchorEl={anchorEl}
-                id="account-menu"
-                open={open}
-                onClose={handleClose}
-                onClick={handleClose}
-            >
-                <MenuItem onClick={handleLogoutClick}>
-                    <ListItemIcon>
-                        <Logout fontSize="small" />
-                    </ListItemIcon>
-                    {dict.logout.title}
-                </MenuItem>
-            </Menu>
-        </div>
-    )
-}
+    const [unreadCount, setUnreadCount] = useState(0)
 
-function AccountWidget(jwt: string, router: AppRouterInstance) {
-    // 未登录
-    if (!jwt) {
-        return (
-            <Button size={"large"} variant={"text"} color={"inherit"} onClick={() => router.push("/login")}>
-                {dict.login.title}
-            </Button>
-        );
-    }
-    // 已登录
-    return <AccountMenu router={router}></AccountMenu>
+    useEffect(() => {
+        fetch(`${backendAddress}/post-login/me/unread-messages`, GET())
+            .then(res => res.json())
+            .then(({count}) => setUnreadCount(count))
+    }, []);
+
+    return !jwt ? <Button size={"large"} variant={"text"} color={"inherit"} href={"login"}>
+        {dict.login.title}
+    </Button> : <div>
+        <IconButton
+            size="large"
+            aria-controls="menu-appbar"
+            aria-haspopup={true}
+            color="inherit"
+            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                setAnchorEl(event.currentTarget);
+            }}
+        >
+            <Badge badgeContent={unreadCount} color={"secondary"} overlap={"circular"}>
+                <AccountCircleOutlined/>
+            </Badge>
+        </IconButton>
+        <Menu
+            anchorEl={anchorEl}
+            id="account-menu"
+            open={open}
+            onClose={() => {
+                setAnchorEl(null);
+            }}
+            onClick={() => {
+                setAnchorEl(null);
+            }}
+        >
+            <MenuItem onClick={() => {
+                router.push("/message")
+            }}>
+                <ListItemIcon>
+                    <MailOutline fontSize={"small"}/>
+                </ListItemIcon>
+                <ListItemText>
+                    {dict.messages.unread} ({unreadCount})
+                </ListItemText>
+            </MenuItem>
+            <MenuItem onClick={() => {
+                // 清空jwt，返回登录页面
+                setJWT("");
+                router.push(`/login?postLogin=${pathName}`);
+            }}>
+                <ListItemIcon>
+                    <Logout fontSize="small"/>
+                </ListItemIcon>
+                {dict.logout.title}
+            </MenuItem>
+        </Menu>
+    </div>
 }
 
 // RootLayout, 所有 UI 的根本框架 (布局), 具体的用户界面在 children 参数中传递, 嵌套在根本框架中
 export default function RootLayout({children}: { children: React.ReactNode }) {
-    const router = useRouter();
-
-    // sessionStorage, 浏览器原生特性, 能储存一些全局变量
-    // usehooks-ts 提供的特性, 能在 Next 中安全地使用 sessionStorage (否则编译会报错, 虽然不影响正常使用)
-    const [jwt, _setJWT] = useSessionStorage("jwt", "")
-    const [accountWidget, setAccountWidget] = useState(<></>)
-
     const pathName = usePathname()
     const [showDocumentWidget, setShowDocumentWidget] = useState(false)
     const [showDocument, setShowDocument] = useState(false)
     const [documentMdText, setDocumentMdText] = useState("")
-
-    useEffect(() => {setAccountWidget(AccountWidget(jwt, router));}, [jwt, router]);
 
     useEffect(() => {
         fetch(`/docs${pathName}.md`)
@@ -190,7 +196,9 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
                 {showDocumentWidget ? <IconButton color={"inherit"} onClick={() => setShowDocument(prev => !prev)}>
                     <HelpOutline/>
                 </IconButton> : <></>}
-                {accountWidget}
+                <NoSsr>
+                    <AccountMenu/>
+                </NoSsr>
             </Toolbar>
         </AppBar>
 
