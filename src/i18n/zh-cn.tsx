@@ -10,7 +10,6 @@ export const dict = {
     },
     login: {
         title: "登录",
-
         username: {
             title: "QQ 号 / 用户名",
             error: {
@@ -24,7 +23,6 @@ export const dict = {
             }
         },
         submit: "登录",
-
         fail: {
             title: "登录失败",
 
@@ -38,7 +36,6 @@ export const dict = {
     },
     register: {
         title: "注册",
-
         submit: {
             label: "提交",
             qid: {
@@ -158,7 +155,7 @@ export const dict = {
                 address: {
                     title: "服务器地址",
                     hint: {
-                        fallback: "域名或 IP",
+                        fallback: "域名或 IPv4 地址",
                         invalid: "服务器地址格式不正确"
                     }
                 },
@@ -275,11 +272,9 @@ export const dict = {
     },
     settings: {
         title: "个人设置",
-
         profile: {
             title: "Profile 管理",
             secondary: "Minecraft 账户的绑定与解绑",
-
             doBind: "绑定",
             javaMicrosoft: {
                 title: "Java 版正版 Profile",
@@ -331,7 +326,6 @@ export const dict = {
     },
     tools: {
         title: "实用工具",
-
         pcl2Subscription: {
             title: "PCL2 订阅"
         }
