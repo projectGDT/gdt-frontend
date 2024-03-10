@@ -1,10 +1,15 @@
 export const dict = {
+    common: {
+        confirm: "确定进行操作？",
+        ok: "确定",
+        cancel: "取消"
+    },
+    navigation: "导航",
     portal: {
         title: "门户页面",
     },
     login: {
         title: "登录",
-
         username: {
             title: "QQ 号 / 用户名",
             error: {
@@ -18,7 +23,6 @@ export const dict = {
             }
         },
         submit: "登录",
-
         fail: {
             title: "登录失败",
 
@@ -32,7 +36,6 @@ export const dict = {
     },
     register: {
         title: "注册",
-
         submit: {
             label: "提交",
             qid: {
@@ -64,7 +67,7 @@ export const dict = {
             confirm: "确认",
             fail: {
                 title: "注册失败",
-                invalidPayload: "注册信息有误，请重试。",
+                invalidPayload: "注册信息有误，请检查你的邀请码以及其他信息是否正确。",
                 timeout: "操作超时。"
             }
         },
@@ -90,7 +93,8 @@ export const dict = {
         subtitle: ["我加入的", "发现"],
         cardButtons: ["设置", "管理"],
     },
-    serverid: {
+    server: {
+        title: "服务器信息",
         headerButtons: ["登入", "设置", "申请", "加入"],
         cardTitle: ["状态", "Java 版", "基岩版", "玩家列表"],
         cardSubtitle: ["核心版本", "兼容版本"],
@@ -109,7 +113,7 @@ export const dict = {
         license: "",
         confirm: "是的，我已满18岁",
         go: "开始申请",
-
+        steps: "填写信息",
         basic: {
             title: "基本信息",
             name: {
@@ -145,14 +149,13 @@ export const dict = {
                 }
             }
         },
-
         remote: {
             title: "远程信息",
             common: {
                 address: {
                     title: "服务器地址",
                     hint: {
-                        fallback: "域名或 IP",
+                        fallback: "域名或 IPv4 地址",
                         invalid: "服务器地址格式不正确"
                     }
                 },
@@ -200,6 +203,13 @@ export const dict = {
                 byForm: "需要填写问卷"
             },
             design: {
+                common: {
+                    required: "必填",
+                    up: "上移",
+                    down: "下移",
+                    add: "添加",
+                    delete: "删除"
+                },
                 formTitle: {
                     title: "标题",
                     hint: {
@@ -257,16 +267,14 @@ export const dict = {
         },
         next: "下一步",
         previous: "上一步",
+        finalConfirm: "以下是你将要提交的信息预览，请再次确认。确认后，点击“完成”提交。",
         complete: "完成"
     },
-
     settings: {
         title: "个人设置",
-
         profile: {
             title: "Profile 管理",
             secondary: "Minecraft 账户的绑定与解绑",
-
             doBind: "绑定",
             javaMicrosoft: {
                 title: "Java 版正版 Profile",
@@ -285,13 +293,7 @@ export const dict = {
                 fallback: "要增删和管理离线 Profile，请进入对应的服务器页面。",
                 secondary: (serverId: number) => `服务器 ID #${serverId}`
             },
-
-            onDelete: {
-                content: "解绑此 Profile？",
-                confirm: "确认",
-                cancel: "取消"
-            },
-
+            onDelete: "解绑此 Profile？",
             bind: {
                 submit: "开始绑定",
                 javaMicrosoft: {
@@ -324,7 +326,6 @@ export const dict = {
     },
     tools: {
         title: "实用工具",
-
         pcl2Subscription: {
             title: "PCL2 订阅"
         }

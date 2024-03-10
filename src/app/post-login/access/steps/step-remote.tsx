@@ -16,7 +16,7 @@ import ModrinthVersionSelector from "@/components/modrinth-version-selector";
 
 import {AccessApplyPayload, AccessApplyBedrockRemoteMeta, AccessApplyJavaRemoteMeta, JavaAuthType} from "@/types";
 
-const domainRegex = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$/
+const domainOrIPv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)+([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$/
 const portRegex = /^((6553[0-5])|(655[0-2][0-9])|(65[0-4][0-9]{2})|(6[0-4][0-9]{3})|([1-5][0-9]{4})|([0-5]{0,5})|([0-9]{1,4}))$/
 
 type JEVersion = {
@@ -111,7 +111,7 @@ export default function StepRemote({current, setActiveStep}: {
                         name={"java.address"}
                         label={dict.access.remote.common.address.title}
                         validator={inOrder({
-                            validator: input => domainRegex.test(input),
+                            validator: input => domainOrIPv4Regex.test(input),
                             hint: dict.access.remote.common.address.hint.invalid
                         })}
                         setValid={setJavaAddressValid}
@@ -149,8 +149,6 @@ export default function StepRemote({current, setActiveStep}: {
                             .map(({id}) => id)
                         )
                     }
-                    compatibleVersionsInputName={"java.compatibleVersions"}
-                    coreVersionInputName={"java.coreVersion"}
                     setValid={setJavaCompatibleVersionsValid}
                     onCompatibleVersionsChange={value => {
                         cachedJavaRef.current.compatibleVersions = value
@@ -198,7 +196,7 @@ export default function StepRemote({current, setActiveStep}: {
                         name={"bedrock.address"}
                         label={dict.access.remote.common.address.title}
                         validator={inOrder({
-                            validator: input => domainRegex.test(input),
+                            validator: input => domainOrIPv4Regex.test(input),
                             hint: dict.access.remote.common.address.hint.invalid
                         })}
                         setValid={setBedrockAddressValid}
@@ -242,8 +240,6 @@ export default function StepRemote({current, setActiveStep}: {
                                 .map(str => str.slice(0, str.lastIndexOf(".")))
                             )
                         }
-                        compatibleVersionsInputName={"bedrock.compatibleVersions"}
-                        coreVersionInputName={"bedrock.coreVersion"}
                         setValid={setBedrockCompatibleVersionsValid}
                         onCompatibleVersionsChange={value => {
                             cachedBedrockRef.current.compatibleVersions = value

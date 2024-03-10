@@ -6,7 +6,7 @@ import {dict} from "@/i18n/zh-cn";
 import {useSearchParams} from "next/navigation";
 import {backendAddress, POST} from "@/utils";
 
-import {XboxProfileButton} from "@/components/profile-display/xbox-profile-button";
+import ProfileDisplayButton from "@/components/profile-display-button";
 
 export default function Page() {
     const params = useSearchParams()
@@ -70,7 +70,7 @@ export default function Page() {
             <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
                 <Paper elevation={2} sx={{padding: 1.5}}>
                     <Typography variant={"h6"}>{dict.settings.profile.bind.xbox.complete}</Typography>
-                    <XboxProfileButton xuid={xuid} gtg={xboxGamerTag}/>
+                    <ProfileDisplayButton uniqueIdProvider={-3} uniqueId={xuid} cachedPlayerName={xboxGamerTag}/>
                 </Paper>
                 <Button sx={{alignSelf: "center"}} href={"."}>
                     {dict.settings.profile.bind.goBack}

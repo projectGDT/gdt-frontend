@@ -6,19 +6,11 @@ import React from "react";
 export default function AccessLayout({children}: { children: React.ReactNode }) {
     return <Box sx={{
         display: "flex",
-        flexDirection: "column",
-        alignItems: "stretch",
-        paddingX: 1,
+        alignItems: "center",
         flexGrow: 1
     }}>
-        <Box sx={{
-            display: "flex",
-            alignItems: "center",
-            flexGrow: 1
-        }}>
-            <Box sx={{flexGrow: 1}}>
-                {children}
-            </Box>
+        <Box sx={{flexGrow: 1}}>
+            {children}
         </Box>
     </Box>
 }

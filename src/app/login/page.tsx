@@ -8,11 +8,11 @@ import {
     Typography
 } from "@mui/material";
 import React, {useRef, useState} from "react";
-import {useRouter} from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
 import {useSessionStorage} from "usehooks-ts";
 
 // cf验证码的轮子
-import { Turnstile } from "@marsidev/react-turnstile";
+import {Turnstile, TurnstileInstance} from "@marsidev/react-turnstile";
 
 import {dict} from "@/i18n/zh-cn"
 
@@ -23,6 +23,7 @@ import ValidatorTextField, {inOrder} from "@/components/validator-text-field";
 // 这一块的内容会套在 /src/app/layout.jsx 定义的东西里面
 export default function Page() {
     const router = useRouter()
+    const postLoginPath = useSearchParams().get("postLogin") ?? "/post-login/list"
     const formRef = useRef()
 
     const [incorrectCredentialsOpen, setIncorrectCredentialsOpen] = useState(false)
@@ -35,12 +36,16 @@ export default function Page() {
     const [notClicked, setNotClicked] = useState(true);
 
     const [_jwt, setJWT] = useSessionStorage("jwt", "");
+    const turnstileRef = useRef<TurnstileInstance>(null)
 
     return <>
         <Snackbar
             open={incorrectCredentialsOpen}
             autoHideDuration={5000}
-            onClose={() => {setIncorrectCredentialsOpen(false)}}
+            onClose={() => {
+                setIncorrectCredentialsOpen(false)
+                setNotClicked(true)
+            }}
             key={"ic"}
         >
             <Alert severity={"error"} variant={"filled"}>{dict.login.fail.incorrectCredentials}</Alert>
@@ -85,6 +90,7 @@ export default function Page() {
                 onSuccess={_token => setTurnstilePassed(true)}
                 onError={() => setTurnstilePassed(false)}
                 onExpire={() => setTurnstilePassed(false)}
+                ref={turnstileRef}
             />
 
             <Box sx={{display: "flex", flexDirection: "row"}}>
@@ -109,19 +115,17 @@ export default function Page() {
                             else throw "incorrect-credentials"
                         }).then(({jwt}) => {
                             setJWT(jwt)
-                            router.push("/post-login/list")
+                            router.push(postLoginPath)
                         }).catch(err => {
-                            setTimeout(() => {setNotClicked(true);}, 5000);
-                            if (err === "incorrect-credentials")
+                            if (err === "incorrect-credentials") {
                                 setIncorrectCredentialsOpen(true)
+                                turnstileRef.current!.reset()
+                            }
                             else throw err
                         })
                     }}
                 >{dict.login.submit}</Button>
-                <Button
-                    href="#text-buttons"
-                    onClick={() => {router.push("/register")}}
-                >{dict.register.title}</Button>
+                <Button href="/register">{dict.register.title}</Button>
             </Box>
         </Box>
     </>
