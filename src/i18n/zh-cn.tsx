@@ -286,7 +286,8 @@ export const dict = {
             },
             xbox: {
                 title: "基岩版 Profile",
-                fallback: "你还没有绑定基岩版 Profile！"
+                fallback: "你还没有绑定基岩版 Profile！",
+                onClick: "绑定基岩版 Profile 将把你重定向到 login.live.com (Microsoft) 下的页面，请在页面完成操作。"
             },
             offline: {
                 title: "离线 Profile",

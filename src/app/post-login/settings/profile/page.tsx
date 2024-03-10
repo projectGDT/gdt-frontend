@@ -112,7 +112,12 @@ export default function Page() {
                     </ListItem>
                 ) : (
                     <ListItem disablePadding secondaryAction={<Button
-                        href={xboxOauthUri}
+                        onClick={() => confirm({
+                            description: dict.settings.profile.xbox.onClick,
+                            confirmationButtonProps: {
+                                href: xboxOauthUri
+                            }
+                        })}
                     >{dict.settings.profile.doBind}</Button>}>
                         <ListItemButton>
                             <ListItemText secondary={dict.settings.profile.xbox.fallback}/>
