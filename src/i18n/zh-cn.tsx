@@ -4,6 +4,9 @@ export const dict = {
         ok: "确定",
         cancel: "取消"
     },
+    messages: {
+        unread: "未读消息"
+    },
     navigation: "导航",
     portal: {
         title: "门户页面",

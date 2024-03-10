@@ -75,12 +75,6 @@ function AccountMenu() {
 
     const [unreadCount, setUnreadCount] = useState(0)
 
-    useEffect(() => {
-        fetch(`${backendAddress}/post-login/me/unread-messages`, GET())
-            .then(res => res.json())
-            .then(({count}) => setUnreadCount(count))
-    }, []);
-
     return !jwt ? <Button size={"large"} variant={"text"} color={"inherit"} href={"login"}>
         {dict.login.title}
     </Button> : <div>
